@@ -1,6 +1,7 @@
 /** @jsxImportSource solid-js */
 
 import Accesories from "../ui/Accesories";
+import halfBody from "../../../assets/half-body.png";
 
 const PhotoSection = () => {
     return (
@@ -14,7 +15,7 @@ const PhotoSection = () => {
                 <Accesories assetNumber={5} />
                 
                 {/* Image Section */}
-                <img src="/assets/half-body.png" class="z-2 relative w-3/4 max-w-xs md:max-w-sm lg:max-w-md mx-auto block" alt="Foto Profil" />
+                <img src={halfBody.src} class="z-2 relative w-3/4 max-w-xs md:max-w-sm lg:max-w-md mx-auto block" alt="Foto Profil" />
             </div>
         </div>
     )

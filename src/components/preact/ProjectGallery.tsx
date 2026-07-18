@@ -1,4 +1,6 @@
 import { useState } from 'preact/hooks';
+import roboTradeImg from "../../assets/projects/robo-trade.png";
+import webPortofolioImg from "../../assets/projects/web-portofolio.png";
 
 interface Project {
   id: number;
@@ -16,7 +18,7 @@ const projects: Project[] = [
     id: 1,
     title: "Valtara Trade System",
     description: "Trading platform with real-time market data and portfolio management.",
-    image: "assets/projects/robo-trade.png",
+    image: roboTradeImg.src,
     category: "System",
     technologies: ["MQL5", "Python"],
     demoUrl: "#",
@@ -26,7 +28,7 @@ const projects: Project[] = [
     id: 2,
     title: "Portfolio Website",
     description: "Modern portfolio website showcasing multiple frontend frameworks.",
-    image: "assets/projects/web-portofolio.png",
+    image: webPortofolioImg.src,
     category: "Fullstack",
     technologies: ["Astro", "React", "Vue", "Svelte", "Tailwind"],
     demoUrl: "#",

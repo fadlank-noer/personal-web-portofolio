@@ -1,8 +1,11 @@
+---
+import logo from "../../assets/logo.png";
+---
 <nav class="z-50 border-b shadow-md bg-(--primary-color) sticky top-0 backdrop-blur-sm" x-data="{ open: false }">
     <div class="px-4 md:px-10 h-16 md:h-20 flex items-center justify-between">
         <!-- Logo -->
         <img 
-            src="/assets/logo.png" 
+            src={logo.src} 
             alt="Fadlan Portfolio Logo" 
             class="h-12 md:h-16 w-auto transition-transform hover:scale-105"
         >

@@ -3,6 +3,7 @@
 import { createSignal } from "solid-js";
 import Assets from "../ui/Assets";
 import ContactMe from "../ui/ContactMe";
+import cvUrl from "../../../assets/files/cv-fadlan.pdf?url";
 
 const TextAndButtonSection = () => {
     // State Management
@@ -10,7 +11,7 @@ const TextAndButtonSection = () => {
 
     function openCV () {
         setCvCount((count) => count + 1);
-        window.open('/files/cv-fadlan.pdf');
+        window.open(cvUrl);
     }
 
     // Function to render stars based on CV count

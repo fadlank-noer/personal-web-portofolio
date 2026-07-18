@@ -1,3 +1,7 @@
+---
+import logo from "../assets/logo.png";
+const OG_IMAGE_URL = `https://fadlank.web.id${logo.src}`;
+---
 <meta charset="utf-8" />
 <title>Fadlan Kautsar Noer - Fullstack Programmer Jakarta Selatan</title>
 
@@ -13,18 +17,18 @@
 <meta property="og:description" content="Saya adalah programmer fullstack dan system yang ada di Jagakarsa Jakarta Selatan. Spesialisasi dalam pengembangan web modern dan sistem." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://fadlank.web.id" />
-<meta property="og:image" content="/assets/logo.png" />
+<meta property="og:image" content={OG_IMAGE_URL} />
 <meta property="og:locale" content="id_ID" />
 
 <!-- Twitter Card Meta Tags -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Fadlan Kautsar Noer - Fullstack Programmer Jakarta Selatan" />
 <meta name="twitter:description" content="Saya adalah programmer fullstack yang ada di Jagakarsa Jakarta Selatan. Spesialisasi dalam pengembangan web modern." />
-<meta name="twitter:image" content="/assets/logo.png" />
+<meta name="twitter:image" content={OG_IMAGE_URL} />
 
 <!-- Favicon -->
-<link rel="icon" type="image/png" href="/assets/logo.png" />
-<link rel="apple-touch-icon" href="/assets/logo.png" />
+<link rel="icon" type="image/png" href={logo.src} />
+<link rel="apple-touch-icon" href={logo.src} />
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://fadlank.web.id" />
