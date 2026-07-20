@@ -40,13 +40,13 @@ export default defineConfig({
     vue(),
     preact({
       compat: true,
-      include: ['**/preact/**'],
+      include: ['**/integrations/preact/**'],
     }),
     react({
-      include: ['**/react/**'],
+      include: ['**/integrations/react/**'],
     }),
     solidJs({
-      include: ['**/solid/**'],
+      include: ['**/integrations/solid/**'],
     })
   ],
 });
