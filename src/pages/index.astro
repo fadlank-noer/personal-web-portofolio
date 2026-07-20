@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import Head from "../components/Head.astro"
+import NotFoundProvider from "../app/NotFoundProvider.astro";
 import Navbar from "../integrations/alpine/Navbar.astro";
 import HeroLayer from "../integrations/solid/HeroLayer.tsx"
 import Experience from "../integrations/vue/Experience.vue";
@@ -14,11 +15,12 @@ import ContactForm from "../integrations/svelte/ContactForm.svelte";
 		<Head />
 	</head>
 	<body class="overflow-x-hidden">
-		<Navbar/>
-		<HeroLayer client:load />
-		<Experience client:load /> 
-		<ProjectGallery client:load />
-		<Testimonials client:load />
-		<ContactForm client:only />
+		<NotFoundProvider />
+		<Navbar />
+		<HeroLayer />
+		<Experience />
+		<ProjectGallery />
+		<Testimonials />
+		<ContactForm />
 	</body>
 </html>

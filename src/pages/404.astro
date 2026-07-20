@@ -1,3 +1,146 @@
 ---
-return Astro.redirect("/")
+const topCards = [
+  "Latest AI news",
+  "Plan a trip",
+  "Learn something new",
+  "Write a poem",
+  "Explain quantum physics",
+  "Cook a recipe",
+  "Debug my code",
+  "Summarize an article",
+];
+
+const bottomCards = [
+  "Draft an email",
+  "Create a story",
+  "Translate text",
+  "Suggest movie",
+  "Solve a riddle",
+  "Design a logo",
+  "Practice interview",
+  "Brainstorm ideas",
+];
+
+const doubledTop = [...topCards, ...topCards];
+const doubledBottom = [...bottomCards, ...bottomCards];
 ---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — Page not found</title>
+  </head>
+  <body>
+    <main
+      class="bg-black text-white min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+      aria-label="Page not found"
+    >
+      <!-- Top Marquee -->
+      <div class="absolute top-0 left-0 w-full overflow-hidden pointer-events-none z-0">
+        <div class="marquee-track marquee-left flex gap-3 py-4 w-max">
+          {doubledTop.map((text) => (
+            <span class="marquee-card">{text}</span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Center Content -->
+      <div class="relative z-10 flex flex-col items-center text-center px-4 fade-in">
+        <h1 class="text-404 font-bold leading-none tracking-tight select-none">404</h1>
+        <p class="mt-4 text-lg text-neutral-400">Page not found</p>
+        <a
+          href="/"
+          class="mt-8 inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-900 px-6 py-3 text-sm font-medium text-neutral-200 transition-colors hover:bg-neutral-800 hover:border-neutral-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        >
+          Back to Home
+        </a>
+      </div>
+
+      <!-- Bottom Marquee -->
+      <div class="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none z-0">
+        <div class="marquee-track marquee-right flex gap-3 py-4 w-max">
+          {doubledBottom.map((text) => (
+            <span class="marquee-card">{text}</span>
+          ))}
+        </div>
+      </div>
+
+      <style>
+        /* 404 text responsive */
+        .text-404 {
+          font-size: 160px;
+        }
+        @media (max-width: 768px) {
+          .text-404 {
+            font-size: 120px;
+          }
+        }
+        @media (max-width: 480px) {
+          .text-404 {
+            font-size: 88px;
+          }
+        }
+
+        /* Fade-in animation */
+        .fade-in {
+          animation: fadeIn 600ms ease-out both;
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Marquee card styling */
+        .marquee-card {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          border-radius: 9999px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.04);
+          font-size: 0.8125rem;
+          color: rgba(255, 255, 255, 0.5);
+          white-space: nowrap;
+          user-select: none;
+        }
+
+        /* Marquee infinite scroll */
+        .marquee-track {
+          animation: marquee 50s linear infinite;
+        }
+        .marquee-left {
+          animation-direction: normal;
+        }
+        .marquee-right {
+          animation-direction: reverse;
+        }
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+          .fade-in {
+            animation: none;
+            opacity: 1;
+          }
+          .marquee-track {
+            animation: none;
+          }
+        }
+      </style>
+    </main>
+  </body>
+</html>
