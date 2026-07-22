@@ -2,12 +2,7 @@
 import "../styles/global.css";
 import Head from "../components/Head.astro"
 import NotFoundProvider from "../app/NotFoundProvider.astro";
-import Navbar from "../integrations/alpine/Navbar.astro";
-import HeroLayer from "../integrations/solid/HeroLayer.tsx"
-import Experience from "../integrations/vue/Experience.vue";
-import ProjectGallery from "../integrations/preact/ProjectGallery.tsx";
-import Testimonials from "../integrations/react/Testimonials.tsx";
-import ContactForm from "../integrations/svelte/ContactForm.svelte";
+import ChatBox from "../integrations/alpine/ChatBox.astro"
 ---
 
 <html lang="en">
@@ -15,12 +10,6 @@ import ContactForm from "../integrations/svelte/ContactForm.svelte";
 		<Head />
 	</head>
 	<body class="overflow-x-hidden">
-		<NotFoundProvider />
-		<Navbar />
-		<HeroLayer />
-		<Experience />
-		<ProjectGallery />
-		<Testimonials />
-		<ContactForm />
+		<ChatBox />
 	</body>
 </html>

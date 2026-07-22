@@ -17,6 +17,7 @@
     "@astrojs/svelte": "^9.0.1",
     "@astrojs/vercel": "^11.0.3",
     "@astrojs/vue": "^7.0.1",
+    "@lucide/astro": "^1.25.0",
     "@solidjs/router": "^0.16.2",
     "@tailwindcss/vite": "^4.3.3",
     "alpinejs": "^3.15.12",

@@ -1,0 +1,44 @@
+---
+import Plus from '@lucide/astro/icons/plus';
+import Mic from '../../assets/svgs/mic.svg';
+import SpeakWave from '../../assets/svgs/speak-wave.svg';
+const { cn = "" } = Astro.props;
+---
+
+<div class:list={["flex flex-col items-center w-full", cn]}>
+    <div
+        x-data="{ input: '', isRecording: false }"
+        class="flex flex-col w-full max-w-2xl"
+    >
+        {/* Disclaimer */}
+        <p class="text-xs text-gray-500 text-center mt-2 my-2">
+            ChatGPT can make mistakes. Contact me for troubleshoot info
+        </p>
+
+        {/* Input bar */}
+        <div class="flex items-center gap-2 bg-[#2f2f2f] rounded-3xl px-4 py-3 my-2">
+            <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                <Plus class="w-5 h-5 text-gray-300" />
+            </button>
+
+            <input
+                x-model="input"
+                type="text"
+                placeholder="Ask anything"
+                class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none min-h-[24px] max-h-[120px]"
+            />
+
+            <button
+                class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors"
+            >
+                <Mic class="w-5 h-5 text-gray-300" />
+            </button>
+
+            <button
+                class="flex-shrink-0 p-1.5 rounded-full bg-white"
+            >
+                <SpeakWave class="w-5 h-5 text-black" />
+            </button>
+        </div>
+    </div>
+</div>

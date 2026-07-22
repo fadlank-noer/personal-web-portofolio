@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, envField } from 'astro/config';
+import { svgoOptimizer } from 'astro/config';
 
 // Plugins
 import tailwindcss from "@tailwindcss/vite";
@@ -35,7 +36,9 @@ export default defineConfig({
 
   // Client Deployment
   integrations: [
-    alpinejs(),
+    alpinejs({
+      entrypoint: '/src/integrations/alpine',
+    }),
     svelte(),
     vue(),
     preact({
@@ -49,4 +52,14 @@ export default defineConfig({
       include: ['**/integrations/solid/**'],
     })
   ],
+
+  experimental: {
+    svg: true,
+    svgOptimizer: svgoOptimizer({
+      plugins: [
+        'preset-default',
+        'removeXMLNS',
+      ],
+    }),
+  },
 });
