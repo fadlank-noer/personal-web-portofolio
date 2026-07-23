@@ -5,9 +5,36 @@ import SpeakWave from '../../assets/svgs/speak-wave.svg';
 const { cn = "" } = Astro.props;
 ---
 
+<style>
+    .chat-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .chat-scrollbar::-webkit-scrollbar-track {
+        background: #2f2f2f;
+        border-radius: 3px;
+    }
+    .chat-scrollbar::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 3px;
+    }
+    .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #777;
+    }
+</style>
+
 <div class:list={["flex flex-col items-center w-full", cn]}>
     <div
-        x-data="{ input: '', isRecording: false }"
+        x-data="{
+            input: '',
+            isTextWrapped: false,
+            resize() {
+                this.$refs.input.style.height = 'auto';
+                this.$refs.input.style.height = this.$refs.input.scrollHeight + 'px';
+                this.isTextWrapped = this.input.length > 74;
+            }
+        }"
+        x-init="resize()"
+        x-effect="resize()"
         class="flex flex-col w-full max-w-2xl"
     >
         {/* Disclaimer */}
@@ -16,29 +43,47 @@ const { cn = "" } = Astro.props;
         </p>
 
         {/* Input bar */}
-        <div class="flex items-center gap-2 bg-[#2f2f2f] rounded-3xl px-4 py-3 my-2">
-            <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
-                <Plus class="w-5 h-5 text-gray-300" />
-            </button>
-
-            <input
-                x-model="input"
-                type="text"
-                placeholder="Ask anything"
-                class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none min-h-[24px] max-h-[120px]"
-            />
-
-            <button
-                class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors"
+        <div
+            class="bg-[#2f2f2f] rounded-3xl px-4 py-3 my-2"
+            :class="isTextWrapped ? 'flex flex-col gap-2' : 'flex items-center gap-2'"
+        >
+            <div
+                class="flex items-center gap-2"
+                :class="isTextWrapped ? 'order-1' : 'flex-1'"
             >
-                <Mic class="w-5 h-5 text-gray-300" />
-            </button>
+                <button x-show="!isTextWrapped" class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                    <Plus class="w-5 h-5 text-gray-300" />
+                </button>
 
-            <button
-                class="flex-shrink-0 p-1.5 rounded-full bg-white"
+                <textarea
+                    x-ref="input"
+                    x-model="input"
+                    @input="resize()"
+                    placeholder="Ask anything"
+                    rows="1"
+                    class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px] chat-scrollbar"
+                    :class="isTextWrapped ? 'w-full' : ''"
+                ></textarea>
+            </div>
+
+            <div
+                class="flex items-center gap-2"
+                :class="isTextWrapped ? 'order-2 justify-between' : ''"
             >
-                <SpeakWave class="w-5 h-5 text-black" />
-            </button>
+                <button x-show="isTextWrapped" class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                    <Plus class="w-5 h-5 text-gray-300" />
+                </button>
+
+                <div class="flex items-center gap-2" :class="isTextWrapped ? 'ml-auto' : ''">
+                    <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                        <Mic class="w-5 h-5 text-gray-300" />
+                    </button>
+
+                    <button class="flex-shrink-0 p-1.5 rounded-full bg-white">
+                        <SpeakWave class="w-5 h-5 text-black" />
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
