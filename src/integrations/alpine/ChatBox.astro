@@ -61,7 +61,7 @@ const { cn = "" } = Astro.props;
                     @input="resize()"
                     placeholder="Ask anything"
                     rows="1"
-                    class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-hidden min-h-[24px] max-h-[200px] chat-scrollbar"
+                    class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar"
                     :class="isTextWrapped ? 'w-full' : ''"
                 ></textarea>
             </div>
