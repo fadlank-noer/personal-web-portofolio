@@ -22,24 +22,41 @@ const { cn = "" } = Astro.props;
     }
 </style>
 
-<div class:list={["flex flex-col items-center w-full", cn]}>
+<div class:list={["flex flex-col items-center w-full flex-1 min-h-0", cn]}>
     <div
         x-data="{
             input: '',
             isTextWrapped: false,
+            isChatted: false,
             resize() {
                 this.$refs.input.style.height = 'auto';
                 this.$refs.input.style.height = this.$refs.input.scrollHeight + 'px';
                 this.isTextWrapped = this.input.length > 74;
+            },
+            submit() {
+                if (this.input.trim()) {
+                    this.isChatted = true;
+                    this.input = '';
+                    this.resize();
+                }
             }
         }"
         x-init="resize()"
         x-effect="resize()"
-        class="flex flex-col w-full max-w-2xl"
+        class="flex flex-col w-full max-w-2xl h-full min-h-0"
+        :class="isChatted ? 'justify-end' : 'justify-center'"
     >
-        {/* Disclaimer */}
-        <p class="text-xs text-gray-500 text-center mt-2 my-2">
-            ChatGPT can make mistakes. Contact me for troubleshoot info
+        {/* Chat History Area */}
+        <div x-show="isChatted" class="flex-1 overflow-y-auto p-4">
+            <!-- Chat messages will go here -->
+        </div>
+
+        {/* Header - before chat */}
+        <h1 x-show="!isChatted" class="text-2xl text-center w-full mb-6">Mind to know me better?</h1>
+
+        {/* Disclaimer - after chat */}
+        <p x-show="isChatted" class="text-xs text-gray-500 text-center mt-2 my-2">
+            ChatGPT can make mistakes. I can fix that.
         </p>
 
         {/* Input bar */}
@@ -59,6 +76,7 @@ const { cn = "" } = Astro.props;
                     x-ref="input"
                     x-model="input"
                     @input="resize()"
+                    @keydown.enter.prevent="submit()"
                     placeholder="Ask anything"
                     rows="1"
                     class="flex-1 bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar"
@@ -79,7 +97,7 @@ const { cn = "" } = Astro.props;
                         <Mic class="w-5 h-5 text-gray-300" />
                     </button>
 
-                    <button class="flex-shrink-0 p-1.5 rounded-full bg-white">
+                    <button @click="submit()" class="flex-shrink-0 p-1.5 rounded-full bg-white">
                         <SpeakWave class="w-5 h-5 text-black" />
                     </button>
                 </div>

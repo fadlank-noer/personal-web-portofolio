@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import Head from "../components/Head.astro"
+import Header from "../components/Header.astro"
 import NotFoundProvider from "../app/NotFoundProvider.astro";
 import ChatBox from "../integrations/alpine/ChatBox.astro"
 ---
@@ -9,7 +10,9 @@ import ChatBox from "../integrations/alpine/ChatBox.astro"
 	<head>
 		<Head />
 	</head>
-	<body class="overflow-x-hidden">
+	<body class="flex flex-col h-screen overflow-hidden">
+		<Header />
+
 		<ChatBox />
 	</body>
 </html>

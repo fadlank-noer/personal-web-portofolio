@@ -11,4 +11,11 @@ body {
 	background-color: #000;
 	color: #fff;
 	--secondary-color: #303030;
+	--font-sans: "-apple-system-body", "ui-sans-serif", "-apple-system", "system-ui", "Segoe UI", "Helvetica", "Apple Color Emoji", "Arial", "sans-serif", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.icon {
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
 }
