@@ -1,0 +1,10 @@
+{
+    "questions": [
+        {
+            "question": "Tell us a little about yourself.",
+            "answer": "Tell us a little about yourself.",
+            "answer_types": ["text", "image"],
+            "file_paths": []
+        }
+    ]
+}
