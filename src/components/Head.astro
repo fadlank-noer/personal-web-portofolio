@@ -1,6 +1,11 @@
 ---
-import logo from "../assets/logo.png";
-const OG_IMAGE_URL = `https://fadlank.web.id${logo.src}`;
+import logoLight from "../assets/logo-v2-light.webp";
+import logoDark from "../assets/logo-v2-dark.webp";
+import faviconIco from "../assets/favicon/favicon.ico";
+import favicon16 from "../assets/favicon/favicon-16x16.png";
+import favicon32 from "../assets/favicon/favicon-32x32.png";
+import appleTouchIcon from "../assets/favicon/apple-touch-icon.png";
+const OG_IMAGE_URL = `https://fadlank.web.id${logoLight.src}`;
 ---
 <meta charset="utf-8" />
 <title>Fadlan Kautsar Noer - Fullstack Programmer Jakarta Selatan</title>
@@ -27,8 +32,10 @@ const OG_IMAGE_URL = `https://fadlank.web.id${logo.src}`;
 <meta name="twitter:image" content={OG_IMAGE_URL} />
 
 <!-- Favicon -->
-<link rel="icon" type="image/png" href={logo.src} />
-<link rel="apple-touch-icon" href={logo.src} />
+<link rel="icon" type="image/x-icon" href={faviconIco.src} />
+<link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
+<link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+<link rel="apple-touch-icon" href={appleTouchIcon.src} />
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://fadlank.web.id" />
