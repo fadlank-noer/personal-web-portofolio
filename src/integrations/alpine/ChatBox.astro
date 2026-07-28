@@ -1,7 +1,9 @@
 ---
 import Plus from '@lucide/astro/icons/plus';
+import ArrowUp from '@lucide/astro/icons/arrow-up';
 import Mic from '../../assets/svgs/mic.svg';
 import SpeakWave from '../../assets/svgs/speak-wave.svg';
+import ChatHistory from '../../components/ChatHistory.astro';
 import questionsData from '../../data/question-templates.json';
 
 const { cn = "" } = Astro.props;
@@ -30,7 +32,6 @@ const { cn = "" } = Astro.props;
             input: '',
             isTextWrapped: false,
             isChatted: false,
-            messages: [],
             questions: questionsData.questions,
             resize() {
                 this.$refs.input.style.height = 'auto';
@@ -49,106 +50,16 @@ const { cn = "" } = Astro.props;
                     );
                     
                     const answer = matched ? matched.answer : "I'm sorry, I don't have an answer for that question yet. Try asking about me!";
-                    const answerType = matched ? matched.answer_type : 'text';
-                    const images = matched ? matched.images : [];
-                    
-                    // Add message to list
-                    const msgId = Date.now().toString();
-                    this.messages.push({
-                        id: msgId,
-                        question: userQuestion,
-                        answer: answer,
-                        answer_type: answerType,
-                        images: images,
-                        displayText: ''
-                    });
                     
                     this.input = '';
                     this.resize();
-                    
-                    // Scroll to bottom after message added
-                    this.$nextTick(() => {
-                        const container = this.$refs.chatContainer;
-                        if (container) container.scrollTop = container.scrollHeight;
-                    });
                 }
-            },
-            getStreamingDelay(textLength) {
-                return Math.max(15, Math.min(50, 2000 / textLength));
             }
         })}
         x-init="resize()"
         x-effect="resize()"
         class="flex flex-col items-center max-w-2xl w-full"
     >
-        {/* Chat History Area */}
-        <div 
-            x-ref="chatContainer"
-            x-show="isChatted && messages.length > 0" 
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 transform translate-y-4"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            class="w-full max-h-[50vh] overflow-y-auto p-4 chat-scrollbar"
-        >
-            <template x-for="msg in messages" :key="msg.id">
-                <div class="flex flex-col gap-4 mb-4">
-                    {/* User message */}
-                    <div class="flex justify-end">
-                        <div class="bg-[#3f3f3f] text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%]">
-                            <p class="text-sm" x-text="msg.question"></p>
-                        </div>
-                    </div>
-                    
-                    {/* Images - shown before text */}
-                            <template x-if="msg.images && msg.images.length > 0">
-                                <div class="no-scrollbar flex flex-nowrap gap-0.5 overflow-auto sm:gap-1 sm:overflow-hidden mt-1 mb-2">
-                                    <template x-for="(img, imgIdx) in msg.images" :key="img">
-                                        <div 
-                                            class="relative w-32 shrink-0 overflow-hidden rounded-xl border-[0.5px] max-h-40 sm:w-[calc((100%-0.5rem)/3)]"
-                                            :class="imgIdx === 0 ? 'rounded-s-xl' : (imgIdx === msg.images.length - 1 ? 'rounded-e-xl' : '')"
-                                            style="aspect-ratio: 5 / 4;"
-                                        >
-                                            <div class="relative rounded-[inherit] h-full w-full" style="aspect-ratio: 5 / 4;">
-                                                <div class="h-full w-full overflow-hidden rounded-[inherit]">
-                                                    <img 
-                                                        :alt="img" 
-                                                        referrerpolicy="no-referrer" 
-                                                        class="m-0 h-full w-full object-cover" 
-                                                        :src="img"
-                                                        style="object-position: 50% 0%;"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </template>
-                            
-                            {/* Streaming text */}
-                            <div class="bg-[#2f2f2f] px-4 py-3 rounded-2xl rounded-bl-md">
-                                <p 
-                                    class="text-sm text-white leading-relaxed whitespace-pre-wrap" 
-                                    x-data={`{ displayedText: '', initialized: false }`}
-                                    x-init={`                                        
-                                        const chars = msg.answer.split('');
-                                        let i = 0;
-                                        const delay = Math.max(15, Math.min(50, 2000 / chars.length));
-                                        const stream = () => {
-                                            if (i < chars.length) {
-                                                displayedText += chars[i];
-                                                i++;
-                                                setTimeout(stream, delay);
-                                            }
-                                        };
-                                        setTimeout(stream, 300);
-                                    `}
-                                    x-text="displayedText"
-                                ></p>
-                            </div>
-                        </div>
-                    </template>
-        </div>
-
         {/* Header - before chat */}
         <h1 x-show="!isChatted" class="text-2xl text-center w-full mb-6">Mind to know me better?</h1>
 
@@ -194,8 +105,13 @@ const { cn = "" } = Astro.props;
                         <Mic class="w-5 h-5 text-gray-300" />
                     </button>
 
-                    <button @click="submit()" class="flex-shrink-0 p-1.5 rounded-full bg-white">
-                        <SpeakWave class="w-5 h-5 text-black" />
+                    <button @click="submit()" class="flex-shrink-0 p-1.5 rounded-full transition-colors" :class="input.trim() ? 'bg-white hover:bg-[--primary-color]' : 'bg-white hover:bg-[--primary-color]'">
+                        <span x-show="input.trim()">
+                            <ArrowUp class="w-5 h-5 text-black" />
+                        </span>
+                        <span x-show="!input.trim()">
+                            <SpeakWave class="w-5 h-5 text-black" />
+                        </span>
                     </button>
                 </div>
             </div>
