@@ -2,9 +2,18 @@
     "questions": [
         {
             "question": "Tell us a little about yourself.",
-            "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions. <br> I have a strong background to in sales and marketing so it helps me to understand my client's needs and provide the best solution possible.",
-            "answer_types": ["text", "image"],
-            "file_paths": []
+            "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions. I have a strong background in sales and marketing so it helps me to understand my client's needs and provide the best solution possible.",
+            "answer_type": "text",
+            "images": [
+                "/assets/images/photo-in-studio.png",
+                "/assets/images/photo-in-boat.png"
+            ]
+        },
+        {
+            "question": "Who are you?",
+            "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions.",
+            "answer_type": "text",
+            "images": []
         }
     ]
 }

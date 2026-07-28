@@ -1,0 +1,69 @@
+---
+import type { StreamChunk } from "./types";
+
+interface Props {
+    chunks: StreamChunk[];
+    answerType: string;
+    images: string[];
+}
+
+const { chunks, answerType, images } = Astro.props;
+---
+
+<div class="flex flex-col gap-4 mb-4" data-chat-history-item>
+    {/* User message */}
+    <div class="flex justify-end">
+        <div class="bg-[#3f3f3f] text-white px-4 py-2 rounded-2xl rounded-br-md max-w-[80%]">
+            <p class="text-sm"></p>
+        </div>
+    </div>
+
+    {/* Assistant response */}
+    <div class="flex justify-start">
+        <div class="flex flex-col gap-2 max-w-[80%]">
+            {/* Streaming text */}
+            <div class="bg-[#2f2f2f] px-4 py-3 rounded-2xl rounded-bl-md">
+                <p 
+                    class="text-sm text-white leading-relaxed whitespace-pre-wrap" 
+                    x-data="{ displayedText: '' }"
+                    x-init={`
+                        const fullText = ${JSON.stringify(chunks.map(c => c.text).join(''))};
+                        const chars = fullText.split('');
+                        let i = 0;
+                        const stream = () => {
+                            if (i < chars.length) {
+                                displayedText += chars[i];
+                                i++;
+                                setTimeout(stream, ${chunks[0]?.delay || 30});
+                            }
+                        };
+                        stream();
+                    `}
+                    x-text="displayedText"
+                ></p>
+            </div>
+            
+            {/* Images if any */}
+            {answerType === 'image' && images.length > 0 && (
+                <div class="flex gap-2 flex-wrap">
+                    {images.map((img) => (
+                        <img src={img} alt="" class="w-32 h-32 object-cover rounded-lg" />
+                    ))}
+                </div>
+            )}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mark as loaded when animation completes
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('chatHistory', () => ({
+            init() {
+                this.$nextTick(() => {
+                    this.$el.dispatchEvent(new CustomEvent('chat-loaded'));
+                });
+            }
+        }));
+    });
+</script>
