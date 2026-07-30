@@ -11,7 +11,7 @@ interface Props {
     }>;
 }
 
-const { messages } = Astro.props;
+const { messages = [] } = Astro.props;
 ---
 
 {messages.map((msg) => (

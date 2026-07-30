@@ -1,0 +1,25 @@
+---
+import ChatHistory from '../../components/ChatHistory.astro';
+---
+
+<script>
+  import Alpine from 'alpinejs';
+  import { $hasChats, setHasChats } from '../../stores/chat';
+  
+  // Initialize Alpine store
+  Alpine.store('chat', {
+    hasChats: false
+  });
+  
+  // Expose to window for Alpine components
+  window.setHasChats = setHasChats;
+  
+  // Listen for changes and update Alpine store
+  $hasChats.subscribe((value) => {
+    Alpine.store('chat').hasChats = value;
+  });
+</script>
+
+<div x-show="$store.chat.hasChats">
+  <ChatHistory />
+</div>

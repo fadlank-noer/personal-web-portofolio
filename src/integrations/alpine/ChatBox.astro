@@ -3,11 +3,50 @@ import Plus from '@lucide/astro/icons/plus';
 import ArrowUp from '@lucide/astro/icons/arrow-up';
 import Mic from '../../assets/svgs/mic.svg';
 import SpeakWave from '../../assets/svgs/speak-wave.svg';
-import ChatHistory from '../../components/ChatHistory.astro';
 import questionsData from '../../data/question-templates.json';
-
-const { cn = "" } = Astro.props;
 ---
+
+<script>
+  import Alpine from 'alpinejs';
+  import { setHasChats } from '../../stores/chat';
+  
+  window.setHasChats = setHasChats;
+  
+  // Expose questions data for Alpine
+  window.questionsData = questionsData.questions;
+  
+  Alpine.data('chatBox', () => ({
+    input: '',
+    isTextWrapped: false,
+    isChatted: false,
+    questions: window.questionsData,
+    resize() {
+      this.$refs.input.style.height = 'auto';
+      this.$refs.input.style.height = this.$refs.input.scrollHeight + 'px';
+      this.isTextWrapped = this.input.length > 74;
+    },
+    submit() {
+      if (this.input.trim()) {
+        const userQuestion = this.input.trim();
+        this.isChatted = true;
+        
+        // Find matching answer
+        const matched = this.questions.find(q => 
+          userQuestion.toLowerCase().includes(q.question.toLowerCase()) ||
+          q.question.toLowerCase().includes(userQuestion.toLowerCase())
+        );
+        
+        const answer = matched ? matched.answer : "I'm sorry, I don't have an answer for that question yet. Try asking about me!";
+        
+        // Update nanostores to show ChatHistory
+        window.setHasChats(true);
+        
+        this.input = '';
+        this.resize();
+      }
+    }
+  }));
+</script>
 
 <style>
     .chat-scrollbar::-webkit-scrollbar {
@@ -26,36 +65,9 @@ const { cn = "" } = Astro.props;
     }
 </style>
 
-<div class:list={["flex flex-col items-center justify-center w-full flex-1 min-h-0", cn]}>
+<div class="flex flex-col items-center justify-center w-full flex-1 min-h-0">
     <div
-        x-data={JSON.stringify({
-            input: '',
-            isTextWrapped: false,
-            isChatted: false,
-            questions: questionsData.questions,
-            resize() {
-                this.$refs.input.style.height = 'auto';
-                this.$refs.input.style.height = this.$refs.input.scrollHeight + 'px';
-                this.isTextWrapped = this.input.length > 74;
-            },
-            async submit() {
-                if (this.input.trim()) {
-                    const userQuestion = this.input.trim();
-                    this.isChatted = true;
-                    
-                    // Find matching answer
-                    const matched = this.questions.find(q => 
-                        userQuestion.toLowerCase().includes(q.question.toLowerCase()) ||
-                        q.question.toLowerCase().includes(userQuestion.toLowerCase())
-                    );
-                    
-                    const answer = matched ? matched.answer : "I'm sorry, I don't have an answer for that question yet. Try asking about me!";
-                    
-                    this.input = '';
-                    this.resize();
-                }
-            }
-        })}
+        x-data="chatBox()"
         x-init="resize()"
         x-effect="resize()"
         class="flex flex-col items-center max-w-2xl w-full"

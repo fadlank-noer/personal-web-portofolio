@@ -1,0 +1,196 @@
+---
+import "../styles/global.css";
+import Head from "../components/Head.astro";
+
+import PanelLeft from '@lucide/astro/icons/panel-left';
+import SquarePen from '@lucide/astro/icons/square-pen';
+import Search from '@lucide/astro/icons/search';
+import Compass from '@lucide/astro/icons/compass';
+import GalleryHorizontalEnd from '@lucide/astro/icons/gallery-horizontal-end';
+import MessageSquare from '@lucide/astro/icons/message-square';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import User from '@lucide/astro/icons/user';
+---
+
+<script>
+  import Alpine from 'alpinejs';
+  import { $hasChats, setHasChats } from '../stores/chat';
+
+  Alpine.store('chat', {
+    hasChats: false
+  });
+
+  window.setHasChats = setHasChats;
+
+  $hasChats.subscribe((value) => {
+    Alpine.store('chat').hasChats = value;
+  });
+
+  Alpine.store('sidebar', {
+    collapsed: false,
+    mobileOpen: false,
+    toggle() {
+      this.collapsed = !this.collapsed;
+    },
+    toggleMobile() {
+      this.mobileOpen = !this.mobileOpen;
+    },
+    closeMobile() {
+      this.mobileOpen = false;
+    }
+  });
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Head />
+  </head>
+  <body class="bg-black text-white">
+    <div class="flex h-screen w-full overflow-hidden">
+      <!-- Sidebar Overlay (mobile) -->
+      <div
+        x-show="$store.sidebar.mobileOpen"
+        x-transition.opacity
+        @click="$store.sidebar.closeMobile()"
+        class="fixed inset-0 z-30 bg-black/50 md:hidden"
+        style="display: none;"
+      >
+      </div>
+
+      <!-- Sidebar -->
+      <aside
+        class="fixed md:relative z-40 h-full bg-[#171717] flex flex-col transition-all duration-300 ease-in-out"
+        :class="$store.sidebar.collapsed ? 'w-0 md:w-[60px] overflow-hidden' : 'w-[260px]'"
+        :style="window.innerWidth < 768 ? `transform: translateX(${$store.sidebar.mobileOpen ? '0' : '-100%'})` : ''"
+        style="width: 260px;"
+      >
+        <!-- Sidebar Header -->
+        <div class="flex items-center justify-between p-3 min-h-[56px]">
+          <button
+            @click="$store.sidebar.toggle()"
+            class="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#2b2b2b] transition-colors"
+            title="Toggle sidebar"
+          >
+            <PanelLeft class="h-5 w-5" />
+          </button>
+
+          <button
+            @click="$store.sidebar.toggleMobile()"
+            class="md:hidden h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white"
+            title="Close"
+          >
+            <PanelLeft class="h-5 w-5" />
+          </button>
+
+          <button
+            x-show="!$store.sidebar.collapsed"
+            class="flex-1 ml-2 text-left text-sm font-medium text-zinc-200 hover:bg-[#2b2b2b] rounded-lg px-2 py-1.5 transition-colors flex items-center justify-between"
+          >
+            <span>FadlanGPT</span>
+            <ChevronDown class="h-4 w-4 opacity-60" />
+          </button>
+        </div>
+
+        <!-- New Chat Button -->
+        <div class="px-3 pb-2">
+          <a
+            href="/"
+            class="flex items-center gap-3 rounded-lg px-2 py-2.5 text-sm text-zinc-200 hover:bg-[#212121] transition-colors"
+            :class="$store.sidebar.collapsed ? 'md:justify-center md:px-0' : ''"
+            title="New chat"
+          >
+            <SquarePen class="h-5 w-5 flex-shrink-0" />
+            <span x-show="!$store.sidebar.collapsed" class="truncate">New chat</span>
+          </a>
+        </div>
+
+        <!-- Search -->
+        <div class="px-3 pb-2">
+          <button
+            class="flex items-center gap-3 w-full rounded-lg px-2 py-2.5 text-sm text-zinc-400 hover:bg-[#212121] transition-colors"
+            :class="$store.sidebar.collapsed ? 'md:justify-center md:px-0' : ''"
+            title="Search chats"
+          >
+            <Search class="h-5 w-5 flex-shrink-0" />
+            <span x-show="!$store.sidebar.collapsed" class="truncate">Search chats</span>
+          </button>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="px-3 pb-2 space-y-0.5">
+          <a
+            href="/explore"
+            class="flex items-center gap-3 rounded-lg px-2 py-2.5 text-sm text-zinc-400 hover:bg-[#212121] transition-colors"
+            :class="$store.sidebar.collapsed ? 'md:justify-center md:px-0' : ''"
+            title="Explore GPTs"
+          >
+            <Compass class="h-5 w-5 flex-shrink-0" />
+            <span x-show="!$store.sidebar.collapsed" class="truncate">Explore GPTs</span>
+          </a>
+          <a
+            href="/gallery"
+            class="flex items-center gap-3 rounded-lg px-2 py-2.5 text-sm text-zinc-400 hover:bg-[#212121] transition-colors"
+            :class="$store.sidebar.collapsed ? 'md:justify-center md:px-0' : ''"
+            title="Gallery"
+          >
+            <GalleryHorizontalEnd class="h-5 w-5 flex-shrink-0" />
+            <span x-show="!$store.sidebar.collapsed" class="truncate">Gallery</span>
+          </a>
+        </nav>
+
+        <!-- Chats List -->
+        <div
+          x-show="!$store.sidebar.collapsed && $store.chat.hasChats"
+          class="flex-1 overflow-y-auto px-3 py-2 min-h-0"
+        >
+          <p class="px-2 py-1 text-xs font-medium text-zinc-500">Chats</p>
+          <a
+            href="/"
+            class="flex items-center gap-3 rounded-lg px-2 py-2 text-sm text-zinc-300 hover:bg-[#212121] transition-colors group"
+          >
+            <MessageSquare class="h-4 w-4 flex-shrink-0 opacity-70" />
+            <span class="truncate flex-1">About Fadlan</span>
+          </a>
+        </div>
+
+        <!-- Spacer when collapsed -->
+        <div x-show="$store.sidebar.collapsed || !$store.chat.hasChats" class="flex-1"></div>
+
+        <!-- Upgrade Plan -->
+        <div class="px-3 py-2 border-t border-[#2b2b2b]">
+          <button
+            class="flex items-center gap-3 w-full rounded-lg px-2 py-2.5 text-sm text-zinc-300 hover:bg-[#212121] transition-colors"
+            :class="$store.sidebar.collapsed ? 'md:justify-center md:px-0' : ''"
+            title="Upgrade plan"
+          >
+            <User class="h-5 w-5 flex-shrink-0" />
+            <span x-show="!$store.sidebar.collapsed" class="truncate flex-1 text-left">Upgrade plan</span>
+          </button>
+        </div>
+
+        <!-- User Profile -->
+        <div class="px-3 py-2">
+          <button
+            class="flex items-center gap-3 w-full rounded-lg px-2 py-2 hover:bg-[#212121] transition-colors"
+            :class="$store.sidebar.collapsed ? 'md:justify-center md:px-0' : ''"
+            title="Profile"
+          >
+            <div class="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold">
+              F
+            </div>
+            <span x-show="!$store.sidebar.collapsed" class="truncate flex-1 text-left text-sm text-zinc-200">Fadlan Kautsar Noer</span>
+            <ChevronDown x-show="!$store.sidebar.collapsed" class="h-4 w-4 text-zinc-500 flex-shrink-0" />
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col min-w-0">
+        <slot />
+      </div>
+    </div>
+  </body>
+</html>
