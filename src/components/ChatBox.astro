@@ -1,0 +1,192 @@
+---
+import Plus from '@lucide/astro/icons/plus';
+import ArrowUp from '@lucide/astro/icons/arrow-up';
+import Mic from '../assets/svgs/mic.svg';
+import SpeakWave from '../assets/svgs/speak-wave.svg';
+import ChatHistory from './ChatHistory.astro';
+import questionsData from '../data/question-templates.json';
+
+const { cn = "" } = Astro.props;
+---
+
+<style>
+    .chat-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .chat-scrollbar::-webkit-scrollbar-track {
+        background: #2f2f2f;
+        border-radius: 3px;
+    }
+    .chat-scrollbar::-webkit-scrollbar-thumb {
+        background: #555;
+        border-radius: 3px;
+    }
+    .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #777;
+    }
+</style>
+
+<div id="chat-container" class:list={["flex flex-col items-center justify-center w-full flex-1 min-h-0", cn]}>
+    <div class="flex flex-col items-center max-w-2xl w-full">
+        {/* Header - before chat */}
+        <h1 id="chat-header" class="text-2xl text-center w-full mb-6">Mind to know me better?</h1>
+
+        {/* Disclaimer - after chat */}
+        <p id="chat-disclaimer" class="text-xs text-gray-500 text-center mt-2 my-2 hidden">
+            ChatGPT can make mistakes. I can fix that.
+        </p>
+
+        {/* Input bar */}
+        <div
+            id="input-wrapper"
+            class="w-full bg-[#2f2f2f] rounded-3xl px-4 py-3 my-2 flex items-center gap-2"
+        >
+            <button id="add-btn-main" class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                <Plus class="w-5 h-5 text-gray-300" />
+            </button>
+
+            <textarea
+                id="chat-input"
+                placeholder="Ask anything"
+                rows="1"
+                class="w-full bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar"
+            ></textarea>
+
+            <div class="flex items-center gap-2 ml-auto">
+                <button id="mic-btn" class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                    <Mic class="w-5 h-5 text-gray-300" />
+                </button>
+
+                <button id="send-btn" class="flex-shrink-0 p-1.5 rounded-full transition-colors bg-white hover:bg-[--primary-color]">
+                    <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
+                    <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
+                </button>
+            </div>
+        </div>
+
+        {/* Wrapped state container (hidden by default) */}
+        <div id="wrapped-wrapper" class="w-full hidden">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center">
+                    <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                        <Plus class="w-5 h-5 text-gray-300" />
+                    </button>
+                </div>
+                <div class="flex items-center justify-between">
+                    <textarea
+                        id="chat-input-wrapped"
+                        placeholder="Ask anything"
+                        rows="1"
+                        class="w-full bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar"
+                    ></textarea>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                            <Mic class="w-5 h-5 text-gray-300" />
+                        </button>
+                        <button class="flex-shrink-0 p-1.5 rounded-full transition-colors bg-white hover:bg-[--primary-color]">
+                            <ArrowUp class="w-5 h-5 text-black" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script define:vars={{ questions: questionsData.questions }}>
+    const container = document.getElementById('chat-container');
+    const header = document.getElementById('chat-header');
+    const disclaimer = document.getElementById('chat-disclaimer');
+    const inputWrapper = document.getElementById('input-wrapper');
+    const wrappedWrapper = document.getElementById('wrapped-wrapper');
+    const input = document.getElementById('chat-input');
+    const inputWrapped = document.getElementById('chat-input-wrapped');
+    const sendBtn = document.getElementById('send-btn');
+    const sendIconDefault = document.getElementById('send-icon-default');
+    const sendIconActive = document.getElementById('send-icon-active');
+    const addBtnMain = document.getElementById('add-btn-main');
+    const micBtn = document.getElementById('mic-btn');
+
+    let isChatted = false;
+
+    function resizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    function checkTextWrap() {
+        const value = input.value;
+        const totalChars = value.length;
+        const CHARS_PER_LINE = 74;
+        const MAX_VISIBLE_LINES = 9;
+        
+        // Hitung jumlah baris
+        const lineCount = Math.ceil(totalChars / CHARS_PER_LINE);
+        const isMultiLine = totalChars > CHARS_PER_LINE;
+        const needsScroll = lineCount > MAX_VISIBLE_LINES;
+        
+        // Reset classes
+        inputWrapper.classList.remove('flex-col', 'max-h-[200px]', 'overflow-y-auto');
+        inputWrapper.classList.add('flex', 'items-center', 'gap-2');
+        
+        if (needsScroll) {
+            // > 9 baris: scrollbar
+            inputWrapper.classList.remove('flex', 'items-center', 'gap-2');
+            inputWrapper.classList.add('flex', 'flex-col', 'gap-2', 'max-h-[200px]', 'overflow-y-auto');
+        } else if (isMultiLine) {
+            // 2-9 baris: wrapped layout
+            inputWrapper.classList.remove('flex', 'items-center', 'gap-2');
+            inputWrapper.classList.add('flex', 'flex-col', 'gap-2');
+        }
+    }
+
+    function submit() {
+        const value = input.value.trim();
+        if (!value) return;
+
+        isChatted = true;
+        header.classList.add('hidden');
+        disclaimer.classList.remove('hidden');
+        
+        // Find matching answer
+        const matched = questions.find(q => 
+            value.toLowerCase().includes(q.question.toLowerCase()) ||
+            q.question.toLowerCase().includes(value.toLowerCase())
+        );
+        
+        const answer = matched ? matched.answer : "I'm sorry, I don't have an answer for that question yet. Try asking about me!";
+        
+        console.log('Question:', value);
+        console.log('Answer:', answer);
+        
+        input.value = '';
+        resizeTextarea(input);
+    }
+
+    // Event listeners
+    input.addEventListener('input', () => {
+        resizeTextarea(input);
+        checkTextWrap();
+        
+        // Toggle send icons
+        if (input.value.trim()) {
+            sendIconDefault.classList.add('hidden');
+            sendIconActive.classList.remove('hidden');
+        } else {
+            sendIconDefault.classList.remove('hidden');
+            sendIconActive.classList.add('hidden');
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submit();
+        }
+    });
+
+    sendBtn.addEventListener('click', submit);
+
+    // Initial resize
+    resizeTextarea(input);
+</script>
