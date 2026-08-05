@@ -1,11 +1,18 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import ChatHistory from "../integrations/alpine/ChatHistory.astro";
-import ChatBox from "../integrations/alpine/ChatBox.astro";
+import "../styles/global.css";
+import Head from "../components/Head.astro"
+import Header from "../components/Header.astro"
+import NotFoundProvider from "../app/NotFoundProvider.astro";
+import ChatBox from "../components/ChatBox.astro"
 ---
 
-<Layout>
-  <ChatHistory />
+<html lang="en">
+	<head>
+		<Head />
+	</head>
+	<body class="flex flex-col h-screen overflow-hidden">
+		<Header />
 
-  <ChatBox />
-</Layout>
+		<ChatBox />
+	</body>
+</html>

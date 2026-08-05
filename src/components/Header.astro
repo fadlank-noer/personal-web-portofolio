@@ -1,13 +1,15 @@
 ---
-import ChevronDown from '@lucide/astro/icons/chevron-down';
+import PanelLeftClose from '@lucide/astro/icons/panel-left-close';
 import Ellipsis from '@lucide/astro/icons/ellipsis';
 ---
 
 <header class="flex items-center justify-between px-4 py-3 bg-black">
-  <button class="flex items-center gap-2 rounded-xl bg-black px-3 py-2 text-white hover:bg-[#2b2b2b] transition-colors duration-150">
-    <span class="text-sm font-semibold">FadlanGPT</span>
-    <ChevronDown class="h-4 w-4 opacity-70" />
-  </button>
+  <div class="flex items-center gap-3">
+    <button class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 hover:text-white hover:bg-[#2b2b2b] transition-colors duration-150">
+      <PanelLeftClose class="h-5 w-5" />
+    </button>
+    <span class="text-sm font-semibold text-white">FadlanGPT</span>
+  </div>
 
   <button class="flex h-8 w-8 items-center justify-center rounded-full text-zinc-300 hover:text-white transition-colors duration-150">
     <Ellipsis class="h-5 w-5" />

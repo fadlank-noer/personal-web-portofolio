@@ -39,51 +39,55 @@ const { cn = "" } = Astro.props;
         {/* Input bar */}
         <div
             id="input-wrapper"
-            class="w-full bg-[#2f2f2f] rounded-3xl px-4 py-3 my-2 flex items-center gap-2"
+            class="w-full bg-[#2f2f2f] rounded-3xl px-4 py-3 my-2 flex items-end gap-2"
         >
-            <button id="add-btn-main" class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
-                <Plus class="w-5 h-5 text-gray-300" />
-            </button>
-
             <textarea
                 id="chat-input"
                 placeholder="Ask anything"
                 rows="1"
-                class="w-full bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar"
+                class="w-full bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar order-2"
             ></textarea>
 
-            <div class="flex items-center gap-2 ml-auto">
-                <button id="mic-btn" class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
-                    <Mic class="w-5 h-5 text-gray-300" />
-                </button>
-
-                <button id="send-btn" class="flex-shrink-0 p-1.5 rounded-full transition-colors bg-white hover:bg-[--primary-color]">
-                    <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
-                    <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
-                </button>
+            <div id="bottom-row" class="contents">
+                <div id="plus-wrap" class="flex-shrink-0 order-1">
+                    <button id="add-btn-main" class="p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                        <Plus class="w-5 h-5 text-gray-300" />
+                    </button>
+                </div>
+                <div id="icons-wrap" class="flex items-center gap-2 flex-shrink-0 order-3">
+                    <button id="mic-btn" class="p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                        <Mic class="w-5 h-5 text-gray-300" />
+                    </button>
+                    <button id="send-btn" class="p-1.5 rounded-full transition-colors bg-white hover:bg-[--primary-color]">
+                        <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
+                        <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
+                    </button>
+                </div>
             </div>
         </div>
 
         {/* Wrapped state container (hidden by default) */}
         <div id="wrapped-wrapper" class="w-full hidden">
             <div class="flex flex-col gap-2">
-                <div class="flex items-center">
-                    <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                {/* Plus button centered with space around */}
+                <div class="flex items-start py-1">
+                    <button class="p-1.5 rounded-full hover:bg-[#424242] transition-colors">
                         <Plus class="w-5 h-5 text-gray-300" />
                     </button>
                 </div>
-                <div class="flex items-center justify-between">
+                {/* Input row */}
+                <div class="flex items-end gap-2">
                     <textarea
                         id="chat-input-wrapped"
                         placeholder="Ask anything"
                         rows="1"
                         class="w-full bg-transparent text-white placeholder-gray-400 outline-none text-sm resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar"
                     ></textarea>
-                    <div class="flex items-center gap-2 ml-auto">
-                        <button class="flex-shrink-0 p-1.5 rounded-full hover:bg-[#424242] transition-colors">
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button class="p-1.5 rounded-full hover:bg-[#424242] transition-colors">
                             <Mic class="w-5 h-5 text-gray-300" />
                         </button>
-                        <button class="flex-shrink-0 p-1.5 rounded-full transition-colors bg-white hover:bg-[--primary-color]">
+                        <button class="p-1.5 rounded-full transition-colors bg-white hover:bg-[--primary-color]">
                             <ArrowUp class="w-5 h-5 text-black" />
                         </button>
                     </div>
@@ -120,23 +124,40 @@ const { cn = "" } = Astro.props;
         const CHARS_PER_LINE = 74;
         const MAX_VISIBLE_LINES = 9;
         
-        // Hitung jumlah baris
         const lineCount = Math.ceil(totalChars / CHARS_PER_LINE);
         const isMultiLine = totalChars > CHARS_PER_LINE;
         const needsScroll = lineCount > MAX_VISIBLE_LINES;
         
-        // Reset classes
-        inputWrapper.classList.remove('flex-col', 'max-h-[200px]', 'overflow-y-auto');
-        inputWrapper.classList.add('flex', 'items-center', 'gap-2');
+        const bottomRow = document.getElementById('bottom-row');
+        const plusWrap = document.getElementById('plus-wrap');
+        const iconsWrap = document.getElementById('icons-wrap');
         
+        if (isMultiLine) {
+            // Multi-line: textarea on top, bottom row below with justify-between
+            inputWrapper.classList.remove('items-end');
+            inputWrapper.classList.add('flex-wrap');
+            input.classList.add('basis-full');
+            bottomRow.classList.remove('contents');
+            bottomRow.classList.add('flex', 'items-center', 'justify-between', 'w-full');
+            input.classList.remove('order-2');
+            plusWrap.classList.remove('order-1');
+            iconsWrap.classList.remove('order-3');
+        } else {
+            // Single-line: all in one row via display:contents
+            inputWrapper.classList.remove('flex-wrap');
+            inputWrapper.classList.add('items-end');
+            input.classList.remove('basis-full');
+            bottomRow.classList.remove('flex', 'items-center', 'justify-between', 'w-full');
+            bottomRow.classList.add('contents');
+            input.classList.add('order-2');
+            plusWrap.classList.add('order-1');
+            iconsWrap.classList.add('order-3');
+        }
+
         if (needsScroll) {
-            // > 9 baris: scrollbar
-            inputWrapper.classList.remove('flex', 'items-center', 'gap-2');
-            inputWrapper.classList.add('flex', 'flex-col', 'gap-2', 'max-h-[200px]', 'overflow-y-auto');
-        } else if (isMultiLine) {
-            // 2-9 baris: wrapped layout
-            inputWrapper.classList.remove('flex', 'items-center', 'gap-2');
-            inputWrapper.classList.add('flex', 'flex-col', 'gap-2');
+            inputWrapper.classList.add('max-h-[300px]', 'overflow-y-auto');
+        } else {
+            inputWrapper.classList.remove('max-h-[300px]', 'overflow-y-auto');
         }
     }
 
