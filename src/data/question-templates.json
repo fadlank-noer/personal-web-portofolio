@@ -2,7 +2,7 @@
     "questions": [
         {
             "question": "Tell us a little about yourself.",
-            "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions. I have a strong background in sales and marketing so it helps me to understand my client's needs and provide the best solution possible.",
+            "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions. I have a strong background in sales and marketing so it helps me to understand my client's needs and provide the best solution possible. I'm passionate about building clean, performant, and user-centric products — from backend APIs to frontend delights.",
             "answer_type": "text",
             "images": [
                 "/assets/images/photo-in-studio.png",
@@ -11,9 +11,69 @@
         },
         {
             "question": "Who are you?",
-            "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions.",
+            "answer": "I'm Fadlan Kautsar Noer — a Fullstack Developer based in Jagakarsa, Jakarta Selatan. I specialize in modern web development with React, Vue, Svelte, Astro, Node.js, and cloud infrastructure. My journey spans from sales & marketing background into engineering, which gives me a unique lens on product and user empathy.",
             "answer_type": "text",
             "images": []
+        },
+        {
+            "question": "What are your skills?",
+            "answer": "My core tech stack: \n\n**Frontend:** React, Next.js, Vue, Nuxt, Svelte, Astro, Tailwind CSS, TypeScript\n**Backend:** Node.js, Express, NestJS, Go, Python, PostgreSQL, Redis, MongoDB\n**DevOps/Infra:** Docker, Vercel, AWS, CI/CD, Nginx\n**Concepts:** System Design, API Design, State Management (Nanostores, Zustand, Pinia), Performance Optimization\n\nI'm also comfortable with Web3/Gaming integrations, fintech compliance logic, and kiosk/IoT hardware interfacing.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "What projects have you built?",
+            "answer": "I've delivered 10+ projects:\n\n• **Fintech Platform** — Loan & payment gateway with midtrans integration, KYC flow, admin dashboard\n• **Enterprise ERP Module** — Inventory & sales reporting for SMEs, role-based access\n• **Web3 Gaming Portal** — Wallet connect, NFT marketplace UI, leaderboard\n• **IoT Kiosk Solution** — Self-service kiosk for ticketing/payment, hardware API bridge\n• **Portfolio GPT Clone** — This very ChatGPT-like portfolio you're chatting with!\n• **E-commerce Headless** — Multi-tenant storefront with CMS\n\nAll built with focus on scalability, clean architecture, and DX.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "What is your experience?",
+            "answer": "4+ years as Software Developer across agencies, startups, and freelance. \n\n- 2020-2022: Started in sales/marketing tech support, transitioned to full-time dev building landing pages & internal tools\n- 2022-2024: Fullstack Engineer — fintech & enterprise projects, led frontend for 3 major releases\n- 2024-Now: Senior-ish Fullstack / Product-minded Engineer — Web3, IoT kiosks, and own products. Mentor juniors, own architecture decisions\n\nStrength: bridging business needs → technical implementation. Weakness I'm working on: saying no to scope creep 😅",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "How do I contact you?",
+            "answer": "Let's talk! Best ways:\n\n📧 Email: fadlan@example.com (replace with real)\n💼 LinkedIn: linkedin.com/in/fadlannoer\n🐙 GitHub: github.com/fadlannoer\n📍 Based: Jagakarsa, Jakarta Selatan — open to remote & hybrid\n\nResponse time: usually within 2-4 hours. For freelance/project inquiries, include scope & timeline — I reply faster with context!",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "What services do you offer?",
+            "answer": "I offer end-to-end product development:\n\n1. **Fullstack Web Development** — MVP to scale, Next.js/Astro + API\n2. **Frontend Revamp** — Performance audit & modern UI rebuild\n3. **Backend & API Design** — REST/GraphQL, auth, payments\n4. **Kiosk & IoT Integration** — Hardware bridge, offline-first logic\n5. **Tech Consultation** — Stack selection, code review, hiring help\n\nEngagement: freelance per project, retainer, or fractional CTO-ish for early startups. Let's build something users love.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "What's your educational background?",
+            "answer": "Self-taught engineer with formal background in business/marketing — which turned out to be superpower for product thinking. I continue learning via:\n\n- Online courses: system design, advanced TS, Go\n- Building in public: 10+ shipped projects\n- Community: active in local dev meetups Jakarta\n- Certs: Various Udemy/Coursera for web & cloud\n\nI believe best education is shipping real things users pay for.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "Why should we hire you?",
+            "answer": "Because I bring 3 things most devs don't bundle: business sense + engineering depth + ownership.\n\n✓ **Business sense** — ex-marketing/sales so I understand conversion, not just code\n✓ **Fullstack depth** — 4yr handling frontend to infra, not ticket-taker\n✓ **Ownership** — I ship, measure, iterate. No hand-holding needed\n✓ **User-first** — performance & UX are non-negotiable\n✓ **Remote-ready** — async, clear comms, Loom-friendly\n\nIf you need someone who can talk to customers, design solution, code it, and deploy by Friday — that's me.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "Where are you based?",
+            "answer": "I'm based in Jagakarsa, Jakarta Selatan, Indonesia 🇮🇩. \n\n- Open to: Remote worldwide (async overlap GMT+7 friendly), hybrid Jabodetabek, occasional onsite Jakarta\n- Timezone: WIB (UTC+7) — I usually overlap 10:00-15:00 CET or 21:00-01:00 EST when needed\n- Setup: fiber internet, ergonomic desk, quiet room for calls\n- Languages: Indonesian (native), English (professional)\n\nJakarta vibes, global standards.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "What tech stack do you use?",
+            "answer": "My go-to stack for 2025-2026:\n\n**For portfolios/SaaS marketing:** Astro + Tailwind v4 + TypeScript + Nanostores + Vercel\n**For SaaS apps:** Next.js 15 + shadcn + tRPC / Hono + Drizzle + PostgreSQL + Clerk\n**For performance:** SvelteKit or Astro islands, Cloudflare\n**For mobile:** React Native or PWA first\n**For infra:** Docker, GitHub Actions, Vercel/AWS\n\nI pick stack per problem, not hype. Ask me why I chose Astro for this portfolio — I'll explain islands, zero JS by default, and SEO wins.",
+            "answer_type": "text",
+            "images": []
+        },
+        {
+            "question": "Can you show your CV?",
+            "answer": "Absolutely! You can download my CV here or ask me to email it.\n\nI have a PDF ready with detailed timeline, skills matrix, and project links. In this chat UI, CV viewing is coming soon as an embedded viewer.\n\nFor now, hit contact and I'll send latest version within minutes!",
+            "answer_type": "text",
+            "images": ["/assets/images/photo-in-studio.png"]
         }
     ]
 }

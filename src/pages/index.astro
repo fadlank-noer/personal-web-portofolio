@@ -1,18 +1,7 @@
 ---
-import "../styles/global.css";
-import Head from "../components/Head.astro"
-import Header from "../components/Header.astro"
-import NotFoundProvider from "../app/NotFoundProvider.astro";
-import ChatBox from "../components/ChatBox.astro"
+import Layout from "../layouts/Layout.astro"
 ---
 
-<html lang="en">
-	<head>
-		<Head />
-	</head>
-	<body class="flex flex-col h-screen overflow-hidden">
-		<Header />
-
-		<ChatBox />
-	</body>
-</html>
+<Layout>
+  <!-- index hanya wrapper - semua ada di Layout: Sidebar + ChatHistory (atas) + ChatBox (bawah) -->
+</Layout>

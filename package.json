@@ -12,8 +12,10 @@
     "@astrojs/vercel": "^11.0.3",
     "@lucide/astro": "^1.25.0",
     "@tailwindcss/vite": "^4.3.3",
+    "alpinejs": "^3.15.12",
     "astro": "^7.1.2",
     "clsx": "^2.1.1",
+    "nanostores": "^1.4.2",
     "resend": "^6.17.2",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3"

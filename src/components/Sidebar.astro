@@ -1,0 +1,371 @@
+---
+/**
+ * Sidebar – ChatGPT style + Pinned / Projects / Library (masonry) / Recents (Notion)
+ * @fadlannoer - request: folder icon chatgpt, buku tumpuk berdiri, masonry variable wh, notion recents + pinned
+ */
+import PanelLeft from '@lucide/astro/icons/panel-left';
+import SquarePen from '@lucide/astro/icons/square-pen';
+import Search from '@lucide/astro/icons/search';
+import Pin from '@lucide/astro/icons/pin';
+import Folder from '@lucide/astro/icons/folder';
+import BookUp from '@lucide/astro/icons/book-up'; // ← buku tumpuk berdiri (rekomendasi deep-planner, verified)
+import LibraryBig from '@lucide/astro/icons/library-big'; // fallback
+import Clock3 from '@lucide/astro/icons/clock-3';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Trash2 from '@lucide/astro/icons/trash-2';
+import User from '@lucide/astro/icons/user';
+import Images from '@lucide/astro/icons/images';
+import Film from '@lucide/astro/icons/film';
+
+import sidebarData from '../data/sidebar.json';
+
+interface Props { collapsed?: boolean; }
+const { collapsed = false } = Astro.props;
+
+const pinned = sidebarData.pinned;
+const projects = sidebarData.projects;
+const library = sidebarData.library;
+const recents = sidebarData.recents;
+---
+
+<aside
+  id="sidebar"
+  data-collapsed={collapsed ? 'true' : 'false'}
+  class="flex h-full flex-col bg-[#171717] transition-all duration-200 ease-in-out
+         w-[280px] flex-shrink-0
+         data-[collapsed=true]:w-[60px] data-[collapsed=true]:md:w-[60px]
+         fixed md:relative inset-y-0 left-0 z-40
+         -translate-x-full md:translate-x-0
+         data-[mobile-open=true]:!translate-x-0
+         border-r border-[#232323]"
+  data-mobile-open="false"
+>
+  <!-- Header -->
+  <div class="flex h-[52px] items-center justify-between px-2.5 flex-shrink-0">
+    <button id="sidebar-toggle" class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors" title="Toggle sidebar">
+      <PanelLeft class="h-[18px] w-[18px]" />
+    </button>
+    <button id="sidebar-brand" class="flex-1 ml-2 flex items-center justify-between text-left text-[13px] font-[600] tracking-tight text-zinc-100 hover:bg-[#212121] rounded-lg px-2.5 py-1.5 transition-colors sidebar-label">
+      <span class="truncate">FadlanGPT</span>
+      <ChevronDown class="h-3.5 w-3.5 opacity-60" />
+    </button>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="px-2.5 pb-2 space-y-0.5">
+    <button id="new-chat-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#212121] transition-colors">
+      <SquarePen class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
+    </button>
+    <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#212121] hover:text-zinc-200 transition-colors">
+      <Search class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">Search chats</span>
+    </button>
+  </div>
+
+  <div class="mx-3 my-1.5 h-px bg-[#222] sidebar-label"></div>
+
+  <!-- Scrollable -->
+  <div class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5">
+
+    <!-- PINNED -->
+    <div data-section-wrap="pinned" class="group/section">
+      <button data-section-toggle="pinned" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+        <span class="flex items-center gap-1.5"><Pin class="h-3.5 w-3.5" /> <span class="sidebar-label">Pinned</span></span>
+        <ChevronDown class="h-3.5 w-3.5 transition-transform sidebar-label" data-chevron="pinned" />
+      </button>
+      <div data-section-content="pinned" class="mt-1.5 space-y-0.5 sidebar-section-content">
+        {pinned.map((p) => (
+          <a href="#" data-pinned-id={p.id} class="group/item flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#212121] hover:text-white transition-colors text-left">
+            <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-[#242424] text-[12px]">{p.icon}</span>
+            <span class="flex-1 min-w-0"><span class="truncate block sidebar-label leading-tight">{p.title}</span><span class="block text-[11px] text-zinc-500 group-hover/item:text-zinc-400 sidebar-label truncate">{p.meta}</span></span>
+          </a>
+        ))}
+        <button id="pin-current" class="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-[#1f1f1f] transition-colors sidebar-label">+ Pin current chat</button>
+      </div>
+    </div>
+
+    <!-- PROJECTS — folder ChatGPT style -->
+    <div data-section-wrap="projects" class="group/section">
+      <button data-section-toggle="projects" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+        <span class="flex items-center gap-1.5">
+          <Folder class="h-4 w-4" />
+          <span class="sidebar-label">Projects</span>
+        </span>
+        <span class="flex items-center gap-1 sidebar-label"><span class="text-[10px] rounded bg-[#252525] px-1.5 py-0.5 text-zinc-400">{projects.length}</span><ChevronDown class="h-3.5 w-3.5 transition-transform" data-chevron="projects" /></span>
+      </button>
+      <div data-section-content="projects" class="mt-1.5 space-y-0.5 sidebar-section-content">
+        {projects.map((pr) => (
+          <a href={`/projects/${pr.id}`} class="group/proj flex w-full items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-[#212121] transition-colors">
+            <span class={`h-6 w-6 rounded-[6px] ${pr.color} flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0`}>{pr.thumb}</span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-[13px] leading-tight text-zinc-200 group-hover/proj:text-white sidebar-label">{pr.title}</span>
+              <span class="block truncate text-[11px] text-zinc-500 sidebar-label">{pr.desc}</span>
+            </span>
+            <span class="text-[11px] text-zinc-500 group-hover/proj:text-zinc-300 sidebar-label">{pr.count}</span>
+          </a>
+        ))}
+        <button class="flex w-full items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] text-zinc-500 hover:text-zinc-300 hover:bg-[#1f1f1f] transition-colors sidebar-label">+ New project</button>
+      </div>
+    </div>
+
+    <!-- LIBRARY — buku tumpuk berdiri + masonry variable wh -->
+    <div data-section-wrap="library" class="group/section">
+      <button data-section-toggle="library" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+        <span class="flex items-center gap-1.5">
+          <!-- stacked books icon – buku tumpuk berdiri – BookUp verified -->
+          <span class="relative flex h-4 w-4 items-center justify-center">
+            <BookUp class="h-4 w-4" />
+            <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          </span>
+          <span class="sidebar-label">Library</span>
+        </span>
+        <span class="flex items-center gap-1 sidebar-label">
+          <span class="hidden sm:flex items-center gap-1 text-[10px] text-zinc-500"><Images class="h-3 w-3" />{library.filter(l=>l.type==='image').length} <Film class="h-3 w-3 ml-1" />{library.filter(l=>l.type==='video').length}</span>
+          <ChevronDown class="h-3.5 w-3.5 transition-transform" data-chevron="library" />
+        </span>
+      </button>
+
+      <div data-section-content="library" class="mt-2 px-0.5 sidebar-section-content">
+        <!-- Masonry: menerima height & width beda dalam satu div -->
+        <!-- Teknik: CSS columns + break-inside-avoid. wide => column-span: all untuk width beda -->
+        <div class="masonry-grid columns-2 gap-2 [column-fill:_balance]">
+          {library.map((m) => (
+            <div class:list={[
+              "masonry-item group/card break-inside-avoid mb-2 relative w-full overflow-hidden rounded-[12px] border border-[#2a2a2a] bg-gradient-to-br transition-all hover:border-[#3a3a3a] hover:-translate-y-0.5 cursor-pointer",
+              m.color,
+              m.ratio,
+              m.wide ? "[column-span:all]" : ""
+            ]}>
+              {/* Jika ada src real, ganti div dengan img */}
+              <div class="absolute inset-0">
+                {/* placeholder pattern */}
+                <div class="h-full w-full opacity-60 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_40%)]"></div>
+              </div>
+              <div class="absolute inset-0 flex flex-col justify-between p-2">
+                <div class="flex justify-between items-start">
+                  <span class="rounded-full bg-black/40 backdrop-blur px-1.5 py-0.5 text-[9px] font-medium text-white/70 border border-white/10">{m.type}</span>
+                  {m.type === 'video' && <span class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] text-black">▶</span>}
+                </div>
+                <span class="truncate rounded bg-black/50 backdrop-blur px-1.5 py-0.5 text-[10px] text-white/80 border border-white/5">{m.label}</span>
+              </div>
+              <div class="absolute inset-0 bg-black/0 group-hover/card:bg-black/20 transition-colors"></div>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-2 rounded-lg bg-[#1b1b1b] border border-[#262626] p-2.5 sidebar-label">
+          <p class="text-[11px] leading-[14px] text-zinc-400"><span class="text-zinc-200 font-medium">Masonry</span> — 1 div menerima <code class="text-zinc-300">height</code> & <code class="text-zinc-300">width</code> beda via <code class="text-zinc-300">aspect-*</code> + <code class="text-zinc-300">[column-span:all]</code> untuk wide. Bisa mix <code class="text-zinc-300">img</code> & <code class="text-zinc-300">video</code>.</p>
+          <div class="mt-2 flex gap-1.5">
+            <button id="library-add-random" class="rounded-md bg-[#252525] hover:bg-[#2e2e2e] px-2 py-1 text-[11px] text-zinc-300 transition-colors">+ Add random</button>
+            <button class="rounded-md bg-[#252525] hover:bg-[#2e2e2e] px-2 py-1 text-[11px] text-zinc-300 transition-colors">Open</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENTS — Notion -->
+    <div data-section-wrap="recents" class="group/section">
+      <button data-section-toggle="recents" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+        <span class="flex items-center gap-1.5"><Clock3 class="h-4 w-4" /><span class="sidebar-label">Recents</span></span>
+        <ChevronDown class="h-3.5 w-3.5 transition-transform sidebar-label" data-chevron="recents" />
+      </button>
+      <div data-section-content="recents" class="mt-1.5 space-y-1 sidebar-section-content">
+        <div id="notion-recents-list" class="space-y-0.5">
+          {recents.map((n) => (
+            <a href="#" class="group/note flex flex-col gap-0.5 rounded-lg px-2 py-2 hover:bg-[#1f1f1f] transition-colors">
+              <span class="flex items-center justify-between gap-2">
+                <span class="flex items-center gap-1.5 min-w-0 flex-1">
+                  <span class="text-[13px]">{n.icon}</span>
+                  <span class="truncate text-[13px] text-zinc-200 group-hover/note:text-white sidebar-label leading-tight">{n.title}</span>
+                </span>
+                <span class="shrink-0 rounded bg-[#252525] px-1 py-0.5 text-[10px] text-zinc-400 group-hover/note:text-zinc-300 sidebar-label">{n.tag}</span>
+              </span>
+              <span class="pl-[22px] text-[11px] text-zinc-500 sidebar-label">{n.time} • Notion</span>
+            </a>
+          ))}
+        </div>
+        <div class="mt-2 rounded-[10px] border border-dashed border-[#2a2a2a] bg-[#161616] p-2.5 text-center sidebar-label">
+          <p class="text-[11px] text-zinc-500 leading-snug">Hubungkan Notion API — fetch <code class="text-zinc-400">/api/notion/recents</code> nanti di sini.</p>
+          <div class="mt-2 flex justify-center gap-1.5">
+            <button id="sync-notion" class="rounded-md bg-[#242424] hover:bg-[#2e2e2e] px-2.5 py-1 text-[11px] text-zinc-300 transition-colors">Sync Notion</button>
+            <a href="https://notion.so" target="_blank" class="rounded-md bg-transparent border border-[#2a2a2a] px-2.5 py-1 text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors">Open Notion</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHATS legacy -->
+    <div data-section-wrap="chats" class="group/section">
+      <button data-section-toggle="chats" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+        <span class="sidebar-label">Chats</span>
+        <ChevronDown class="h-3.5 w-3.5 transition-transform sidebar-label" data-chevron="chats" />
+      </button>
+      <div data-section-content="chats" class="mt-1 sidebar-section-content">
+        <div id="sidebar-chat-list" class="space-y-0.5"><p id="sidebar-empty" class="px-2 py-2 text-xs text-zinc-600 sidebar-label">No chats yet</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-auto border-t border-[#232323]">
+    <div class="px-2 py-1.5">
+      <button id="clear-chats-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#212121] hover:text-zinc-200 transition-colors"><Trash2 class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label">Clear chats</span></button>
+    </div>
+    <div class="px-2 pb-1">
+      <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#212121] hover:text-zinc-200 transition-colors"><User class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label flex-1 text-left">Upgrade plan</span></button>
+    </div>
+    <div class="px-2 py-2 pb-3">
+      <button class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#212121] transition-colors">
+        <div class="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold">F</div>
+        <span class="truncate flex-1 text-left text-[13px] text-zinc-200 sidebar-label">Fadlan K. Noer</span>
+        <ChevronDown class="h-4 w-4 text-zinc-500 flex-shrink-0 sidebar-label" />
+      </button>
+    </div>
+  </div>
+</aside>
+
+<div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/50 hidden md:hidden"></div>
+
+<style>
+  .chat-scrollbar::-webkit-scrollbar { width: 4px; }
+  .chat-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .chat-scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+  .masonry-grid { column-count: 2; column-gap: 0.5rem; }
+  .masonry-item { break-inside: avoid; }
+  .masonry-item:hover { transform: translateY(-1px); }
+  [data-collapsed="true"] .sidebar-section-content { display: none !important; }
+  [data-collapsed="true"] .group\/section > button { justify-content: center; }
+</style>
+
+<script>
+  const STORAGE_KEY = 'fadlan-chat-history';
+  const SIDEBAR_COLLAPSED_KEY = 'fadlan-sidebar-collapsed';
+  const SECTIONS_KEY = 'fadlan-sidebar-sections-v2';
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggleBtn = document.getElementById('sidebar-toggle');
+  const newChatBtn = document.getElementById('new-chat-btn');
+  const clearBtn = document.getElementById('clear-chats-btn');
+  const chatListEl = document.getElementById('sidebar-chat-list');
+  const emptyEl = document.getElementById('sidebar-empty');
+
+  const isMobile = () => window.innerWidth < 768;
+  const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
+  const saveCollapsed = (v) => { try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(v)); } catch {} };
+
+  const defaultSections = { pinned: true, projects: true, library: true, recents: true, chats: true };
+  const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
+  const saveSections = (s) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
+
+  let sectionsState = loadSections();
+
+  function applySections() {
+    Object.entries(sectionsState).forEach(([key, open]) => {
+      const content = document.querySelector(`[data-section-content="${key}"]`);
+      const chevron = document.querySelector(`[data-chevron="${key}"]`);
+      if (content) content.style.display = open ? '' : 'none';
+      if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
+    });
+  }
+
+  function applyCollapsed(collapsed) {
+    if (!sidebar) return;
+    sidebar.dataset.collapsed = collapsed ? 'true' : 'false';
+    document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = collapsed ? 'none' : ''; });
+    if (!collapsed) applySections();
+  }
+
+  function applyMobile(open) {
+    if (!sidebar || !overlay) return;
+    sidebar.dataset.mobileOpen = open ? 'true' : 'false';
+    overlay.classList.toggle('hidden', !open);
+  }
+
+  const collapsedInit = loadCollapsed();
+  applyCollapsed(collapsedInit);
+  applySections();
+
+  toggleBtn?.addEventListener('click', () => {
+    if (isMobile()) {
+      const isOpen = sidebar?.dataset.mobileOpen === 'true';
+      applyMobile(!isOpen);
+    } else {
+      const cur = sidebar?.dataset.collapsed === 'true';
+      const next = !cur;
+      applyCollapsed(next);
+      saveCollapsed(next);
+      window.dispatchEvent(new CustomEvent('sidebar:toggle', { detail: { collapsed: next }}));
+    }
+  });
+
+  overlay?.addEventListener('click', () => applyMobile(false));
+  newChatBtn?.addEventListener('click', () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} window.dispatchEvent(new CustomEvent('chat:clear')); if (isMobile()) applyMobile(false); });
+  clearBtn?.addEventListener('click', () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} window.dispatchEvent(new CustomEvent('chat:clear')); });
+
+  document.querySelectorAll('[data-section-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.getAttribute('data-section-toggle'); if (!key) return;
+      if (sidebar?.dataset.collapsed === 'true') return;
+      sectionsState[key] = !sectionsState[key];
+      saveSections(sectionsState);
+      applySections();
+    });
+  });
+
+  function renderSidebarList() {
+    if (!chatListEl) return;
+    let history = [];
+    try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) history = JSON.parse(raw); } catch {}
+    if (history.length === 0) {
+      if (emptyEl) emptyEl.style.display = sidebar?.dataset.collapsed === 'true' ? 'none' : '';
+      chatListEl.querySelectorAll('[data-sidebar-item]').forEach(el => el.remove());
+      return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+    chatListEl.querySelectorAll('[data-sidebar-item]').forEach(el => el.remove());
+    history.slice().reverse().forEach((msg) => {
+      const btn = document.createElement('button');
+      btn.setAttribute('data-sidebar-item', msg.id);
+      btn.className = 'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#212121] transition-colors text-left';
+      btn.title = msg.question;
+      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 flex-shrink-0 opacity-70"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="truncate flex-1 sidebar-label">${escapeHtml(msg.question)}</span>`;
+      btn.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('chat:scroll-to', { detail: { id: msg.id } })); if (isMobile()) applyMobile(false); });
+      chatListEl.appendChild(btn);
+    });
+  }
+  function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+
+  renderSidebarList();
+  window.addEventListener('chat:updated', renderSidebarList);
+  window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) renderSidebarList(); });
+
+  // Library masonry – menerima height & width beda dalam satu div
+  // Helper global buat kamu nambah media dinamis
+  window.addLibraryMedia = (item) => {
+    const container = document.querySelector('.masonry-grid');
+    if (!container) return;
+    const div = document.createElement('div');
+    const ratio = item.ratio || 'aspect-[4/3]';
+    const color = item.color || 'from-zinc-800 to-zinc-700';
+    const wide = item.wide ? '[column-span:all]' : '';
+    div.className = `masonry-item break-inside-avoid mb-2 relative w-full overflow-hidden rounded-[12px] border border-[#2a2a2a] bg-gradient-to-br ${color} ${ratio} ${wide}`;
+    div.innerHTML = `<div class="absolute inset-0 flex flex-col justify-between p-2"><span class="rounded-full bg-black/40 px-1.5 py-0.5 text-[9px] text-white/70">${escapeHtml(item.type||'media')}</span><span class="truncate rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white/80">${escapeHtml(item.label||'media')}</span></div>`;
+    container.appendChild(div);
+  };
+
+  document.getElementById('library-add-random')?.addEventListener('click', () => {
+    const ratios = ['aspect-[4/3]','aspect-[3/4]','aspect-square','aspect-[16/10]','aspect-[2/3]','aspect-[16/7]'];
+    const r = ratios[Math.floor(Math.random()*ratios.length)];
+    const wide = Math.random() > 0.7;
+    window.addLibraryMedia({ ratio: r, wide, label: `rand-${Date.now().toString().slice(-4)}`, type: wide ? 'wide' : 'image', color: 'from-zinc-800 to-zinc-700' });
+  });
+
+  document.getElementById('sync-notion')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget; const orig = btn.textContent; btn.textContent='Syncing...';
+    try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); }
+    catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
+  });
+
+  window.toggleSidebar = () => { if (isMobile()) { const isOpen = sidebar?.dataset.mobileOpen === 'true'; applyMobile(!isOpen); } };
+</script>
