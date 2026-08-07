@@ -1,5 +1,6 @@
 ---
-import Canonical from '../features/chat/components/ChatResponse.astro';
+/** Canonical mini moved to src/components/ui/chat/ChatResponse.astro — shim */
+import Canonical from '../../../components/ui/chat/ChatResponse.astro';
 interface Props { answer: string; images?: string[]; answer_type?: string; isStreaming?: boolean; messageId?: string; class?: string; }
 const props = Astro.props as Props;
 ---

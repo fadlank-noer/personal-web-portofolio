@@ -1,0 +1,545 @@
+---
+/**
+ * ChatBox — Unified ChatComposer Surface
+ * Guide: chat-composer-ui-ux-fix-guide.md + implementation-prompt.md
+ * 
+ * Principles:
+ * - 1 outer container only (radius 28px, border white/10, bg #252525 ish, overflow hidden)
+ * - Suggestion = top rows inside same surface, divider 06% between rows, 07% before input
+ * - Max 3 suggestions: about, skills, projects (hard cap)
+ * - No scrollbar, no nested card
+ * - Textarea transparent, no border/background of its own
+ * - Collapse suggestions when typing (input.trim().length>0)
+ * - Send = primary CTA 40px white circle
+ * - Hover: subtle bg, chevron appears on hover/focus
+ */
+import Plus from '@lucide/astro/icons/plus';
+import ArrowUp from '@lucide/astro/icons/arrow-up';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import Mic from '../../../assets/svgs/mic.svg';
+import SpeakWave from '../../../assets/svgs/speak-wave.svg';
+import questionsData from '../../../data/question-templates.json';
+
+const { cn = "" } = Astro.props;
+
+// Fixed 3 suggestions per guide — funnel: about -> skills -> projects
+const FIXED_SUGGESTIONS = [
+  questionsData.questions.find(q => q.question === "Tell us a little about yourself.") ?? questionsData.questions[0],
+  questionsData.questions.find(q => q.question === "What are your skills?") ?? questionsData.questions[2],
+  questionsData.questions.find(q => q.question === "What projects have you built?") ?? questionsData.questions[3],
+].filter(Boolean).slice(0,3);
+
+const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
+---
+
+<style>
+  /* Outer surface */
+  .composer-shell {
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(37,37,37,.96);
+    box-shadow: 0 10px 30px rgba(0,0,0,.28);
+    overflow: hidden;
+  }
+  /* Suggestion collapse */
+  .suggest-wrap {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 200ms ease, opacity 140ms ease;
+  }
+  .suggest-wrap[data-collapsed="true"] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  .suggest-inner { overflow: hidden; }
+
+  /* Row */
+  .suggest-row {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 16px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.35;
+    color: rgba(255,255,255,.88);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: background 140ms ease, color 140ms ease;
+  }
+  .suggest-row:hover { background: rgba(255,255,255,.045); color: #fff; }
+  .suggest-row:focus-visible {
+    outline: none;
+    background: rgba(255,255,255,.06);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+  }
+  .suggest-row .chevron {
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 140ms ease, transform 140ms ease;
+    color: rgba(255,255,255,.35);
+  }
+  .suggest-row:hover .chevron,
+  .suggest-row:focus-visible .chevron {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Textarea */
+  .composer-textarea {
+    width: 100%;
+    resize: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 16px 0 16px;
+    font-size: 15px;
+    line-height: 24px;
+    color: #fff;
+    min-height: 24px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .composer-textarea::placeholder { color: rgba(255,255,255,.38); }
+  .composer-textarea::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* Disclaimer above but inside? spec says above textarea hidden until chat started */
+  #disclaimer { transition: opacity 120ms ease; }
+
+  @media (max-width: 768px) {
+    .composer-shell { border-radius: 24px; }
+    .suggest-row { min-height: 44px; font-size: 14px; }
+    .suggest-row .chevron { display: none; } /* hide chevron on narrow */
+  }
+</style>
+
+<div id="chatbox-container" class:list={["w-full flex-shrink-0 bg-gradient-to-t from-black via-black to-transparent", cn]}>
+  <div class="mx-auto w-full max-w-[48rem] px-4 pb-6 pt-2">
+    <!-- Disclaimer — di ATAS textarea, hanya muncul setelah chat dimulai -->
+    <p id="disclaimer" class="hidden mb-3 text-center text-[11px] leading-4 text-zinc-500">
+      ChatGPT can make mistakes. <button type="button" class="underline decoration-zinc-500 underline-offset-2 hover:text-zinc-300 transition-colors">I'm here to fix that.</button>
+    </p>
+
+    <!-- Unified Composer Surface -->
+    <div class="composer-shell">
+      <!-- Composer Input: textarea transparent + actions — NOW ON TOP -->
+      <div class="relative w-full px-1.5 pb-2.5 pt-2.5">
+        <p id="input-helper" class="hidden text-[11px] text-amber-400/80 px-3 pb-1.5">Please select from suggestions — only questions from list are allowed.</p>
+
+        <textarea
+          id="chat-input"
+          placeholder="Ask anything"
+          rows="1"
+          class="composer-textarea pt-0"
+        ></textarea>
+
+        <div id="autocomplete-list" class="hidden absolute bottom-[68px] left-2 right-2 rounded-2xl bg-[#212121] border border-[#2f2f2f] shadow-2xl overflow-hidden z-10 max-h-64 overflow-y-auto">
+        </div>
+
+        <div class="flex items-center justify-between gap-2 px-1.5 pt-2.5">
+          <div id="plus-wrap" class="flex items-center">
+            <button id="add-btn-main" class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition-colors" type="button" aria-label="Add attachment">
+              <Plus class="w-5 h-5 text-zinc-300" />
+            </button>
+          </div>
+          <div id="icons-wrap" class="flex items-center gap-2">
+            <button id="mic-btn" class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 transition-colors" type="button" aria-label="Voice input">
+              <Mic class="w-5 h-5 text-zinc-300" />
+            </button>
+            <button id="send-btn" class="flex h-10 w-10 items-center justify-center rounded-full transition-all bg-white text-black shadow-sm hover:bg-zinc-100 active:scale-[.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white" type="button" aria-label="Send message" disabled>
+              <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
+              <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider — only show when suggestions visible (typing mode) -->
+      <div id="composer-divider" class="hidden h-px bg-white/[0.07]"></div>
+
+      <!-- Suggestions: BELOW input, appears after typing — 3 fixed when no autocomplete -->
+      <div id="suggest-wrap" class="suggest-wrap" data-collapsed="true" style="opacity:0; pointer-events:none">
+        <div class="suggest-inner">
+          <div class="divide-y divide-white/[0.06]">
+            {suggestionLabels.map((label, i) => (
+              <button type="button" data-suggest-fixed={i} class="suggest-row group">
+                <span class="truncate">{label}</span>
+                <span class="chevron flex h-5 w-5 items-center justify-center rounded-full bg-white/10">
+                  <ChevronRight class="h-3.5 w-3.5" />
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ questions: questionsData.questions, fixedLabels: suggestionLabels, fixedData: FIXED_SUGGESTIONS }}>
+  const STORAGE_KEY = 'fadlan-chat-history';
+
+  const suggestWrap = document.getElementById('suggest-wrap');
+  const composerDivider = document.getElementById('composer-divider');
+  const input = document.getElementById('chat-input');
+  const autoList = document.getElementById('autocomplete-list');
+  const inputHelper = document.getElementById('input-helper');
+  const sendBtn = document.getElementById('send-btn');
+  const sendIconDefault = document.getElementById('send-icon-default');
+  const sendIconActive = document.getElementById('send-icon-active');
+  const disclaimer = document.getElementById('disclaimer');
+
+  let filteredSuggestions = [];
+  let selectedIndex = -1;
+  const isSubmitting = { value: false };
+
+  function generateId() { return `msg_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; }
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // INVERTED per user request: suggestion HANYA muncul setelah diketik
+  // Idle (empty) = collapsed/hidden, Typing (>=1 char) = show fixed 3 suggestions if no autocomplete filtering yet, or autocomplete if filtering
+  function updateSuggestionVisibility() {
+    const trimmed = input.value.trim();
+    // Show fixed suggestions ONLY when user has typed something (opposite of guide)
+    const shouldShowFixed = trimmed.length >= 1 && !isSubmitting.value && filteredSuggestions.length === 0;
+    if (suggestWrap) {
+      suggestWrap.dataset.collapsed = shouldShowFixed ? 'false' : 'true';
+      suggestWrap.style.opacity = shouldShowFixed ? '1' : '0';
+      suggestWrap.style.pointerEvents = shouldShowFixed ? 'auto' : 'none';
+    }
+    if (composerDivider) {
+      composerDivider.style.display = shouldShowFixed ? 'block' : 'none';
+    }
+  }
+
+  function updateSuggestionVisibilityTypingMode() {
+    const trimmed = input.value.trim();
+    if (trimmed.length === 0) {
+      // empty -> always hide fixed
+      if (suggestWrap) {
+        suggestWrap.dataset.collapsed = 'true';
+        suggestWrap.style.opacity = '0';
+        suggestWrap.style.pointerEvents = 'none';
+      }
+      if (composerDivider) composerDivider.style.display = 'none';
+      return false;
+    }
+    // typing -> if we have autocomplete results, hide fixed and show autocomplete
+    if (filteredSuggestions.length > 0) {
+      if (suggestWrap) {
+        suggestWrap.dataset.collapsed = 'true';
+        suggestWrap.style.opacity = '0';
+        suggestWrap.style.pointerEvents = 'none';
+      }
+      if (composerDivider) composerDivider.style.display = 'none';
+      return false;
+    }
+    // typing but no autocomplete -> show fixed 3
+    if (suggestWrap) {
+      suggestWrap.dataset.collapsed = 'false';
+      suggestWrap.style.opacity = '1';
+      suggestWrap.style.pointerEvents = 'auto';
+    }
+    if (composerDivider) composerDivider.style.display = 'block';
+    return true;
+  }
+
+  function filterQuestions(query, limit = 3) {
+    if (!query || query.trim().length < 1) return [];
+    const q = query.toLowerCase().trim();
+    const scored = questions.map(qt => {
+      const lq = qt.question.toLowerCase();
+      let score = 0;
+      if (lq === q) score = 100;
+      else if (lq.startsWith(q)) score = 80;
+      else if (lq.includes(q)) score = 60;
+      else {
+        const words = q.split(/\s+/).filter(Boolean);
+        const matches = words.filter(w => lq.includes(w)).length;
+        if (matches > 0) score = (matches / words.length) * 50;
+      }
+      return { qt, score };
+    }).filter(({score}) => score > 0).sort((a,b) => b.score - a.score).slice(0, limit).map(({qt}) => qt);
+    return scored;
+  }
+
+  function findExactQuestion(query) {
+    const q = (query||'').toLowerCase().trim();
+    if (!q) return null;
+    const exact = questions.find(i => i.question.toLowerCase().trim() === q);
+    if (exact) return exact;
+    const loose = questions.find(i => {
+      const lq = i.question.toLowerCase();
+      return lq.includes(q) || q.includes(lq);
+    });
+    return loose ?? null;
+  }
+
+  function isValidQuestion(query) {
+    return !!findExactQuestion(query);
+  }
+
+  function renderAutocomplete() {
+    if (filteredSuggestions.length === 0) {
+      autoList.classList.add('hidden');
+      return;
+    }
+    // still show as simple rows but inside autocomplete dropdown (max 3)
+    autoList.innerHTML = filteredSuggestions.map((item, idx) => {
+      const active = idx === selectedIndex ? 'bg-[#3a3a3a] text-white' : 'text-zinc-300 hover:bg-[#2a2a2a]';
+      return `<button type="button" data-suggest-idx="${idx}" class="w-full text-left px-4 py-3 text-[14px] leading-snug transition-colors ${active} border-b border-white/[0.06] last:border-0">${escapeHtml(item.question)}</button>`;
+    }).join('');
+    autoList.classList.remove('hidden');
+
+    autoList.querySelectorAll('[data-suggest-idx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-suggest-idx'), 10);
+        selectSuggestion(idx);
+      });
+    });
+  }
+
+  function selectSuggestion(idx) {
+    if (idx < 0 || idx >= filteredSuggestions.length) return;
+    const q = filteredSuggestions[idx];
+    input.value = q.question;
+    resizeTextarea(input);
+    closeAutocomplete();
+    validateInput();
+    updateSuggestionVisibility();
+    input.focus();
+  }
+
+  function closeAutocomplete() {
+    autoList.classList.add('hidden');
+    selectedIndex = -1;
+    filteredSuggestions = [];
+  }
+
+  function validateInput() {
+    const value = input.value.trim();
+    if (value === '') {
+      sendBtn.disabled = true;
+      sendBtn.classList.add('opacity-50');
+      sendIconDefault.classList.remove('hidden');
+      sendIconActive.classList.add('hidden');
+      inputHelper.classList.add('hidden');
+      return false;
+    }
+    const valid = isValidQuestion(value);
+    if (valid) {
+      sendBtn.disabled = false;
+      sendBtn.classList.remove('opacity-50');
+      sendIconDefault.classList.add('hidden');
+      sendIconActive.classList.remove('hidden');
+      inputHelper.classList.add('hidden');
+      return true;
+    } else {
+      sendBtn.disabled = true;
+      sendBtn.classList.add('opacity-50');
+      sendIconDefault.classList.remove('hidden');
+      sendIconActive.classList.add('hidden');
+      if (value.length >= 2) inputHelper.classList.remove('hidden');
+      return false;
+    }
+  }
+
+  function resizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+  }
+
+  function submit() {
+    const value = input.value.trim();
+    if (!value) return;
+    if (!isValidQuestion(value)) {
+      inputHelper.classList.remove('hidden');
+      input.classList.add('ring-1', 'ring-amber-500/30');
+      setTimeout(() => input.classList.remove('ring-1', 'ring-amber-500/30'), 600);
+      return;
+    }
+    const matched = findExactQuestion(value);
+    if (!matched) return;
+
+    isSubmitting.value = true;
+    updateSuggestionVisibility();
+
+    const newMessage = {
+      id: generateId(),
+      question: matched.question,
+      answer: matched.answer,
+      answer_type: matched.answer_type,
+      images: matched.images || [],
+      timestamp: Date.now()
+    };
+
+    const api = window.chatHistoryApi;
+    if (api) {
+      api.add(newMessage);
+      api.showTyping(true);
+      setTimeout(() => {
+        api.showTyping(false);
+        api.scrollToBottom();
+        isSubmitting.value = false;
+        updateSuggestionVisibility();
+      }, 450 + Math.random()*400);
+    } else {
+      let history = [];
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) history = JSON.parse(raw);
+      } catch {}
+      history = [...history, newMessage];
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch {}
+      window.dispatchEvent(new CustomEvent('chat:updated'));
+      isSubmitting.value = false;
+      updateSuggestionVisibility();
+    }
+
+    input.value = '';
+    resizeTextarea(input);
+    validateInput();
+    closeAutocomplete();
+    updateSuggestionVisibility();
+  }
+
+  // Fixed 3 suggestions click -> direct submit per guide Option A
+  document.querySelectorAll('[data-suggest-fixed]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-suggest-fixed'), 10);
+      const data = fixedData[idx];
+      if (!data) return;
+      // Option A: langsung submit
+      input.value = data.question;
+      resizeTextarea(input);
+      validateInput();
+      submit();
+    });
+  });
+
+  input.addEventListener('input', () => {
+    const value = input.value;
+    resizeTextarea(input);
+    validateInput();
+
+    if (value.trim().length >= 1) {
+      // When typing, if filter matches exist -> show autocomplete (3 max) else show fixed 3
+      filteredSuggestions = filterQuestions(value, 3);
+      selectedIndex = -1;
+      if (filteredSuggestions.length > 0 && !isValidQuestion(value)) {
+        renderAutocomplete();
+        // hide fixed
+        if (suggestWrap) {
+          suggestWrap.dataset.collapsed = 'true';
+          suggestWrap.style.opacity = '0';
+          suggestWrap.style.pointerEvents = 'none';
+        }
+        if (composerDivider) composerDivider.style.display = 'none';
+      } else {
+        closeAutocomplete();
+        // show fixed
+        updateSuggestionVisibility();
+      }
+      if (value.trim().length >= 2 && !isValidQuestion(value) && filteredSuggestions.length === 0) inputHelper.classList.remove('hidden');
+      else if (isValidQuestion(value) || filteredSuggestions.length > 0) inputHelper.classList.add('hidden');
+    } else {
+      closeAutocomplete();
+      inputHelper.classList.add('hidden');
+      // empty -> hide all suggestions (inverted mode)
+      updateSuggestionVisibility();
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') {
+      if (filteredSuggestions.length > 0) {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, filteredSuggestions.length - 1);
+        renderAutocomplete();
+        const activeBtn = autoList.querySelector(`[data-suggest-idx="${selectedIndex}"]`);
+        if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (filteredSuggestions.length > 0) {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, 0);
+        renderAutocomplete();
+        const activeBtn = autoList.querySelector(`[data-suggest-idx="${selectedIndex}"]`);
+        if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
+      }
+    } else if (e.key === 'Enter') {
+      if (filteredSuggestions.length > 0 && selectedIndex >= 0) {
+        e.preventDefault();
+        selectSuggestion(selectedIndex);
+        return;
+      }
+      if (!e.shiftKey) {
+        e.preventDefault();
+        submit();
+      }
+    } else if (e.key === 'Escape') {
+      closeAutocomplete();
+      inputHelper.classList.add('hidden');
+      // inverted: if empty, keep suggestions hidden
+      if (input.value.trim().length === 0) {
+        if (suggestWrap) {
+          suggestWrap.dataset.collapsed = 'true';
+          suggestWrap.style.opacity = '0';
+        }
+        if (composerDivider) composerDivider.style.display = 'none';
+      }
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if (!autoList.contains(target) && target !== input && !input.closest('.composer-shell')?.contains(target)) {
+      closeAutocomplete();
+    }
+  });
+
+  sendBtn.addEventListener('click', () => submit());
+
+  window.addEventListener('chat:chip-click', (e) => {
+    const q = e.detail && e.detail.question;
+    if (!q) return;
+    input.value = q;
+    resizeTextarea(input);
+    validateInput();
+    submit();
+  });
+
+  // Disclaimer: hanya muncul setelah chat dimulai, hidden kalau belum mulai
+  const updateDisclaimer = (show) => {
+    if (!disclaimer) return;
+    disclaimer.classList.toggle('hidden', !show);
+  };
+
+  window.addEventListener('chat:state', (e) => {
+    const empty = !!(e.detail && e.detail.empty);
+    updateDisclaimer(!empty);
+    if (empty) {
+      // when back to empty, show suggestions again
+      setTimeout(() => updateSuggestionVisibility(), 50);
+    }
+  });
+
+  window.addEventListener('chat:updated', () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      updateDisclaimer(Array.isArray(arr) && arr.length > 0);
+    } catch { updateDisclaimer(false); }
+  });
+
+  // initial
+  updateDisclaimer(false);
+  resizeTextarea(input);
+  validateInput();
+  updateSuggestionVisibility();
+</script>

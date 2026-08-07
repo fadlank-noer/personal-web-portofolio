@@ -1,6 +1,6 @@
 <svg width="357" height="357" viewBox="0 0 357 357" xmlns="http://www.w3.org/2000/svg">
-  <!-- Waveform bars (putih) -->
-  <g fill="#000000">
+  <!-- Waveform bars — use currentColor so parent text color controls it -->
+  <g fill="currentColor">
     <rect x="60" y="118" width="28" height="120" rx="14"/>
     <rect x="130" y="18"  width="28" height="320" rx="14"/>
     <rect x="200" y="68" width="28" height="220" rx="14"/>

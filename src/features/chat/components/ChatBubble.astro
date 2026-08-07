@@ -1,5 +1,6 @@
 ---
-import Canonical from '../features/chat/components/ChatBubble.astro';
+/** Canonical mini moved to src/components/ui/chat/ChatBubble.astro — this is shim for feature compat */
+import Canonical from '../../../components/ui/chat/ChatBubble.astro';
 interface Props { role: 'user' | 'assistant'; content: string; images?: string[]; timestamp?: number; isStreaming?: boolean; avatarLabel?: string; class?: string; }
 const props = Astro.props as Props;
 ---

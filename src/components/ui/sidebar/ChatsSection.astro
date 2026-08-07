@@ -1,0 +1,12 @@
+---
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+---
+<div data-section-wrap="chats" class="group/section">
+  <button data-section-toggle="chats" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+    <span class="sidebar-label">Chats</span>
+    <ChevronDown class="h-3.5 w-3.5 transition-transform sidebar-label" data-chevron="chats" />
+  </button>
+  <div data-section-content="chats" class="mt-1 sidebar-section-content">
+    <div id="sidebar-chat-list" class="space-y-0.5"><p id="sidebar-empty" class="px-2 py-2 text-xs text-zinc-600 sidebar-label">No chats yet</p></div>
+  </div>
+</div>

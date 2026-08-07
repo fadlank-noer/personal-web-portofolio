@@ -1,0 +1,25 @@
+---
+import Pin from '@lucide/astro/icons/pin';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import type { PinnedItem } from '../../../lib/types/sidebar';
+
+interface Props {
+  items: PinnedItem[];
+}
+const { items } = Astro.props;
+---
+<div data-section-wrap="pinned" class="group/section">
+  <button data-section-toggle="pinned" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+    <span class="flex items-center gap-1.5"><Pin class="h-3.5 w-3.5" /> <span class="sidebar-label">Pinned</span></span>
+    <ChevronDown class="h-3.5 w-3.5 transition-transform sidebar-label" data-chevron="pinned" />
+  </button>
+  <div data-section-content="pinned" class="mt-1.5 space-y-0.5 sidebar-section-content">
+    {items.map((p) => (
+      <a href="#" data-pinned-id={p.id} class="group/item flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#212121] hover:text-white transition-colors text-left">
+        <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-[#242424] text-[12px]">{p.icon}</span>
+        <span class="flex-1 min-w-0"><span class="truncate block sidebar-label leading-tight">{p.title}</span><span class="block text-[11px] text-zinc-500 group-hover/item:text-zinc-400 sidebar-label truncate">{p.meta}</span></span>
+      </a>
+    ))}
+    <button id="pin-current" class="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-[#1f1f1f] transition-colors sidebar-label">+ Pin current chat</button>
+  </div>
+</div>

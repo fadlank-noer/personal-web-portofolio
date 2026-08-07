@@ -1,0 +1,40 @@
+---
+/**
+ * ChatThread.astro
+ * Full GPT-like chat container - composition of ChatHistory + input
+ * Layout: flex-1 thread scrollable + sticky input bottom with gradient fade
+ * This is the main chat surface to drop into Layout slot.
+ */
+import ChatHistory from './ChatHistory.astro';
+import ChatBox from './ChatBox.astro';
+import type { ChatMessage } from '../../../lib/types/chat';
+
+interface Props {
+  messages?: ChatMessage[];
+  isStreaming?: boolean;
+  class?: string;
+}
+
+const { messages = [], isStreaming = false, class: className = '' } = Astro.props;
+---
+
+<div class:list={["flex h-full min-h-0 w-full flex-col bg-black", className]}>
+  {/* Thread - scrollable */}
+  <div class="flex flex-1 flex-col min-h-0 overflow-hidden">
+    <ChatHistory messages={messages} isStreaming={isStreaming} class="flex-1" />
+  </div>
+
+  {/* Sticky input with gradient fade like ChatGPT */}
+  <div class="relative w-full flex-shrink-0 bg-black">
+    {/* Gradient fade top edge */}
+    <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
+
+    <div class="mx-auto w-full max-w-[48rem] px-4 pb-4 pt-2">
+      <ChatBox cn="w-full" />
+
+      <p class="mt-3 text-center text-[11px] leading-4 text-zinc-500">
+        FadlanGPT can make mistakes. Check important info.
+      </p>
+    </div>
+  </div>
+</div>

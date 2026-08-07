@@ -13,7 +13,7 @@
  */
 
 import { atom, computed, map } from 'nanostores';
-import type { ChatMessage, QuestionTemplate } from '../components/types';
+import type { ChatMessage, QuestionTemplate } from '../lib/types/chat';
 
 // Re-export for consumers that import types from store
 export type { ChatMessage, QuestionTemplate };

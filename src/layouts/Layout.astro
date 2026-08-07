@@ -1,10 +1,10 @@
 ---
 import "../styles/global.css";
-import Head from "../components/Head.astro";
-import Header from "../components/Header.astro";
-import Sidebar from "../components/Sidebar.astro";
-import ChatHistory from "../components/ChatHistory.astro";
-import ChatBox from "../components/ChatBox.astro";
+import Head from "./Head.astro";
+import Header from "../components/layout/Header.astro";
+import Sidebar from "../features/sidebar/components/Sidebar.astro";
+import ChatHistory from "../features/chat/components/ChatHistory.astro";
+import ChatBox from "../features/chat/components/ChatBox.astro";
 ---
 
 <html lang="en">
@@ -16,44 +16,31 @@ import ChatBox from "../components/ChatBox.astro";
   <body class="bg-black text-white antialiased overflow-hidden">
     <div class="flex h-screen w-full overflow-hidden bg-black">
       <Sidebar />
-
-      <!-- Main: when empty → only Header + centered heading + ChatBox (image 1). When has chat → Header + thread + bottom ChatBox -->
       <main id="main-chat" class="flex flex-1 flex-col min-w-0 bg-black relative overflow-hidden">
         <Header title="FadlanGPT" />
-
-        <!-- EMPTY state — matches image: "Ready to know me better?" + centered ChatBox -->
         <div id="empty-wrapper" class="flex flex-1 flex-col items-center justify-center px-4 pb-6 md:pb-10 overflow-hidden">
           <h1 class="mb-8 md:mb-10 text-[28px] md:text-[32px] font-[400] md:font-[500] tracking-[-0.02em] leading-tight text-center text-white">Ready to know me better?</h1>
-          <div id="empty-chatbox" class="w-full max-w-[640px] md:max-w-[720px]">
-            <!-- ChatBox will render here when empty (cloned/moved via JS) — fallback static below -->
-          </div>
+          <div id="empty-chatbox" class="w-full max-w-[640px] md:max-w-[720px]"></div>
         </div>
-
-        <!-- THREAD state — ChatHistory scrollable + bottom ChatBox -->
         <div id="thread-wrapper" class="hidden flex-1 flex-col min-h-0 overflow-hidden">
           <div class="flex flex-1 flex-col min-h-0 overflow-hidden">
             <ChatHistory class="flex-1" />
           </div>
           <div id="thread-chatbox-anchor" class="flex-shrink-0 bg-black relative">
             <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
-            <!-- ChatBox will be moved here when thread -->
           </div>
         </div>
-
-        <!-- Actual ChatBox source (will be moved by JS) -->
         <div id="chatbox-source" class="w-full flex-shrink-0 bg-black relative">
           <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent thread-only"></div>
           <ChatBox />
         </div>
       </main>
     </div>
-
     <slot />
   </body>
 </html>
 
 <style>
-  /* Hide gradient when in empty */
   #main-chat[data-empty="true"] #chatbox-source .thread-only { display: none; }
   #main-chat[data-empty="false"] #empty-wrapper { display: none !important; }
   #main-chat[data-empty="true"] #thread-wrapper { display: none !important; }
@@ -62,62 +49,30 @@ import ChatBox from "../components/ChatBox.astro";
 </style>
 
 <script>
-  const mainEl = document.getElementById('main-chat') as HTMLElement | null;
-  const emptyWrapper = document.getElementById('empty-wrapper');
+  const mainEl = document.getElementById('main-chat');
   const emptyChatbox = document.getElementById('empty-chatbox');
-  const threadWrapper = document.getElementById('thread-wrapper');
   const threadAnchor = document.getElementById('thread-chatbox-anchor');
   const source = document.getElementById('chatbox-source');
-
-  const chatBoxEl = source?.querySelector('#chatbox-container') as HTMLElement | null;
-
+  const chatBoxEl = source?.querySelector('#chatbox-container');
   function moveToEmpty() {
     if (!mainEl || !emptyChatbox || !chatBoxEl || !source) return;
     mainEl.dataset.empty = 'true';
-    // move chatbox DOM to empty center
-    if (chatBoxEl.parentElement !== emptyChatbox) {
-      emptyChatbox.appendChild(chatBoxEl);
-    }
+    if (chatBoxEl.parentElement !== emptyChatbox) emptyChatbox.appendChild(chatBoxEl);
   }
-
   function moveToThread() {
     if (!mainEl || !threadAnchor || !chatBoxEl) return;
     mainEl.dataset.empty = 'false';
-    if (chatBoxEl.parentElement !== threadAnchor) {
-      threadAnchor.appendChild(chatBoxEl);
-    }
+    if (chatBoxEl.parentElement !== threadAnchor) threadAnchor.appendChild(chatBoxEl);
   }
-
-  const applyState = (empty: boolean) => {
-    if (empty) moveToEmpty();
-    else moveToThread();
-  };
-
-  // initial: assume empty, will be corrected by chat:state
+  const applyState = (empty) => { if (empty) moveToEmpty(); else moveToThread(); };
   moveToEmpty();
   if (mainEl) mainEl.dataset.empty = 'true';
-
-  window.addEventListener('chat:state' as any, (e: any) => {
-    const isEmpty = !!(e.detail && e.detail.empty);
-    applyState(isEmpty);
-  });
-
-  // fallback: also check on chat:updated via localStorage
+  window.addEventListener('chat:state', (e) => { const isEmpty = !!(e.detail && e.detail.empty); applyState(isEmpty); });
   const checkStorage = () => {
-    try {
-      const raw = localStorage.getItem('fadlan-chat-history');
-      if (!raw) { applyState(true); return; }
-      const arr = JSON.parse(raw);
-      applyState(!Array.isArray(arr) || arr.length === 0);
-    } catch {
-      applyState(true);
-    }
+    try { const raw = localStorage.getItem('fadlan-chat-history'); if (!raw) { applyState(true); return; } const arr = JSON.parse(raw); applyState(!Array.isArray(arr) || arr.length === 0); } catch { applyState(true); }
   };
-
   window.addEventListener('chat:updated', checkStorage);
   window.addEventListener('storage', (e) => { if (e.key === 'fadlan-chat-history') checkStorage(); });
-
-  // also run checkStorage shortly after load (ChatHistory loads async)
   setTimeout(checkStorage, 100);
   setTimeout(checkStorage, 400);
 </script>

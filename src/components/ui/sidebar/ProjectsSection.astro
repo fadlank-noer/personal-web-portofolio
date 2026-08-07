@@ -1,0 +1,32 @@
+---
+import Folder from '@lucide/astro/icons/folder';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import type { ProjectItem } from '../../../lib/types/sidebar';
+
+interface Props {
+  items: ProjectItem[];
+}
+const { items } = Astro.props;
+---
+<div data-section-wrap="projects" class="group/section">
+  <button data-section-toggle="projects" class="flex w-full items-center justify-between rounded-md px-1.5 py-1 text-[11px] font-semibold tracking-widest uppercase text-zinc-500 hover:bg-[#1f1f1f] hover:text-zinc-300 transition-colors">
+    <span class="flex items-center gap-1.5">
+      <Folder class="h-4 w-4" />
+      <span class="sidebar-label">Projects</span>
+    </span>
+    <span class="flex items-center gap-1 sidebar-label"><span class="text-[10px] rounded bg-[#252525] px-1.5 py-0.5 text-zinc-400">{items.length}</span><ChevronDown class="h-3.5 w-3.5 transition-transform" data-chevron="projects" /></span>
+  </button>
+  <div data-section-content="projects" class="mt-1.5 space-y-0.5 sidebar-section-content">
+    {items.map((pr) => (
+      <a href={pr.url || `/projects/${pr.id}`} class="group/proj flex w-full items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-[#212121] transition-colors">
+        <span class={`h-6 w-6 rounded-[6px] ${pr.color} flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0`}>{pr.thumb}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate text-[13px] leading-tight text-zinc-200 group-hover/proj:text-white sidebar-label">{pr.title}</span>
+          <span class="block truncate text-[11px] text-zinc-500 sidebar-label">{pr.desc}</span>
+        </span>
+        <span class="text-[11px] text-zinc-500 group-hover/proj:text-zinc-300 sidebar-label">{pr.count}</span>
+      </a>
+    ))}
+    <button class="flex w-full items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] text-zinc-500 hover:text-zinc-300 hover:bg-[#1f1f1f] transition-colors sidebar-label">+ New project</button>
+  </div>
+</div>
