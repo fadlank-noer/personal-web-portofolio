@@ -1,15 +1,16 @@
 ---
 /**
- * Sidebar – ChatGPT style + Pinned / Projects / Library (masonry) / Recents (Notion)
- * Canonical: features/sidebar/components/Sidebar.astro
- * Mini components: components/ui/sidebar/* (reusable)
+ * Sidebar – bg hitam plek index.astro bg-black
+ * Header: logo-v2.svg ganti PanelLeft (42-44), right actions search + side-toggle proper buttons (46-49)
  */
-import PanelLeft from '@lucide/astro/icons/panel-left';
 import SquarePen from '@lucide/astro/icons/square-pen';
 import Search from '@lucide/astro/icons/search';
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Trash2 from '@lucide/astro/icons/trash-2';
 import User from '@lucide/astro/icons/user';
+import LogoV2 from '../../../assets/logo-v2.svg';
+import SideToggleMobile from '../../../assets/svgs/side-toggle-mobile.svg';
+import FolderIcon from '../../../assets/svgs/folder.svg';
 
 import PinnedSection from '../../../components/ui/sidebar/PinnedSection.astro';
 import ProjectsSection from '../../../components/ui/sidebar/ProjectsSection.astro';
@@ -22,47 +23,55 @@ import type { SidebarData } from '../../../lib/types/sidebar';
 
 interface Props { collapsed?: boolean; }
 const { collapsed = false } = Astro.props;
-
 const data = sidebarData as SidebarData;
 ---
 
 <aside
   id="sidebar"
   data-collapsed={collapsed ? 'true' : 'false'}
-  class="flex h-full flex-col bg-[#171717] transition-all duration-200 ease-in-out
+  class="flex h-full flex-col bg-black transition-all duration-200 ease-in-out
          w-[75vw] max-w-[280px] md:w-[12%] md:max-w-none flex-shrink-0
          data-[collapsed=true]:!w-[60px] data-[collapsed=true]:md:!w-[60px] data-[collapsed=true]:!max-w-[60px]
          fixed md:relative inset-y-0 left-0 z-40
          -translate-x-full md:translate-x-0
          data-[mobile-open=true]:!translate-x-0
-         border-r border-[#232323]"
+         border-r border-white/[0.06]"
   data-mobile-open="false"
 >
-  <!-- Header -->
-  <div class="flex h-[52px] items-center justify-between px-2.5 flex-shrink-0">
-    <button id="sidebar-toggle" class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors" title="Toggle sidebar">
-      <PanelLeft class="h-[18px] w-[18px]" />
+  <!-- Header 42-44 logo-v2 + 46-49 search & side-toggle — no text placeholder -->
+  <div class="flex h-[52px] items-center justify-between px-2.5 flex-shrink-0 bg-black">
+    <button id="sidebar-toggle" class="flex h-8 w-8 items-center justify-center rounded-lg text-white hover:bg-[#141414] transition-colors shrink-0" title="Toggle sidebar" aria-label="Toggle sidebar">
+      <!-- logo-v2.svg — original fill #FAFAFA -> force white/black via currentColor -->
+      <LogoV2 class="h-5 w-5 [&_path]:!fill-white" />
     </button>
-    <button id="sidebar-brand" class="flex-1 ml-2 flex items-center justify-between text-left text-[13px] font-[600] tracking-tight text-zinc-100 hover:bg-[#212121] rounded-lg px-2.5 py-1.5 transition-colors sidebar-label">
-      <span class="truncate">FadlanGPT</span>
-      <ChevronDown class="h-3.5 w-3.5 opacity-60" />
-    </button>
+
+    <!-- 46-49 — proper icon buttons, bukan text -->
+    <div class="flex items-center gap-0.5 ml-auto">
+      <button id="sidebar-search" class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors sidebar-label" title="Search" aria-label="Search chats">
+        <Search class="h-[18px] w-[18px]" />
+      </button>
+      <button id="sidebar-side-toggle" class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors" title="Close" aria-label="Close sidebar">
+        <SideToggleMobile class="h-[18px] w-[18px]" />
+      </button>
+    </div>
   </div>
 
-  <!-- Quick actions -->
-  <div class="px-2.5 pb-2 space-y-0.5">
-    <button id="new-chat-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#212121] transition-colors">
+  <!-- Quick actions — New Chat + Projects (folder.svg) + Search -->
+  <div class="px-2.5 pb-2 space-y-0.5 bg-black">
+    <button id="new-chat-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors">
       <SquarePen class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
     </button>
-    <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#212121] hover:text-zinc-200 transition-colors">
+    <a href="/projects" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
+      <FolderIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Projects</span>
+    </a>
+    <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors">
       <Search class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">Search chats</span>
     </button>
   </div>
 
-  <div class="mx-3 my-1.5 h-px bg-[#222] sidebar-label"></div>
+  <div class="mx-3 my-1.5 h-px bg-white/[0.06] sidebar-label"></div>
 
-  <!-- Scrollable -->
-  <div class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5">
+  <div class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5 bg-black">
     <PinnedSection items={data.pinned} />
     <ProjectsSection items={data.projects} />
     <LibrarySection items={data.library} />
@@ -70,16 +79,15 @@ const data = sidebarData as SidebarData;
     <ChatsSection />
   </div>
 
-  <!-- Footer -->
-  <div class="mt-auto border-t border-[#232323]">
+  <div class="mt-auto border-t border-white/[0.06] bg-black">
     <div class="px-2 py-1.5">
-      <button id="clear-chats-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#212121] hover:text-zinc-200 transition-colors"><Trash2 class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label">Clear chats</span></button>
+      <button id="clear-chats-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors"><Trash2 class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label">Clear chats</span></button>
     </div>
     <div class="px-2 pb-1">
-      <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#212121] hover:text-zinc-200 transition-colors"><User class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label flex-1 text-left">Upgrade plan</span></button>
+      <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors"><User class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label flex-1 text-left">Upgrade plan</span></button>
     </div>
     <div class="px-2 py-2 pb-3">
-      <button class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#212121] transition-colors">
+      <button class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#141414] transition-colors">
         <div class="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold">F</div>
         <span class="truncate flex-1 text-left text-[13px] text-zinc-200 sidebar-label">Fadlan K. Noer</span>
         <ChevronDown class="h-4 w-4 text-zinc-500 flex-shrink-0 sidebar-label" />
@@ -91,22 +99,26 @@ const data = sidebarData as SidebarData;
 <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/50 hidden md:hidden"></div>
 
 <style>
-  .chat-scrollbar::-webkit-scrollbar { width: 4px; }
-  .chat-scrollbar::-webkit-scrollbar-track { background: transparent; }
-  .chat-scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
-  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+  .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #2a2a2a #000; }
+  .chat-scrollbar::-webkit-scrollbar { width: 6px; }
+  .chat-scrollbar::-webkit-scrollbar-track { background: #000; }
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    background: #444; border-radius: 9999px; border: 1px solid #000; background-clip: padding-box;
+  }
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #5a5a5a; background-clip: padding-box; }
+  .chat-scrollbar::-webkit-scrollbar-button { width: 6px; height: 10px; background: #000 no-repeat center; display: block; }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:start:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M3 0 L6 4 L0 4 Z' fill='%23444'/%3E%3C/svg%3E"); }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%23444'/%3E%3C/svg%3E"); }
   .masonry-grid { column-count: 2; column-gap: 0.5rem; }
   .masonry-item { break-inside: avoid; }
-  .masonry-item:hover { transform: translateY(-1px); }
   [data-collapsed="true"] .sidebar-section-content { display: none !important; }
-  [data-collapsed="true"] .group\/section > button { justify-content: center; }
+  [data-collapsed="true"] .group\/section .hover-reveal { display: none !important; }
 </style>
 
 <script>
   const STORAGE_KEY = 'fadlan-chat-history';
   const SIDEBAR_COLLAPSED_KEY = 'fadlan-sidebar-collapsed';
   const SECTIONS_KEY = 'fadlan-sidebar-sections-v2';
-
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const toggleBtn = document.getElementById('sidebar-toggle');
@@ -114,17 +126,15 @@ const data = sidebarData as SidebarData;
   const clearBtn = document.getElementById('clear-chats-btn');
   const chatListEl = document.getElementById('sidebar-chat-list');
   const emptyEl = document.getElementById('sidebar-empty');
-
+  const sideToggleBtn = document.getElementById('sidebar-side-toggle');
+  const searchBtn = document.getElementById('sidebar-search');
   const isMobile = () => window.innerWidth < 768;
   const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
   const saveCollapsed = (v) => { try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(v)); } catch {} };
-
   const defaultSections = { pinned: true, projects: true, library: true, recents: true, chats: true };
   const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
   const saveSections = (s) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
-
   let sectionsState = loadSections();
-
   function applySections() {
     Object.entries(sectionsState).forEach(([key, open]) => {
       const content = document.querySelector(`[data-section-content="${key}"]`);
@@ -133,66 +143,54 @@ const data = sidebarData as SidebarData;
       if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
     });
   }
-
   function applyCollapsed(collapsed) {
     if (!sidebar) return;
     sidebar.dataset.collapsed = collapsed ? 'true' : 'false';
     document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = collapsed ? 'none' : ''; });
     if (!collapsed) applySections();
   }
-
   function applyMobile(open) {
     if (!sidebar || !overlay) return;
     sidebar.dataset.mobileOpen = open ? 'true' : 'false';
     overlay.classList.toggle('hidden', !open);
   }
-
-  const collapsedInit = loadCollapsed();
-  applyCollapsed(collapsedInit);
+  applyCollapsed(loadCollapsed());
   applySections();
-
-  toggleBtn?.addEventListener('click', () => {
+  const handleToggle = () => {
     if (isMobile()) {
-      const isOpen = sidebar?.dataset.mobileOpen === 'true';
-      applyMobile(!isOpen);
+      applyMobile(sidebar?.dataset.mobileOpen !== 'true');
     } else {
-      const cur = sidebar?.dataset.collapsed === 'true';
-      const next = !cur;
-      applyCollapsed(next);
-      saveCollapsed(next);
+      const cur = sidebar?.dataset.collapsed === 'true'; const next = !cur;
+      applyCollapsed(next); saveCollapsed(next);
       window.dispatchEvent(new CustomEvent('sidebar:toggle', { detail: { collapsed: next }}));
     }
-  });
-
+  };
+  toggleBtn?.addEventListener('click', handleToggle);
+  sideToggleBtn?.addEventListener('click', () => applyMobile(sidebar?.dataset.mobileOpen !== 'true'));
+  searchBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('sidebar:search')); document.getElementById('chat-input')?.focus(); });
   overlay?.addEventListener('click', () => applyMobile(false));
   newChatBtn?.addEventListener('click', () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} window.dispatchEvent(new CustomEvent('chat:clear')); if (isMobile()) applyMobile(false); });
   clearBtn?.addEventListener('click', () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} window.dispatchEvent(new CustomEvent('chat:clear')); });
-
   document.querySelectorAll('[data-section-toggle]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const key = btn.getAttribute('data-section-toggle'); if (!key) return;
       if (sidebar?.dataset.collapsed === 'true') return;
-      sectionsState[key] = !sectionsState[key];
-      saveSections(sectionsState);
-      applySections();
+      sectionsState[key] = !sectionsState[key]; saveSections(sectionsState); applySections();
     });
   });
-
   function renderSidebarList() {
     if (!chatListEl) return;
-    let history = [];
-    try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) history = JSON.parse(raw); } catch {}
+    let history = []; try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) history = JSON.parse(raw); } catch {}
     if (history.length === 0) {
       if (emptyEl) emptyEl.style.display = sidebar?.dataset.collapsed === 'true' ? 'none' : '';
-      chatListEl.querySelectorAll('[data-sidebar-item]').forEach(el => el.remove());
-      return;
+      chatListEl.querySelectorAll('[data-sidebar-item]').forEach(el => el.remove()); return;
     }
     if (emptyEl) emptyEl.style.display = 'none';
     chatListEl.querySelectorAll('[data-sidebar-item]').forEach(el => el.remove());
     history.slice().reverse().forEach((msg) => {
       const btn = document.createElement('button');
       btn.setAttribute('data-sidebar-item', msg.id);
-      btn.className = 'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#212121] transition-colors text-left';
+      btn.className = 'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#141414] transition-colors text-left';
       btn.title = msg.question;
       btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 flex-shrink-0 opacity-70"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="truncate flex-1 sidebar-label">${escapeHtml(msg.question)}</span>`;
       btn.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('chat:scroll-to', { detail: { id: msg.id } })); if (isMobile()) applyMobile(false); });
@@ -200,36 +198,25 @@ const data = sidebarData as SidebarData;
     });
   }
   function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
-
   renderSidebarList();
   window.addEventListener('chat:updated', renderSidebarList);
   window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) renderSidebarList(); });
-
-  // Library masonry helper
+  // library masonry preserved minimal
   window.addLibraryMedia = (item) => {
-    const container = document.querySelector('.masonry-grid');
-    if (!container) return;
+    const container = document.querySelector('.masonry-grid'); if (!container) return;
     const div = document.createElement('div');
-    const ratio = item.ratio || 'aspect-[4/3]';
-    const color = item.color || 'from-zinc-800 to-zinc-700';
-    const wide = item.wide ? '[column-span:all]' : '';
+    const ratio = item.ratio || 'aspect-[4/3]'; const color = item.color || 'from-zinc-800 to-zinc-700'; const wide = item.wide ? '[column-span:all]' : '';
     div.className = `masonry-item break-inside-avoid mb-2 relative w-full overflow-hidden rounded-[12px] border border-[#2a2a2a] bg-gradient-to-br ${color} ${ratio} ${wide}`;
     div.innerHTML = `<div class="absolute inset-0 flex flex-col justify-between p-2"><span class="rounded-full bg-black/40 px-1.5 py-0.5 text-[9px] text-white/70">${escapeHtml(item.type||'media')}</span><span class="truncate rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white/80">${escapeHtml(item.label||'media')}</span></div>`;
     container.appendChild(div);
   };
-
   document.getElementById('library-add-random')?.addEventListener('click', () => {
-    const ratios = ['aspect-[4/3]','aspect-[3/4]','aspect-square','aspect-[16/10]','aspect-[2/3]','aspect-[16/7]'];
-    const r = ratios[Math.floor(Math.random()*ratios.length)];
-    const wide = Math.random() > 0.7;
+    const ratios = ['aspect-[4/3]','aspect-[3/4]','aspect-square','aspect-[16/10]','aspect-[2/3]','aspect-[16/7]']; const r = ratios[Math.floor(Math.random()*ratios.length)]; const wide = Math.random() > 0.7;
     window.addLibraryMedia({ ratio: r, wide, label: `rand-${Date.now().toString().slice(-4)}`, type: wide ? 'wide' : 'image', color: 'from-zinc-800 to-zinc-700' });
   });
-
   document.getElementById('sync-notion')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget; const orig = btn.textContent; btn.textContent='Syncing...';
-    try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); }
-    catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
+    try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); } catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
   });
-
-  window.toggleSidebar = () => { if (isMobile()) { const isOpen = sidebar?.dataset.mobileOpen === 'true'; applyMobile(!isOpen); } };
+  window.toggleSidebar = () => { if (isMobile()) applyMobile(sidebar?.dataset.mobileOpen !== 'true'); };
 </script>

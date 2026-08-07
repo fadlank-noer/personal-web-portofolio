@@ -10,17 +10,19 @@ import ChatBox from "../features/chat/components/ChatBox.astro";
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <Head />
   </head>
   <body class="bg-black text-white antialiased overflow-hidden">
-    <div class="flex h-screen w-full overflow-hidden bg-black">
+    <div class="flex h-[100dvh] w-full overflow-hidden bg-black">
       <Sidebar />
       <main id="main-chat" class="flex flex-1 flex-col min-w-0 bg-black relative overflow-hidden">
         <Header title="FadlanGPT" />
-        <div id="empty-wrapper" class="flex flex-1 flex-col items-center justify-center px-4 pb-6 md:pb-10 overflow-hidden">
-          <h1 class="mb-8 md:mb-10 text-[28px] md:text-[32px] font-[400] md:font-[500] tracking-[-0.02em] leading-tight text-center text-white">Ready to know me better?</h1>
-          <div id="empty-chatbox" class="w-full max-w-[640px] md:max-w-[720px]"></div>
+        <!-- Empty state — mobile centered like ChatGPT screenshot: centered READY copy + bottom composer -->
+        <div id="empty-wrapper" class="flex flex-1 flex-col items-center justify-center md:justify-center px-4 pb-[160px] md:pb-10 overflow-hidden">
+          <h1 class="mb-8 md:mb-10 text-[22px] md:text-[32px] font-[400] md:font-[500] tracking-[-0.02em] leading-tight text-center text-white">Ready to know me better?</h1>
+          <!-- on mobile composer is NOT here, it's absolute bottom via #chatbox-source, but we keep anchor for desktop -->
+          <div id="empty-chatbox" class="hidden md:flex w-full max-w-[640px] md:max-w-[720px]"></div>
         </div>
         <div id="thread-wrapper" class="hidden flex-1 flex-col min-h-0 overflow-hidden">
           <div class="flex flex-1 flex-col min-h-0 overflow-hidden">
@@ -30,8 +32,9 @@ import ChatBox from "../features/chat/components/ChatBox.astro";
             <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
           </div>
         </div>
-        <div id="chatbox-source" class="w-full flex-shrink-0 bg-black relative">
-          <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent thread-only"></div>
+        <!-- chatbox source — on mobile fixed bottom like ChatGPT -->
+        <div id="chatbox-source" class="w-full flex-shrink-0 bg-black relative md:relative fixed md:static bottom-0 left-0 right-0 z-10 md:z-auto">
+          <div class="pointer-events-none absolute -top-12 left-0 right-0 h-12 bg-gradient-to-t from-black via-black/80 to-transparent md:h-8 thread-only"></div>
           <ChatBox />
         </div>
       </main>
@@ -46,6 +49,24 @@ import ChatBox from "../features/chat/components/ChatBox.astro";
   #main-chat[data-empty="true"] #thread-wrapper { display: none !important; }
   #main-chat[data-empty="false"] #thread-wrapper { display: flex !important; }
   #main-chat[data-empty="false"] #chatbox-source { display: none !important; }
+  /* On mobile, when empty = fixed composer, keep wrapper centered */
+  @media (max-width: 768px) {
+    #main-chat[data-empty="true"] #chatbox-source {
+      position: fixed !important;
+      bottom: 0; left: 0; right: 0;
+      padding-bottom: env(safe-area-inset-bottom);
+      background: linear-gradient(to top, black 40%, transparent);
+    }
+    #main-chat[data-empty="false"] #chatbox-source {
+      display: none !important;
+    }
+    #empty-wrapper h1 {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+  }
 </style>
 
 <script>
@@ -57,7 +78,13 @@ import ChatBox from "../features/chat/components/ChatBox.astro";
   function moveToEmpty() {
     if (!mainEl || !emptyChatbox || !chatBoxEl || !source) return;
     mainEl.dataset.empty = 'true';
-    if (chatBoxEl.parentElement !== emptyChatbox) emptyChatbox.appendChild(chatBoxEl);
+    // desktop: move chatbox into empty wrapper, mobile: keep fixed bottom
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) {
+      if (chatBoxEl.parentElement !== emptyChatbox) emptyChatbox.appendChild(chatBoxEl);
+    } else {
+      if (chatBoxEl.parentElement !== source) source.appendChild(chatBoxEl);
+    }
   }
   function moveToThread() {
     if (!mainEl || !threadAnchor || !chatBoxEl) return;
@@ -73,6 +100,10 @@ import ChatBox from "../features/chat/components/ChatBox.astro";
   };
   window.addEventListener('chat:updated', checkStorage);
   window.addEventListener('storage', (e) => { if (e.key === 'fadlan-chat-history') checkStorage(); });
+  window.addEventListener('resize', () => {
+    const empty = mainEl?.dataset.empty === 'true';
+    if (empty) moveToEmpty();
+  });
   setTimeout(checkStorage, 100);
   setTimeout(checkStorage, 400);
 </script>
