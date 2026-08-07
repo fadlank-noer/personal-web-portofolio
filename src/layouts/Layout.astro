@@ -1,33 +1,11 @@
 ---
 import "../styles/global.css";
 import Head from "../components/Head.astro";
+import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
 import ChatHistory from "../components/ChatHistory.astro";
 import ChatBox from "../components/ChatBox.astro";
 ---
-
-<script>
-  import Alpine from 'alpinejs';
-  import { $hasChats, setHasChats } from '../stores/chat';
-
-  // Alpine stores - ChatGPT-like
-  Alpine.store('chat', { hasChats: false });
-  Alpine.store('sidebar', {
-    collapsed: false,
-    mobileOpen: false,
-    toggle() { this.collapsed = !this.collapsed; },
-    toggleMobile() { this.mobileOpen = !this.mobileOpen; },
-    closeMobile() { this.mobileOpen = false; }
-  });
-
-  (window as any).setHasChats = setHasChats;
-
-  $hasChats.subscribe((value) => {
-    try { Alpine.store('chat').hasChats = value; } catch {}
-  });
-
-  Alpine.start();
-</script>
 
 <html lang="en">
   <head>
@@ -36,41 +14,110 @@ import ChatBox from "../components/ChatBox.astro";
     <Head />
   </head>
   <body class="bg-black text-white antialiased overflow-hidden">
-    <!-- GPT-like layout: Sidebar kiri + Main content -->
     <div class="flex h-screen w-full overflow-hidden bg-black">
-      <!-- Sidebar kiri -->
       <Sidebar />
 
-      <!-- Main content: ChatHistory DI ATAS, ChatBox DI BAWAH setelah submit -->
-      <main class="flex flex-1 flex-col min-w-0 bg-black relative overflow-hidden">
-        <!-- Mobile header - hamburger -->
-        <div class="flex md:hidden items-center justify-between px-4 py-3 border-b border-[#2b2b2b] flex-shrink-0 bg-black">
-          <button
-            onclick="window.toggleSidebar?.()"
-            class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#2b2b2b]"
-            aria-label="Open sidebar"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-          </button>
-          <p class="text-sm font-medium">FadlanGPT</p>
-          <div class="w-8"></div>
+      <!-- Main: when empty → only Header + centered heading + ChatBox (image 1). When has chat → Header + thread + bottom ChatBox -->
+      <main id="main-chat" class="flex flex-1 flex-col min-w-0 bg-black relative overflow-hidden">
+        <Header title="FadlanGPT" />
+
+        <!-- EMPTY state — matches image: "Ready to know me better?" + centered ChatBox -->
+        <div id="empty-wrapper" class="flex flex-1 flex-col items-center justify-center px-4 pb-6 md:pb-10 overflow-hidden">
+          <h1 class="mb-8 md:mb-10 text-[28px] md:text-[32px] font-[400] md:font-[500] tracking-[-0.02em] leading-tight text-center text-white">Ready to know me better?</h1>
+          <div id="empty-chatbox" class="w-full max-w-[640px] md:max-w-[720px]">
+            <!-- ChatBox will render here when empty (cloned/moved via JS) — fallback static below -->
+          </div>
         </div>
 
-        <!-- ChatHistory DI ATAS - flex-1 scrollable -->
-        <div class="flex flex-1 flex-col min-h-0 overflow-hidden">
-          <ChatHistory class="flex-1" />
+        <!-- THREAD state — ChatHistory scrollable + bottom ChatBox -->
+        <div id="thread-wrapper" class="hidden flex-1 flex-col min-h-0 overflow-hidden">
+          <div class="flex flex-1 flex-col min-h-0 overflow-hidden">
+            <ChatHistory class="flex-1" />
+          </div>
+          <div id="thread-chatbox-anchor" class="flex-shrink-0 bg-black relative">
+            <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
+            <!-- ChatBox will be moved here when thread -->
+          </div>
         </div>
 
-        <!-- ChatBox DI BAWAH - sticky bottom, input bar -->
-        <div class="flex-shrink-0 bg-black relative">
-          <!-- Gradient fade like ChatGPT -->
-          <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent"></div>
+        <!-- Actual ChatBox source (will be moved by JS) -->
+        <div id="chatbox-source" class="w-full flex-shrink-0 bg-black relative">
+          <div class="pointer-events-none absolute -top-8 left-0 right-0 h-8 bg-gradient-to-t from-black to-transparent thread-only"></div>
           <ChatBox />
         </div>
       </main>
     </div>
 
-    <!-- Slot for other pages (not used on index but kept) -->
     <slot />
   </body>
 </html>
+
+<style>
+  /* Hide gradient when in empty */
+  #main-chat[data-empty="true"] #chatbox-source .thread-only { display: none; }
+  #main-chat[data-empty="false"] #empty-wrapper { display: none !important; }
+  #main-chat[data-empty="true"] #thread-wrapper { display: none !important; }
+  #main-chat[data-empty="false"] #thread-wrapper { display: flex !important; }
+  #main-chat[data-empty="false"] #chatbox-source { display: none !important; }
+</style>
+
+<script>
+  const mainEl = document.getElementById('main-chat') as HTMLElement | null;
+  const emptyWrapper = document.getElementById('empty-wrapper');
+  const emptyChatbox = document.getElementById('empty-chatbox');
+  const threadWrapper = document.getElementById('thread-wrapper');
+  const threadAnchor = document.getElementById('thread-chatbox-anchor');
+  const source = document.getElementById('chatbox-source');
+
+  const chatBoxEl = source?.querySelector('#chatbox-container') as HTMLElement | null;
+
+  function moveToEmpty() {
+    if (!mainEl || !emptyChatbox || !chatBoxEl || !source) return;
+    mainEl.dataset.empty = 'true';
+    // move chatbox DOM to empty center
+    if (chatBoxEl.parentElement !== emptyChatbox) {
+      emptyChatbox.appendChild(chatBoxEl);
+    }
+  }
+
+  function moveToThread() {
+    if (!mainEl || !threadAnchor || !chatBoxEl) return;
+    mainEl.dataset.empty = 'false';
+    if (chatBoxEl.parentElement !== threadAnchor) {
+      threadAnchor.appendChild(chatBoxEl);
+    }
+  }
+
+  const applyState = (empty: boolean) => {
+    if (empty) moveToEmpty();
+    else moveToThread();
+  };
+
+  // initial: assume empty, will be corrected by chat:state
+  moveToEmpty();
+  if (mainEl) mainEl.dataset.empty = 'true';
+
+  window.addEventListener('chat:state' as any, (e: any) => {
+    const isEmpty = !!(e.detail && e.detail.empty);
+    applyState(isEmpty);
+  });
+
+  // fallback: also check on chat:updated via localStorage
+  const checkStorage = () => {
+    try {
+      const raw = localStorage.getItem('fadlan-chat-history');
+      if (!raw) { applyState(true); return; }
+      const arr = JSON.parse(raw);
+      applyState(!Array.isArray(arr) || arr.length === 0);
+    } catch {
+      applyState(true);
+    }
+  };
+
+  window.addEventListener('chat:updated', checkStorage);
+  window.addEventListener('storage', (e) => { if (e.key === 'fadlan-chat-history') checkStorage(); });
+
+  // also run checkStorage shortly after load (ChatHistory loads async)
+  setTimeout(checkStorage, 100);
+  setTimeout(checkStorage, 400);
+</script>

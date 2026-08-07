@@ -1,5 +1,5 @@
 /**
- * GPT-like Chat Store — nanostores (v1.4.2) + Alpine.js compat
+ * GPT-like Chat Store — nanostores (v1.4.2) — Astro-only SPA
  * Project: personal-web-portofolio
  *
  * Design:
@@ -10,7 +10,6 @@
  * - Actions: plain functions (nanostores v1 doesn't export action)
  * - Matching: fuzzy score exact > includes > jaccard
  * - Persistence: auto localStorage + optional enablePersistence()
- * - Alpine: bindAlpineChatStore()
  */
 
 import { atom, computed, map } from 'nanostores';
@@ -400,27 +399,6 @@ export function enablePersistence(key = STORAGE_KEY): () => void {
   return unsub;
 }
 
-export function bindAlpineChatStore(Alpine: any): void {
-  if (!Alpine || typeof window === 'undefined') return;
-  if (!Alpine.store('chat')) {
-    Alpine.store('chat', { hasChats: false, isTyping: false, messageCount: 0 });
-  }
-  $hasChats.subscribe((v) => {
-    try {
-      Alpine.store('chat').hasChats = v;
-    } catch {}
-  });
-  $isTyping.subscribe((v) => {
-    try {
-      Alpine.store('chat').isTyping = v;
-    } catch {}
-  });
-  $messageCount.subscribe((v) => {
-    try {
-      Alpine.store('chat').messageCount = v;
-    } catch {}
-  });
-}
 
 if (typeof window !== 'undefined') {
   (window as any).__CHAT_STORE__ = {
@@ -446,6 +424,5 @@ if (typeof window !== 'undefined') {
     findBestMatch,
     calculateMatchScore,
     enablePersistence,
-    bindAlpineChatStore,
   };
 }

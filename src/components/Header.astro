@@ -1,17 +1,59 @@
 ---
-import PanelLeftClose from '@lucide/astro/icons/panel-left-close';
-import Ellipsis from '@lucide/astro/icons/ellipsis';
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+
+interface Props {
+  title?: string;
+}
+const { title = 'FadlanGPT' } = Astro.props;
 ---
 
-<header class="flex items-center justify-between px-4 py-3 bg-black">
-  <div class="flex items-center gap-3">
-    <button class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 hover:text-white hover:bg-[#2b2b2b] transition-colors duration-150">
-      <PanelLeftClose class="h-5 w-5" />
+<header class="flex h-[56px] md:h-[52px] w-full items-center justify-between bg-black px-3 md:px-4 flex-shrink-0 shrink-0">
+  <!-- Left: Trademark only — sidebar toggle hide on desktop, ellipsis removed -->
+  <div class="flex items-center gap-1.5 md:gap-2 min-w-0">
+    <!-- Sidebar toggle — mobile only (desktop hidden) -->
+    <button id="chatroom-sidebar-toggle" class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors shrink-0" aria-label="Toggle sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
     </button>
-    <span class="text-sm font-semibold text-white">FadlanGPT</span>
+
+    <!-- Trademark — ChatGPT style -->
+    <button id="fadlangpt-trademark" class="group flex items-center gap-[6px] rounded-lg px-2 py-1.5 text-white hover:bg-[#1a1a1a] transition-colors select-none min-w-0 max-w-[60vw] md:max-w-none">
+      <span class="truncate text-[18px] font-[600] leading-none tracking-[-0.02em] font-sans antialiased">{title}</span>
+      <ChevronDown class="h-[14px] w-[14px] shrink-0 text-zinc-400 group-hover:text-zinc-200 transition-colors mt-[1px]" />
+    </button>
   </div>
 
-  <button class="flex h-8 w-8 items-center justify-center rounded-full text-zinc-300 hover:text-white transition-colors duration-150">
-    <Ellipsis class="h-5 w-5" />
-  </button>
+  <!-- Right removed — ellipsis tiada -->
 </header>
+
+<script>
+  const sidebar = document.getElementById('sidebar') as HTMLElement | null;
+  const overlay = document.getElementById('sidebar-overlay') as HTMLElement | null;
+  const toggle = document.getElementById('chatroom-sidebar-toggle') as HTMLElement | null;
+  const trademark = document.getElementById('fadlangpt-trademark');
+
+  const isMobile = () => window.innerWidth < 768;
+
+  const applyMobile = (open: boolean) => {
+    if (!sidebar || !overlay) return;
+    sidebar.dataset.mobileOpen = open ? 'true' : 'false';
+    overlay.classList.toggle('hidden', !open);
+  };
+
+  toggle?.addEventListener('click', () => {
+    if (!sidebar) return;
+    const cur = sidebar.dataset.mobileOpen === 'true';
+    applyMobile(!cur);
+  });
+
+  trademark?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('fadlangpt:trademark-click'));
+  });
+
+  // ensure toggle only matters on mobile
+  window.addEventListener('resize', () => {
+    if (!isMobile() && sidebar && overlay) {
+      sidebar.dataset.mobileOpen = 'false';
+      overlay.classList.add('hidden');
+    }
+  });
+</script>

@@ -19,53 +19,53 @@ const { cn = "" } = Astro.props;
 </style>
 
 <!-- 
-  ChatBox — GPT-like input bar
-  Posisi: sticky bottom DI BAWAH ChatHistory
-  Logic: query ke questions json, hanya bisa submit yang ada di json, history via nanostores localStorage
+  ChatBox — GPT-like pill
+  Empty state: centered under "What's on your mind today?" (image ref: dark charcoal pill, Ask anything, + left, mic + wave right)
+  Thread state: sticky bottom
 -->
 <div id="chatbox-container" class:list={["w-full flex-shrink-0 bg-gradient-to-t from-black via-black to-transparent", cn]}>
   <div class="mx-auto w-full max-w-[48rem] px-4 pb-6 pt-2">
-    <!-- Autocomplete dropdown - di ATAS input -->
-    <div id="autocomplete-list" class="hidden absolute bottom-full mb-2 w-full left-0 right-0 rounded-2xl bg-[#212121] border border-[#2f2f2f] shadow-2xl overflow-hidden z-10 suggestion-enter max-h-64 overflow-y-auto chat-scrollbar">
-    </div>
+    <!-- Disclaimer — di ATAS textarea, hanya muncul setelah chat dimulai (hidden when empty) -->
+    <p id="disclaimer" class="hidden mb-3 text-center text-[11px] leading-4 text-zinc-500">
+      ChatGPT can make mistakes. <button type="button" class="underline decoration-zinc-500 underline-offset-2 hover:text-zinc-300 transition-colors">I'm here to fix that.</button>
+    </p>
 
     <div class="relative w-full">
-      <!-- Helper -->
       <p id="input-helper" class="hidden text-[12px] text-amber-400/80 px-3 pb-2">Please select from suggestions — only questions from list are allowed.</p>
-
-      <!-- Input bar - GPT-like rounded-[28px] -->
+      <!-- Pill bar: matches image — dark charcoal, rounded full -->
       <div
         id="input-wrapper"
-        class="w-full bg-[#2f2f2f] rounded-[28px] px-4 py-3 flex items-end gap-2 transition-colors focus-within:bg-[#303030] border border-transparent focus-within:border-[#3a3a3a]"
+        class="w-full bg-[#2f2f2f] md:bg-[#303030] rounded-[28px] md:rounded-[28px] px-3.5 md:px-4 py-3 md:py-3.5 flex items-center gap-2 transition-colors focus-within:bg-[#303030] border border-transparent focus-within:border-[#3a3a3a] shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]"
       >
+        <!-- + left — image ref -->
+        <div id="plus-wrap" class="flex-shrink-0 order-1">
+          <button id="add-btn-main" class="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full hover:bg-[#424242] transition-colors" type="button" aria-label="Add">
+            <Plus class="w-[18px] h-[18px] md:w-5 md:h-5 text-zinc-300" />
+          </button>
+        </div>
+
         <textarea
           id="chat-input"
           placeholder="Ask anything"
           rows="1"
-          class="w-full bg-transparent text-white placeholder-zinc-400 outline-none text-[15px] leading-[24px] resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar order-2"
+          class="w-full min-w-0 bg-transparent text-white placeholder-zinc-400 outline-none text-[15px] leading-[24px] resize-none overflow-y-auto min-h-[24px] max-h-[200px] chat-scrollbar order-2"
         ></textarea>
-        <div id="bottom-row" class="contents">
-          <div id="plus-wrap" class="flex-shrink-0 order-1">
-            <button id="add-btn-main" class="p-1.5 rounded-full hover:bg-[#424242] transition-colors" type="button" aria-label="Add">
-              <Plus class="w-5 h-5 text-zinc-300" />
-            </button>
-          </div>
-          <div id="icons-wrap" class="flex items-center gap-2 flex-shrink-0 order-3">
-            <button id="mic-btn" class="p-1.5 rounded-full hover:bg-[#424242] transition-colors" type="button" aria-label="Voice">
-              <Mic class="w-5 h-5 text-zinc-300" />
-            </button>
-            <button id="send-btn" class="p-2 rounded-full transition-all bg-zinc-600 opacity-40 disabled:cursor-not-allowed" type="button" aria-label="Send" disabled>
-              <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
-              <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
-            </button>
-          </div>
+
+        <div id="icons-wrap" class="flex items-center gap-1 md:gap-2 flex-shrink-0 order-3">
+          <button id="mic-btn" class="flex h-7 w-7 md:h-8 md:w-8 items-center justify-center rounded-full hover:bg-[#424242] transition-colors" type="button" aria-label="Voice">
+            <Mic class="w-[18px] h-[18px] md:w-5 md:h-5 text-zinc-300" />
+          </button>
+          <!-- Send: white circle with black wave like image -->
+          <button id="send-btn" class="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full transition-all bg-white disabled:bg-zinc-600 disabled:opacity-40 disabled:cursor-not-allowed" type="button" aria-label="Send" disabled>
+            <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
+            <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
+          </button>
         </div>
       </div>
+      <!-- Autocomplete - still above but now after input wrapper for layering -->
+      <div id="autocomplete-list" class="hidden absolute bottom-full mb-2 w-full left-0 right-0 rounded-2xl bg-[#212121] border border-[#2f2f2f] shadow-2xl overflow-hidden z-10 suggestion-enter max-h-64 overflow-y-auto chat-scrollbar">
+      </div>
     </div>
-
-    <p class="mt-3 text-center text-[11px] leading-4 text-zinc-500">
-      FadlanGPT can make mistakes. Check important info.
-    </p>
   </div>
 </div>
 
@@ -79,12 +79,12 @@ const { cn = "" } = Astro.props;
   const sendBtn = document.getElementById('send-btn');
   const sendIconDefault = document.getElementById('send-icon-default');
   const sendIconActive = document.getElementById('send-icon-active');
+  const disclaimer = document.getElementById('disclaimer');
 
   let filteredSuggestions = [];
   let selectedIndex = -1;
 
   function generateId() { return `msg_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; }
-
   function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
@@ -101,7 +101,7 @@ const { cn = "" } = Astro.props;
       else if (lq.startsWith(q)) score = 80;
       else if (lq.includes(q)) score = 60;
       else {
-        const words = q.split(/\s+/).filter(Boolean);
+        const words = q.split(/\\s+/).filter(Boolean);
         const matches = words.filter(w => lq.includes(w)).length;
         if (matches > 0) score = (matches / words.length) * 50;
       }
@@ -115,7 +115,6 @@ const { cn = "" } = Astro.props;
     if (!q) return null;
     const exact = questions.find(i => i.question.toLowerCase().trim() === q);
     if (exact) return exact;
-    // user requirement: only valid if exists in json - allow flexible contains if long enough
     const loose = questions.find(i => {
       const lq = i.question.toLowerCase();
       return lq.includes(q) || q.includes(lq);
@@ -134,7 +133,7 @@ const { cn = "" } = Astro.props;
     }
     autoList.innerHTML = filteredSuggestions.map((item, idx) => {
       const active = idx === selectedIndex ? 'bg-[#3a3a3a] text-white' : 'text-zinc-300 hover:bg-[#2a2a2a]';
-      return `<button type="button" data-suggest-idx="${idx}" class="w-full text-left px-4 py-3 text-[14px] leading-snug transition-colors ${active} border-b border-[#2a2a2a] last:border-0">${escapeHtml(item.question)}</button>`;
+      return `<button type=\"button\" data-suggest-idx=\"${idx}\" class=\"w-full text-left px-4 py-3 text-[14px] leading-snug transition-colors ${active} border-b border-[#2a2a2a] last:border-0\">${escapeHtml(item.question)}</button>`;
     }).join('');
     autoList.classList.remove('hidden');
 
@@ -198,42 +197,6 @@ const { cn = "" } = Astro.props;
     textarea.style.height = textarea.scrollHeight + 'px';
   }
 
-  function checkTextWrap() {
-    const value = input.value;
-    const CHARS_PER_LINE = 74;
-    const MAX_VISIBLE_LINES = 9;
-    const totalChars = value.length;
-    const lineCount = Math.ceil(totalChars / CHARS_PER_LINE);
-    const isMultiLine = totalChars > CHARS_PER_LINE;
-    const needsScroll = lineCount > MAX_VISIBLE_LINES;
-    const bottomRow = document.getElementById('bottom-row');
-    const plusWrap = document.getElementById('plus-wrap');
-    const iconsWrap = document.getElementById('icons-wrap');
-
-    if (isMultiLine) {
-      inputWrapper.classList.remove('items-end');
-      inputWrapper.classList.add('flex-wrap');
-      input.classList.add('basis-full');
-      bottomRow.classList.remove('contents');
-      bottomRow.classList.add('flex','items-center','justify-between','w-full');
-      input.classList.remove('order-2');
-      plusWrap.classList.remove('order-1');
-      iconsWrap.classList.remove('order-3');
-    } else {
-      inputWrapper.classList.remove('flex-wrap');
-      inputWrapper.classList.add('items-end');
-      input.classList.remove('basis-full');
-      bottomRow.classList.remove('flex','items-center','justify-between','w-full');
-      bottomRow.classList.add('contents');
-      input.classList.add('order-2');
-      plusWrap.classList.add('order-1');
-      iconsWrap.classList.add('order-3');
-    }
-
-    if (needsScroll) inputWrapper.classList.add('max-h-[300px]','overflow-y-auto');
-    else inputWrapper.classList.remove('max-h-[300px]','overflow-y-auto');
-  }
-
   function submit() {
     const value = input.value.trim();
     if (!value) return;
@@ -255,18 +218,15 @@ const { cn = "" } = Astro.props;
       timestamp: Date.now()
     };
 
-    // Use ChatHistory API (nanostores via localStorage)
     const api = window.chatHistoryApi;
     if (api) {
       api.add(newMessage);
-      // typing then done
       api.showTyping(true);
       setTimeout(() => {
         api.showTyping(false);
         api.scrollToBottom();
       }, 450 + Math.random()*400);
     } else {
-      // fallback direct localStorage
       let history = [];
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -279,23 +239,19 @@ const { cn = "" } = Astro.props;
 
     input.value = '';
     resizeTextarea(input);
-    checkTextWrap();
     validateInput();
     closeAutocomplete();
   }
 
-  // Events
   input.addEventListener('input', () => {
     const value = input.value;
     resizeTextarea(input);
-    checkTextWrap();
     validateInput();
 
     if (value.trim().length >= 1) {
       filteredSuggestions = filterQuestions(value);
       selectedIndex = -1;
       renderAutocomplete();
-      // helper
       if (value.trim().length >= 2 && !isValidQuestion(value)) inputHelper.classList.remove('hidden');
       else if (isValidQuestion(value)) inputHelper.classList.add('hidden');
     } else {
@@ -310,8 +266,7 @@ const { cn = "" } = Astro.props;
         e.preventDefault();
         selectedIndex = Math.min(selectedIndex + 1, filteredSuggestions.length - 1);
         renderAutocomplete();
-        // scroll into view
-        const activeBtn = autoList.querySelector(`[data-suggest-idx="${selectedIndex}"]`);
+        const activeBtn = autoList.querySelector(`[data-suggest-idx=\"${selectedIndex}\"]`);
         if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
       }
     } else if (e.key === 'ArrowUp') {
@@ -319,7 +274,7 @@ const { cn = "" } = Astro.props;
         e.preventDefault();
         selectedIndex = Math.max(selectedIndex - 1, 0);
         renderAutocomplete();
-        const activeBtn = autoList.querySelector(`[data-suggest-idx="${selectedIndex}"]`);
+        const activeBtn = autoList.querySelector(`[data-suggest-idx=\"${selectedIndex}\"]`);
         if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
       }
     } else if (e.key === 'Enter') {
@@ -338,7 +293,6 @@ const { cn = "" } = Astro.props;
     }
   });
 
-  // Click outside to close autocomplete
   document.addEventListener('click', (e) => {
     const target = e.target;
     if (!autoList.contains(target) && target !== input && !inputWrapper.contains(target)) {
@@ -348,7 +302,6 @@ const { cn = "" } = Astro.props;
 
   sendBtn.addEventListener('click', () => submit());
 
-  // Listen to chip clicks from ChatHistory
   window.addEventListener('chat:chip-click', (e) => {
     const q = e.detail && e.detail.question;
     if (!q) return;
@@ -358,12 +311,28 @@ const { cn = "" } = Astro.props;
     submit();
   });
 
-  // Listen to mobile toggle focus
-  input.addEventListener('focus', () => {
-    // on mobile, maybe close sidebar
+  // Disclaimer: hanya muncul setelah chat dimulai, hidden kalau belum mulai
+  const updateDisclaimer = (show) => {
+    if (!disclaimer) return;
+    disclaimer.classList.toggle('hidden', !show);
+  };
+
+  window.addEventListener('chat:state', (e) => {
+    const empty = !!(e.detail && e.detail.empty);
+    updateDisclaimer(!empty);
   });
 
-  // Init
+  window.addEventListener('chat:updated', () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      updateDisclaimer(Array.isArray(arr) && arr.length > 0);
+    } catch { updateDisclaimer(false); }
+  });
+
+  // initial hide
+  updateDisclaimer(false);
+
   resizeTextarea(input);
   validateInput();
 </script>
