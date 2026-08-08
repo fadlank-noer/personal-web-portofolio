@@ -1,10 +1,13 @@
 ---
 /**
  * ChatHistory.astro - GPT-like chat thread
- * Empty: "What's on your mind today?" centered (image ref) — no chips visible when we use Layout empty state
- * Thread: bubble kanan + response kiri
+ * Empty: centered "What's on your mind today?" — no chips visible when Layout empty state
+ * Thread: bubble kanan + response kiri + MediaGallery + MediaViewer
  */
 import type { ChatMessage } from '../../../lib/types/chat';
+import type { MediaItem } from '../../../lib/types/chat';
+import MediaGallery from '../../../components/ui/chat/MediaGallery.astro';
+import CopyIconComponent from '@lucide/astro/icons/copy';
 
 interface Props {
   class?: string;
@@ -21,7 +24,7 @@ const { class: className = '' } = Astro.props;
     className,
   ]}
 >
-  <!-- Empty state is now handled by Layout's centered state, but keep hidden fallback for direct use -->
+  <!-- Empty state: handled by Layout's centered state -->
   <div id="chat-empty-state" class="hidden flex flex-1 flex-col items-center justify-center px-4 py-12 md:py-20">
     <h1 class="text-[28px] md:text-[32px] font-semibold tracking-tight text-center mb-2">What's on your mind today?</h1>
     <p class="text-sm text-zinc-500 text-center mb-8">Ask me anything from the list — powered by FadlanGPT</p>
@@ -77,8 +80,18 @@ const { class: className = '' } = Astro.props;
 </style>
 
 <script>
+  import type { MediaItem } from '../../../lib/types/chat';
+
   const STORAGE_KEY = 'fadlan-chat-history';
-  let chatHistory = [];
+  interface ChatMsg {
+    id: string;
+    question: string;
+    answer: string;
+    answer_type: string;
+    images: MediaItem[];
+    timestamp: number;
+  }
+  let chatHistory: ChatMsg[] = [];
 
   const emptyState = document.getElementById('chat-empty-state');
   const threadEl = document.getElementById('chat-thread');
@@ -97,10 +110,97 @@ const { class: className = '' } = Astro.props;
     } catch {}
   }
 
-  function escapeHtml(s) {
+  function escapeHtml(s: string) {
     const d = document.createElement('div');
     d.textContent = s;
     return d.innerHTML;
+  }
+
+  function extractHeading(text: string): string | null {
+    if (!text) return null;
+    const firstLine = text.split('\n')[0].trim();
+    if (firstLine && firstLine.length <= 60 && firstLine.length >= 3 && /^[A-Z]/.test(firstLine) && !firstLine.endsWith('.')) {
+      return firstLine;
+    }
+    return null;
+  }
+
+  function extractSource(text: string): { label: string; url: string } | null {
+    const lines = text.split('\n');
+    if (lines.length < 2) return null;
+    const second = (lines[1] || '').trim();
+    const urlMatch = second.match(/https?:\/\/[^\s\)]+/);
+    if (urlMatch) {
+      const label = second.replace(/https?:\/\/[^\s\)]+.*/, '').trim() || urlMatch[0];
+      return { label, url: urlMatch[0] };
+    }
+    return null;
+  }
+
+  function stripHeader(text: string): string {
+    if (!text) return '';
+    const heading = extractHeading(text);
+    const source = extractSource(text);
+    const lines = text.split('\n');
+    if (heading) lines.shift();
+    if (source) lines.shift();
+    return lines.join('\n').trim();
+  }
+
+  // Render gallery HTML for a set of images
+  function renderGallery(images: MediaItem[], msgId: string): string {
+    if (!images || images.length === 0) return '';
+    const count = images.length;
+    const galleryId = `gallery-${msgId}`;
+    const maxPreview = 4;
+    const previewItems = images.slice(0, maxPreview);
+    const remaining = Math.max(0, count - maxPreview);
+    const layout = count === 1 ? 'single'
+      : count === 2 ? 'two'
+      : count === 3 ? 'three'
+      : 'grid';
+
+    function tileImg(item: MediaItem, i: number, layoutClass: string) {
+      return `<button type="button" class="gallery-tile ${layoutClass}" data-gallery-id="${galleryId}" data-tile-index="${i}" aria-label="${i === 0 ? `Open image 1 of ${count}` : `Open image ${i + 1} of ${count}`}" style="position:relative;display:block;width:100%;aspect-ratio:4/3;overflow:hidden;background:rgba(255,255,255,.04);cursor:zoom-in;">
+        <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt || 'Image')}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
+        <div style="position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:1;transition:opacity 300ms ease;" class="skeleton"></div>
+      </button>`;
+    }
+
+    let tilesHtml = '';
+    if (layout === 'single') {
+      tilesHtml = tileImg(previewItems[0], 0, 'tile-single');
+    } else if (layout === 'two') {
+      tilesHtml = previewItems.map((item, i) => tileImg(item, i, 'tile-two')).join('');
+    } else if (layout === 'three') {
+      tilesHtml = `
+        <button type="button" class="gallery-tile tile-three-hero" data-gallery-id="${galleryId}" data-tile-index="0" aria-label="Open image 1 of ${count}" style="grid-row:1/span 2;position:relative;display:block;width:100%;height:100%;overflow:hidden;background:rgba(255,255,255,.04);cursor:zoom-in;">
+          <img src="${escapeHtml(previewItems[0].src)}" alt="${escapeHtml(previewItems[0].alt || 'Image 1')}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
+          <div style="position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:1;transition:opacity 300ms ease;" class="skeleton"></div>
+        </button>
+        ${previewItems.slice(1, 3).map((item, i) => tileImg(item, i + 1, 'tile-three-sub')).join('')}
+      `;
+    } else {
+      // grid (4+)
+      tilesHtml = previewItems.slice(0, 3).map((item, i) => tileImg(item, i, 'tile-grid')).join('');
+      // 4th tile with +N overlay
+      const lastItem = previewItems[Math.min(3, previewItems.length - 1)];
+      tilesHtml += `<button type="button" class="gallery-tile tile-grid tile-more" data-gallery-id="${galleryId}" data-tile-index="${maxPreview - 1}" aria-label="${remaining > 0 ? `View ${remaining + 1} more images` : `Open image ${maxPreview} of ${count}`}" style="position:relative;display:block;width:100%;aspect-ratio:4/3;overflow:hidden;background:rgba(255,255,255,.04);cursor:zoom-in;">
+        <img src="${escapeHtml(lastItem?.src || '')}" alt="${escapeHtml(lastItem?.alt || 'Image')}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
+        ${remaining > 0 ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:600;pointer-events:none;">+${remaining}</div>` : ''}
+        <div style="position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:1;transition:opacity 300ms ease;" class="skeleton"></div>
+      </button>`;
+    }
+
+    // Grid style
+    const gridStyle = layout === 'single' ? 'grid-template-columns:1fr;'
+      : layout === 'two' ? 'grid-template-columns:repeat(2,minmax(0,1fr));'
+      : layout === 'three' ? 'grid-template-columns:2fr 1fr;grid-template-rows:repeat(2,minmax(0,1fr));'
+      : 'grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));';
+
+    return `<div class="media-gallery" data-count="${count}" data-layout="${layout}" data-gallery-id="${galleryId}" role="group" aria-label="${count} images" style="display:grid;${gridStyle}gap:4px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04);max-width:100%;margin-bottom:16px;">
+      ${tilesHtml}
+    </div>`;
   }
 
   function render() {
@@ -109,7 +209,6 @@ const { class: className = '' } = Astro.props;
     if (chatHistory.length === 0) {
       emptyState.classList.add('hidden');
       threadEl.classList.add('hidden');
-      // notify Layout for empty state (header + centered chatbox only)
       window.dispatchEvent(new CustomEvent('chat:state', { detail: { empty: true, count: 0 } }));
       return;
     }
@@ -121,14 +220,24 @@ const { class: className = '' } = Astro.props;
     innerEl.innerHTML = chatHistory.map((msg) => {
       const safeQ = escapeHtml(msg.question);
       const safeA = escapeHtml(msg.answer);
-      const imagesHtml = (msg.images && msg.images.length > 0) ? `
-        <div class="mt-3 grid gap-2 ${msg.images.length===1 ? 'grid-cols-1 max-w-[24rem]' : 'grid-cols-2 max-w-[32rem]'}">
-          ${msg.images.map((src) => `<div class="overflow-hidden rounded-xl bg-[#1a1a1a] aspect-[4/3]"><img src="${escapeHtml(src)}" alt="" loading="lazy" class="h-full w-full object-cover"/></div>`).join('')}
-        </div>
-      ` : '';
+      const heading = extractHeading(msg.answer);
+      const source = heading ? extractSource(msg.answer) : null;
+      const body = stripHeader(msg.answer);
+      const galleryHtml = renderGallery(msg.images, msg.id);
+
+      // Derive source line HTML
+      const sourceHtml = source ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer" class="mt-0.5 inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors">${escapeHtml(source.label)} <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 1h6v6M9 1L1 9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : '';
+      const headingHtml = heading ? `<h3 class="text-[19px] font-[600] leading-tight tracking-tight text-white mb-0.5">${escapeHtml(heading)}</h3>${sourceHtml ? `<div class="mb-3">${sourceHtml}</div>` : ''}` : '';
+
+      // Body text with streaming cursor
+      const bodyHtml = body ? `<div class="prose prose-invert max-w-none"><div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[#ececec]">${escapeHtml(body)}</div></div>` : '';
+
+      // Register images with global viewer
+      const viewerRegister = '';
 
       return `
         <div class="flex flex-col gap-6 group/item" data-chat-id="${msg.id}" id="chat-${msg.id}">
+          <!-- User bubble -->
           <div class="flex w-full justify-end">
             <div class="flex max-w-[78%] flex-col items-end gap-1">
               <div class="rounded-[24px] rounded-br-[6px] bg-[#303030] px-4 py-2.5 text-[15px] leading-[24px] text-white">
@@ -136,31 +245,79 @@ const { class: className = '' } = Astro.props;
               </div>
             </div>
           </div>
+          <!-- Assistant response -->
           <div class="flex w-full gap-3">
             <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-semibold text-white select-none">F</div>
             <div class="min-w-0 flex-1 pt-0.5">
-              <div class="prose prose-invert max-w-none">
-                <div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[#ececec]">${safeA}</div>
-              </div>
-              ${imagesHtml}
+              ${galleryHtml}
+              ${headingHtml}
+              ${bodyHtml}
               <div class="mt-3 flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                <button data-copy="${escapeHtml(msg.answer)}" class="copy-action flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Copy">⎘</button>
+                <button data-copy="${escapeHtml(msg.answer)}" class="copy-action flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Copy" aria-label="Copy response">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                </button>
                 <span class="text-[11px] text-zinc-600 ml-2">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
               </div>
             </div>
           </div>
         </div>
-      `;
+        `;
     }).join('');
 
+    // Image tile hover scale + skeleton hide
+    innerEl.querySelectorAll('.media-gallery img').forEach((img) => {
+      const tile = img.parentElement;
+      img.addEventListener('mouseenter', () => {
+        if ((img as HTMLImageElement).complete) {
+          (img as HTMLImageElement).style.transform = 'scale(1.015)';
+        }
+      });
+      img.addEventListener('mouseleave', () => {
+        (img as HTMLImageElement).style.transform = 'scale(1)';
+      });
+      img.addEventListener('load', () => {
+        const skeleton = tile?.querySelector('.skeleton');
+        if (skeleton) (skeleton as HTMLElement).style.opacity = '0';
+      });
+      if ((img as HTMLImageElement).complete) {
+        const skeleton = tile?.querySelector('.skeleton');
+        if (skeleton) (skeleton as HTMLElement).style.opacity = '0';
+      }
+    });
+
+    // Register ALL galleries in DOM with global viewer (no inline scripts needed)
+          innerEl.querySelectorAll('.media-gallery').forEach((gallery) => {
+            const galleryId = gallery.getAttribute('data-gallery-id');
+            if (!galleryId) return;
+            const imgs = gallery.querySelectorAll<HTMLImageElement>('img');
+            const items = Array.from(imgs).map((img) => ({
+              src: img.src,
+              alt: img.alt || 'Image',
+            }));
+            (window as any).__mediaViewer__?.register(galleryId, items);
+          });
+
+          // Image tile click → open viewer
+          innerEl.querySelectorAll('[data-tile-index]').forEach((tile) => {
+            tile.addEventListener('click', () => {
+              const galleryId = (tile as HTMLElement).dataset.galleryId || '';
+              const index = parseInt((tile as HTMLElement).dataset.tileIndex || '0', 10);
+              (window as any).__mediaViewer__?.open(galleryId, index);
+            });
+          });
+
+    // Copy action
     innerEl.querySelectorAll('.copy-action').forEach((btn) => {
       btn.addEventListener('click', async () => {
         const txt = btn.getAttribute('data-copy') || '';
         try {
           await navigator.clipboard.writeText(txt);
-          const orig = btn.textContent;
-          btn.textContent = '✓';
-          setTimeout(() => btn.textContent = orig, 1200);
+          const svg = btn.querySelector('svg');
+          if (svg) {
+            const orig = svg.innerHTML;
+            svg.innerHTML = '<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+            setTimeout(() => { svg.innerHTML = orig; }, 1200);
+          }
         } catch {}
       });
     });
@@ -176,18 +333,18 @@ const { class: className = '' } = Astro.props;
     });
   }
 
-  function showTyping(show) {
+  function showTyping(show: boolean) {
     if (!typingEl) return;
     if (show) typingEl.classList.remove('hidden');
     else typingEl.classList.add('hidden');
     scrollToBottom();
   }
 
-  (window).chatHistoryApi = {
+  (window as any).chatHistoryApi = {
     load: () => { load(); render(); },
     get: () => chatHistory,
-    set: (newHistory) => { chatHistory = newHistory; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory)); } catch {}; render(); },
-    add: (msg) => { chatHistory = [...chatHistory, msg]; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory)); } catch {}; render(); },
+    set: (newHistory: ChatMsg[]) => { chatHistory = newHistory; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory)); } catch {}; render(); },
+    add: (msg: ChatMsg) => { chatHistory = [...chatHistory, msg]; try { localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory)); } catch {}; render(); },
     clear: () => { chatHistory = []; try { localStorage.removeItem(STORAGE_KEY); } catch {}; render(); },
     showTyping,
     scrollToBottom,
@@ -196,7 +353,7 @@ const { class: className = '' } = Astro.props;
   load();
   render();
 
-  document.querySelectorAll('[data-chip]').forEach(btn => {
+  document.querySelectorAll('[data-chip]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const q = btn.getAttribute('data-chip') || '';
       window.dispatchEvent(new CustomEvent('chat:chip-click', { detail: { question: q } }));
@@ -209,14 +366,15 @@ const { class: className = '' } = Astro.props;
     render();
   });
 
-  window.addEventListener('chat:scroll-to', (e) => {
-    const id = e.detail && e.detail.id;
+  window.addEventListener('chat:scroll-to', (e: Event) => {
+    const detail = (e as CustomEvent).detail;
+    const id = detail && detail.id;
     if (!id) return;
     const el = document.getElementById(`chat-${id}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
-  window.addEventListener('storage', (e) => {
+  window.addEventListener('storage', (e: StorageEvent) => {
     if (e.key === STORAGE_KEY) { load(); render(); }
   });
 </script>

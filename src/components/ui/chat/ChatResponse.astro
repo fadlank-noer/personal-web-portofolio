@@ -1,12 +1,20 @@
 ---
+/**
+ * ChatResponse — Assistant bubble with MediaGallery + action bar
+ * - Media rendered as GPT-style editorial gallery (MediaGallery component)
+ * - Heading + source line above body text
+ * - Copy/like/dislike action bar on hover
+ */
 import Copy from '@lucide/astro/icons/copy';
 import Check from '@lucide/astro/icons/check';
 import ThumbsUp from '@lucide/astro/icons/thumbs-up';
 import ThumbsDown from '@lucide/astro/icons/thumbs-down';
+import MediaGallery from './MediaGallery.astro';
+import type { MediaItem } from '../../../lib/types/chat';
 
 interface Props {
   answer: string;
-  images?: string[];
+  images?: MediaItem[];
   answer_type?: string;
   isStreaming?: boolean;
   messageId?: string;
@@ -24,9 +32,48 @@ const {
 
 const hasImages = images && images.length > 0;
 const isEmpty = !answer || answer.trim().length === 0;
+
+// Derive heading from answer: first line if it looks like a title (short, no period ending, starts with capital)
+function extractHeading(text: string): string | null {
+  if (!text) return null;
+  const firstLine = text.split('\n')[0].trim();
+  if (firstLine && firstLine.length <= 60 && firstLine.length >= 3 && /^[A-Z]/.test(firstLine) && !firstLine.endsWith('.')) {
+    return firstLine;
+  }
+  return null;
+}
+const heading = extractHeading(answer);
+
+// Derive source line: if heading exists, look for second line starting with http or contains "source"
+function extractSource(text: string): { label: string; url: string } | null {
+  const lines = text.split('\n');
+  if (lines.length < 2) return null;
+  const second = (lines[1] || '').trim();
+  const urlMatch = second.match(/https?:\/\/[^\s\)]+/);
+  if (urlMatch) {
+    const label = second.replace(/https?:\/\/[^\s\)]+.*/, '').trim() || urlMatch[0];
+    return { label, url: urlMatch[0] };
+  }
+  return null;
+}
+const source = heading ? extractSource(answer) : null;
+
+// Strip heading + source from body
+function stripHeader(text: string): string {
+  if (!text) return '';
+  const lines = text.split('\n');
+  if (heading) lines.shift(); // remove heading
+  if (source) lines.shift(); // remove source line
+  return lines.join('\n').trim();
+}
+const body = stripHeader(answer);
+
+// Gallery ID unique per message
+const galleryId = `gallery-${messageId}`;
 ---
 
 <div class:list={["group/response flex w-full flex-col", className]} data-message-id={messageId} data-streaming={isStreaming ? 'true' : 'false'}>
+
   {/* Typing indicator when streaming and empty */}
   {isStreaming && isEmpty ? (
     <div class="flex items-center gap-1.5 py-2">
@@ -36,35 +83,53 @@ const isEmpty = !answer || answer.trim().length === 0;
     </div>
   ) : (
     <>
-      {/* Answer text - markdown-ish rendering */}
-      <div class="prose prose-invert max-w-none">
-        <div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[#ececec]">
-          {answer}
-          {isStreaming && (
-            <span class="ml-0.5 inline-block h-[16px] w-[2px] animate-pulse bg-white align-middle"></span>
+      {/* Media Gallery — ABOVE text, aligned with response column */}
+      {hasImages && (
+        <div class="mb-4 max-w-full">
+          <MediaGallery
+            items={images}
+            galleryId={galleryId}
+          />
+        </div>
+      )}
+
+      {/* Heading + Source */}
+      {heading && (
+        <div class="mb-1">
+          <h3 class="text-[19px] font-[600] leading-tight tracking-tight text-white">
+            {heading}
+          </h3>
+          {source && (
+            <a
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-0.5 inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors"
+            >
+              {source.label}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M3 1h6v6M9 1L1 9" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Images grid */}
-      {hasImages && (
-        <div
-          class:list={[
-            "mt-3 grid gap-2 overflow-hidden rounded-xl",
-            images.length === 1 ? "grid-cols-1 max-w-[24rem]" : "grid-cols-2 max-w-[32rem]",
-          ]}
-        >
-          {images.map((img) => (
-            <div class="group/img relative aspect-[4/3] overflow-hidden rounded-xl bg-[#1a1a1a]">
-              <img
-                src={img}
-                alt="Attachment"
-                loading="lazy"
-                class="h-full w-full object-cover transition-transform duration-300 group-hover/img:scale-[1.02]"
-              />
-            </div>
-          ))}
+      {/* Body text */}
+      {body && (
+        <div class="prose prose-invert max-w-none">
+          <div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[#ececec]">
+            {body}
+            {isStreaming && (
+              <span class="ml-0.5 inline-block h-[16px] w-[2px] animate-pulse bg-white align-middle"></span>
+            )}
+          </div>
         </div>
+      )}
+
+      {/* Streaming cursor when there's content */}
+      {isStreaming && !isEmpty && !body && (
+        <span class="ml-0.5 inline-block h-[16px] w-[2px] animate-pulse bg-white align-middle mt-1"></span>
       )}
     </>
   )}
@@ -103,8 +168,15 @@ const isEmpty = !answer || answer.trim().length === 0;
   <span data-copy-text={messageId} class="hidden">{answer}</span>
 </div>
 
+{/* Register gallery items with global viewer */}
+{hasImages && (
+  <script define:vars={{ galleryId, images }}>
+    (window.__mediaViewer__ || { register() {} }).register(galleryId, images);
+  </script>
+)}
+
 <script>
-  // Delegated copy logic - works for all ChatResponse instances on page
+  // Delegated copy logic
   function initCopyButtons() {
     document.querySelectorAll('[data-copy-btn]').forEach((btn) => {
       if ((btn as HTMLElement).dataset.bound === 'true') return;
@@ -133,7 +205,6 @@ const isEmpty = !answer || answer.trim().length === 0;
   }
 
   initCopyButtons();
-  // Re-init on DOM changes (Astro view transitions / dynamic messages)
   const observer = new MutationObserver(() => initCopyButtons());
   observer.observe(document.body, { childList: true, subtree: true });
   document.addEventListener('astro:page-load', initCopyButtons);

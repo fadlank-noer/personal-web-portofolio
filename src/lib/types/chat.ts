@@ -1,10 +1,20 @@
+export interface MediaItem {
+  src: string
+  alt: string
+  caption?: string
+  sourceLabel?: string
+  sourceUrl?: string
+  width?: number
+  height?: number
+}
+
 export type MessageRole = 'user' | 'assistant';
 
 export interface QuestionTemplate {
   question: string;
   answer: string;
   answer_type: string;
-  images: string[];
+  images: MediaItem[];
 }
 
 export interface StreamChunk {
@@ -17,7 +27,7 @@ export interface ChatMessage {
   question: string;
   answer: string;
   answer_type: string;
-  images: string[];
+  images: MediaItem[];
   timestamp: number;
   role?: MessageRole;
 }
@@ -25,7 +35,7 @@ export interface ChatMessage {
 export interface BubbleProps {
   role: MessageRole;
   content: string;
-  images?: string[];
+  images?: MediaItem[];
   timestamp?: number;
   isStreaming?: boolean;
   avatarLabel?: string;
@@ -33,7 +43,7 @@ export interface BubbleProps {
 
 export interface ResponseProps {
   answer: string;
-  images?: string[];
+  images?: MediaItem[];
   answer_type?: string;
   isStreaming?: boolean;
   messageId?: string;

@@ -5,8 +5,14 @@
             "answer": "I'm Fadlan Kautsar Noer, a Software Developer with 4+ years of hands-on experience and 10+ projects delivered across fintech, enterprise systems, gaming/Web3, and IoT-adjacent kiosk solutions. I have a strong background in sales and marketing so it helps me to understand my client's needs and provide the best solution possible. I'm passionate about building clean, performant, and user-centric products — from backend APIs to frontend delights.",
             "answer_type": "text",
             "images": [
-                "/assets/images/photo-in-studio.png",
-                "/assets/images/photo-in-boat.png"
+                {
+                    "src": "/assets/images/photo-in-studio.png",
+                    "alt": "Fadlan Kautsar Noer — professional photo in studio setting"
+                },
+                {
+                    "src": "/assets/images/photo-in-boat.png",
+                    "alt": "Fadlan Kautsar Noer — casual photo on a boat, Jakarta area"
+                }
             ]
         },
         {
@@ -73,7 +79,14 @@
             "question": "Can you show your CV?",
             "answer": "Absolutely! You can download my CV here or ask me to email it.\n\nI have a PDF ready with detailed timeline, skills matrix, and project links. In this chat UI, CV viewing is coming soon as an embedded viewer.\n\nFor now, hit contact and I'll send latest version within minutes!",
             "answer_type": "text",
-            "images": ["/assets/images/photo-in-studio.png"]
+            "images": [
+                {
+                    "src": "/assets/images/photo-in-studio.png",
+                    "alt": "Fadlan Kautsar Noer — professional portrait photo for CV",
+                    "sourceLabel": "Fadlan's Portfolio",
+                    "sourceUrl": "/"
+                }
+            ]
         }
     ]
 }

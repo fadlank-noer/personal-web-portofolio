@@ -5,6 +5,7 @@ import Header from "../components/layout/Header.astro";
 import Sidebar from "../features/sidebar/components/Sidebar.astro";
 import ChatHistory from "../features/chat/components/ChatHistory.astro";
 import ChatBox from "../features/chat/components/ChatBox.astro";
+import MediaViewer from "../components/ui/chat/MediaViewer.astro";
 ---
 
 <html lang="en">
@@ -39,6 +40,7 @@ import ChatBox from "../features/chat/components/ChatBox.astro";
         </div>
       </main>
     </div>
+    <MediaViewer />
     <slot />
   </body>
 </html>

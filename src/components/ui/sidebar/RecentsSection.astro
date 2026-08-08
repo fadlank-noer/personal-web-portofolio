@@ -1,6 +1,6 @@
 ---
 /**
- * RecentsSection — bg black plek index, icons chevron/ellipsis/edit muncul pas hover text Recents saja
+ * RecentsSection — dark theme for chat index
  */
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Ellipsis from '@lucide/astro/icons/ellipsis';
@@ -11,7 +11,7 @@ interface Props { items: RecentItem[]; }
 const { items } = Astro.props;
 ---
 <div data-section-wrap="recents" class="group/section bg-black">
-  <div class="group/header flex h-[32px] w-full items-center justify-between bg-black px-1 rounded-md hover:bg-[#0a0a0a] transition-colors">
+  <div class="group/header flex h-[32px] w-full items-center justify-between px-1 rounded-md hover:bg-[#0a0a0a] transition-colors">
     <button data-section-toggle="recents" class="flex items-center gap-1 bg-black group-hover/header:bg-[#0a0a0a] text-white transition-colors">
       <span class="text-[13px] font-[600] leading-none tracking-tight sidebar-label">Recents</span>
       <ChevronDown class="h-[12px] w-[12px] text-white/60 opacity-0 group-hover/header:opacity-100 transition-all duration-150 sidebar-label hover-reveal" data-chevron="recents" />

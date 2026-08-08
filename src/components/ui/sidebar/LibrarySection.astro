@@ -28,34 +28,36 @@ const videoCount = items.filter(l=>l.type==='video').length;
     </div>
   </div>
   <div data-section-content="library" class="mt-2 px-1 sidebar-section-content bg-black">
-    <div class="masonry-grid columns-2 gap-2 [column-fill:_balance]">
-      {items.map((m) => (
-        <div class:list={[
-          "masonry-item group/card break-inside-avoid mb-2 relative w-full overflow-hidden rounded-[12px] border border-white/[0.06] bg-gradient-to-br transition-all hover:border-white/[0.12] hover:-translate-y-0.5 cursor-pointer",
-          m.color,
-          m.ratio,
-          m.wide ? "[column-span:all]" : ""
-        ]}>
-          <div class="absolute inset-0">
-            <div class="h-full w-full opacity-50 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_40%)]"></div>
-          </div>
-          <div class="absolute inset-0 flex flex-col justify-between p-2">
-            <div class="flex justify-between items-start">
-              <span class="rounded-full bg-black/50 backdrop-blur px-1.5 py-0.5 text-[9px] font-medium text-white/60 border border-white/10">{m.type}</span>
-              {m.type === 'video' && <span class="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] text-black">▶</span>}
+    <div class="space-y-0.5">
+      {items.length === 0 ? (
+        <p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No media</p>
+      ) : (
+        <>
+          {items.slice(0, 3).map((m) => (
+            <div class:list={[
+              "flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-[#141414] transition-colors cursor-pointer group/media",
+              m.wide ? "border border-white/[0.06] bg-[#111]" : ""
+            ]}>
+              <span class:list={[
+                "flex h-6 w-6 items-center justify-center rounded-md text-[10px] font-bold text-white flex-shrink-0",
+                m.color.includes('from-indigo') ? "bg-indigo-600" :
+                m.color.includes('from-violet') ? "bg-violet-600" :
+                m.color.includes('from-amber') ? "bg-amber-600" :
+                m.color.includes('from-emerald') ? "bg-emerald-600" :
+                "bg-zinc-600"
+              ]}>{m.type === 'video' ? '▶' : '◼'}</span>
+              <span class="flex-1 truncate text-[13px] text-zinc-400 group-hover/media:text-zinc-200 sidebar-label">{m.label}</span>
             </div>
-            <span class="truncate rounded bg-black/60 backdrop-blur px-1.5 py-0.5 text-[10px] text-white/70 border border-white/5">{m.label}</span>
-          </div>
-          <div class="absolute inset-0 bg-black/0 group-hover/card:bg-black/20 transition-colors"></div>
-        </div>
-      ))}
-    </div>
-    <div class="mt-2 rounded-lg bg-black border border-white/[0.06] p-2.5 sidebar-label">
-      <p class="text-[11px] leading-[14px] text-zinc-600"><span class="text-zinc-400 font-medium">Masonry</span> — <code class="text-zinc-500">aspect-*</code> + <code class="text-zinc-500">[column-span:all]</code></p>
-      <div class="mt-2 flex gap-1.5">
-        <button id="library-add-random" class="rounded-md bg-[#141414] hover:bg-[#1f1f1f] px-2 py-1 text-[11px] text-zinc-400 transition-colors">+ Add random</button>
-        <button class="rounded-md bg-[#141414] hover:bg-[#1f1f1f] px-2 py-1 text-[11px] text-zinc-400 transition-colors">Open</button>
-      </div>
+          ))}
+          <a href="/library" class="flex w-full items-center justify-between rounded-lg px-2 py-2 text-[12px] text-zinc-500 hover:text-zinc-300 hover:bg-[#0a0a0a] transition-colors sidebar-label">
+            <span class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.33"><rect x="2" y="3" width="12" height="10" rx="2"/><circle cx="8" cy="7.5" r="1.5"/></svg>
+              View all in Library
+            </span>
+            <span>→</span>
+          </a>
+        </>
+      )}
     </div>
   </div>
 </div>

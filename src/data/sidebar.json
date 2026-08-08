@@ -4,12 +4,7 @@
     { "id": "pin_2", "title": "FadlanGPT — Prompt Lab", "meta": "Prompt • lab", "icon": "🧪" },
     { "id": "pin_3", "title": "Portfolio Copy Revamp", "meta": "Pinned • today", "icon": "✦" }
   ],
-  "projects": [
-    { "id": "personal-gpt", "title": "Personal Portfolio GPT", "desc": "ChatGPT clone for portfolio", "count": 12, "color": "bg-violet-500", "thumb": "GPT", "url": "/projects/personal-gpt", "featured": true },
-    { "id": "saas-dash", "title": "AI Saas Dashboard", "desc": "Analytics & billing", "count": 8, "color": "bg-emerald-500", "thumb": "AI", "url": "/projects/saas-dash" },
-    { "id": "movee", "title": "Movee — Movie App", "desc": "TMDB + streaming UI", "count": 5, "color": "bg-orange-500", "thumb": "M", "url": "/projects/movee" },
-    { "id": "kiosk-freelance", "title": "Freelance Kiosk OS", "desc": "IoT + payment", "count": 3, "color": "bg-sky-500", "thumb": "K", "url": "/projects/kiosk" }
-  ],
+  "projects": [],
   "library": [
     { "id": "lib1", "type": "image", "label": "photo-studio.jpg", "ratio": "aspect-[4/3]", "color": "from-zinc-800 to-zinc-700", "wide": false, "src": "/src/assets/images/photo-in-studio.png" },
     { "id": "lib2", "type": "image", "label": "boat.png", "ratio": "aspect-[3/4]", "color": "from-indigo-950 to-zinc-800", "wide": false },
