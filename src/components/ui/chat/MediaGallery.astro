@@ -1,8 +1,10 @@
 ---
 /**
  * MediaGallery — GPT-style responsive image gallery
- * Layouts: 1=hero, 2=50/50, 3=asymmetric (2fr+1fr desktop, hero-top mobile), 4=2x2, 5+=4preview+N
- * Treats entire gallery as ONE object — outer radius only, 4px gap
+ * Layouts: 1=hero contain (max 640x420), 2=50/50 (8px gap, stack <400px), 3=asymmetric (2fr+1fr desktop, hero-top mobile), 4=2x2, 5+=4preview+N
+ * Treats entire gallery as ONE object — outer radius only
+ * Premium generating UX: shimmer skeleton 1.8s → blur(8px)→0 + opacity .5→1 reveal 250ms
+ * Error state per tile: "Image couldn't be generated" + Try again (retry cap 2) — never browser broken-image
  */
 import type { MediaItem } from '../../../lib/types/chat';
 
@@ -56,6 +58,10 @@ const layout = hasImages
           class="tile-img"
         />
         <div class="tile-skeleton" aria-hidden="true"></div>
+        <div class="tile-error" hidden aria-hidden="true">
+          <span class="tile-error-text">Image couldn't be generated</span>
+          <span class="tile-retry" role="button" tabindex="0">Try again</span>
+        </div>
       </button>
     )}
 
@@ -75,6 +81,10 @@ const layout = hasImages
             class="tile-img"
           />
           <div class="tile-skeleton" aria-hidden="true"></div>
+          <div class="tile-error" hidden aria-hidden="true">
+            <span class="tile-error-text">Image couldn't be generated</span>
+            <span class="tile-retry" role="button" tabindex="0">Try again</span>
+          </div>
         </button>
       ))
     )}
@@ -95,6 +105,10 @@ const layout = hasImages
             class="tile-img"
           />
           <div class="tile-skeleton" aria-hidden="true"></div>
+          <div class="tile-error" hidden aria-hidden="true">
+            <span class="tile-error-text">Image couldn't be generated</span>
+            <span class="tile-retry" role="button" tabindex="0">Try again</span>
+          </div>
         </button>
         <div class="tile-three-stack">
           {previewItems.slice(1, 3).map((item, i) => (
@@ -112,6 +126,10 @@ const layout = hasImages
                 class="tile-img"
               />
               <div class="tile-skeleton" aria-hidden="true"></div>
+              <div class="tile-error" hidden aria-hidden="true">
+                <span class="tile-error-text">Image couldn't be generated</span>
+                <span class="tile-retry" role="button" tabindex="0">Try again</span>
+              </div>
             </button>
           ))}
         </div>
@@ -135,6 +153,10 @@ const layout = hasImages
               class="tile-img"
             />
             <div class="tile-skeleton" aria-hidden="true"></div>
+            <div class="tile-error" hidden aria-hidden="true">
+              <span class="tile-error-text">Image couldn't be generated</span>
+              <span class="tile-retry" role="button" tabindex="0">Try again</span>
+            </div>
           </button>
         ))}
         {/* 4th tile: last preview OR +N overlay */}
@@ -146,7 +168,7 @@ const layout = hasImages
           onclick={`window.__mediaViewer__.open('${galleryId}', ${maxPreview - 1})`}
         >
           <img
-            src={previewItems[maxPreview - 1]?.src ?? previewItems[maxPreview - 1]?.src ?? ''}
+            src={previewItems[maxPreview - 1]?.src ?? ''}
             alt={previewItems[maxPreview - 1]?.alt ?? 'Image'}
             loading="lazy"
             class="tile-img"
@@ -157,6 +179,10 @@ const layout = hasImages
             </div>
           )}
           <div class="tile-skeleton" aria-hidden="true"></div>
+          <div class="tile-error" hidden aria-hidden="true">
+            <span class="tile-error-text">Image couldn't be generated</span>
+            <span class="tile-retry" role="button" tabindex="0">Try again</span>
+          </div>
         </button>
       </>
     )}
@@ -170,33 +196,41 @@ const layout = hasImages
     --gallery-gap: 4px;
     --tile-transition: 180ms ease;
     --tile-scale: 1.015;
+    --tile-border: rgba(255, 255, 255, 0.07);
+    --tile-surface: rgba(255, 255, 255, 0.055);
 
     display: grid;
     gap: var(--gallery-gap);
     border-radius: var(--gallery-radius);
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--tile-surface);
     cursor: zoom-in;
     max-width: 100%;
   }
 
-  /* === Single image === */
+  /* === Single image — contain, max 640x420, preserve original aspect === */
   .media-gallery[data-count="1"] {
     grid-template-columns: 1fr;
+    max-width: 640px;
   }
 
   .tile-single {
     position: relative;
     display: block;
     width: 100%;
-    max-height: 520px;
+    max-height: 420px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--tile-surface);
   }
 
-  /* === Two images: 50/50 === */
+  .media-gallery[data-count="1"] .tile-img {
+    object-fit: contain;
+  }
+
+  /* === Two images: 50/50, 8px gap, stack when tiles too narrow === */
   .media-gallery[data-count="2"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .tile-two {
@@ -205,7 +239,7 @@ const layout = hasImages
     width: 100%;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--tile-surface);
   }
 
   /* === Three images: 2fr + 1fr stacked (desktop) === */
@@ -221,7 +255,7 @@ const layout = hasImages
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--tile-surface);
   }
 
   .tile-three-stack {
@@ -234,7 +268,7 @@ const layout = hasImages
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--tile-surface);
   }
 
   /* === 4+ images: 2x2 grid === */
@@ -250,7 +284,20 @@ const layout = hasImages
     width: 100%;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--tile-surface);
+  }
+
+  /* === Tile base: subtle border + dark elevated surface (guide §9) === */
+  .gallery-tile {
+    border: 1px solid var(--tile-border);
+    border-radius: 14px;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .gallery-tile:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.07);
   }
 
   /* === +N Overlay === */
@@ -272,45 +319,100 @@ const layout = hasImages
     pointer-events: none;
   }
 
-  /* === Tile Image === */
+  /* === Tile Image — blur reveal (guide §14) === */
   .tile-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform var(--tile-transition);
+    opacity: 0.5;
+    filter: blur(8px);
+    transition: opacity 250ms ease, filter 250ms ease, transform var(--tile-transition);
   }
 
-  /* === Hover Effect === */
+  .tile-img.loaded {
+    opacity: 1;
+    filter: blur(0);
+  }
+
   .gallery-tile:hover .tile-img {
     transform: scale(var(--tile-scale));
   }
 
-  /* === Skeleton / Loading === */
+  /* === Skeleton / Loading — subtle shimmer 1.8s (guide §20) === */
   .tile-skeleton {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.06);
+    background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 60%);
+    background-size: 200% 100%;
+    animation: tile-shimmer 1.8s linear infinite;
     opacity: 1;
     transition: opacity 300ms ease;
   }
 
-  .tile-img[src] + .tile-skeleton,
-  .tile-img:not([src=""]) {
-    /* skeleton hides once image has src and loads */
+  @keyframes tile-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   .tile-img.loaded + .tile-skeleton {
     opacity: 0;
   }
 
-  /* === Reduced Motion === */
+  /* === Error state — never browser broken-image (guide §13) === */
+  .tile-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.045);
+    color: rgba(255, 255, 255, 0.62);
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .tile-error[hidden] {
+    display: none;
+  }
+
+  .tile-error-text {
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 0 12px;
+    text-align: center;
+  }
+
+  .tile-retry {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    padding: 4px 12px;
+    transition: background 140ms ease;
+  }
+
+  .tile-retry:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* === Reduced Motion (guide §17) === */
   @media (prefers-reduced-motion: reduce) {
-    .tile-img {
-      transition: none;
-    }
     .tile-skeleton {
+      animation: none;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .tile-img,
+    .tile-img.loaded {
       transition: none;
+      opacity: 1;
+      filter: none;
+    }
+    .gallery-tile:hover {
+      transform: none;
     }
   }
 
@@ -348,26 +450,71 @@ const layout = hasImages
       aspect-ratio: 1 / 1;
     }
   }
+
+  /* === Narrow: two-image gallery stacks to 1 column (guide §8) === */
+  @media (max-width: 400px) {
+    .media-gallery[data-count="2"] {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
 <script>
-  // Skeleton fade-out once images load
-  document.querySelectorAll('.tile-img').forEach((img) => {
-    if ((img as HTMLImageElement).complete) {
-      img.classList.add('loaded');
-      const skeleton = img.parentElement?.querySelector('.tile-skeleton');
-      if (skeleton) skeleton.setAttribute('style', 'opacity:0');
-    } else {
-      img.addEventListener('load', () => {
-        img.classList.add('loaded');
-        const skeleton = img.parentElement?.querySelector('.tile-skeleton');
-        if (skeleton) skeleton.setAttribute('style', 'opacity:0');
+  // Skeleton fade-out, blur reveal, and error state — component tiles only
+  // (runtime inline galleries in ChatHistory handle themselves via .skeleton)
+  function initTiles(scope) {
+    scope.querySelectorAll('.gallery-tile').forEach((tile) => {
+      if ((tile as HTMLElement).dataset.bound === 'true') return;
+      const errorEl = tile.querySelector('.tile-error');
+      if (!errorEl) return; // runtime gallery tile — handled by ChatHistory
+      (tile as HTMLElement).dataset.bound = 'true';
+
+      const img = tile.querySelector('img') as HTMLImageElement;
+      const skeleton = tile.querySelector('.tile-skeleton') as HTMLElement | null;
+      const error = errorEl as HTMLElement;
+      const attempts = { n: 0 };
+
+      function showError() {
+        img.style.display = 'none';
+        if (skeleton) skeleton.style.opacity = '0';
+        error.hidden = false;
+      }
+
+      function retry() {
+        attempts.n += 1;
+        if (attempts.n > 2) return; // retry cap
+        error.hidden = true;
+        img.style.display = '';
+        if (skeleton) skeleton.style.opacity = '';
+        img.classList.remove('loaded');
+        const src = img.getAttribute('src') || '';
+        img.src = '';
+        img.src = src;
+      }
+
+      error.addEventListener('click', (e) => { e.stopPropagation(); retry(); });
+      error.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); retry(); }
       });
-      img.addEventListener('error', () => {
-        img.classList.add('loaded');
-        const skeleton = img.parentElement?.querySelector('.tile-skeleton');
-        if (skeleton) skeleton.setAttribute('style', 'opacity:0');
-      });
-    }
-  });
+
+      if (img.complete) {
+        if (img.naturalWidth > 0) {
+          img.classList.add('loaded');
+          if (skeleton) skeleton.style.opacity = '0';
+        } else {
+          showError();
+        }
+      } else {
+        img.addEventListener('load', () => {
+          img.classList.add('loaded');
+          if (skeleton) skeleton.style.opacity = '0';
+        });
+        img.addEventListener('error', showError);
+      }
+    });
+  }
+
+  initTiles(document);
+  const observer = new MutationObserver(() => initTiles(document));
+  observer.observe(document.body, { childList: true, subtree: true });
 </script>

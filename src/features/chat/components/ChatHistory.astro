@@ -1,8 +1,9 @@
 ---
 /**
- * ChatHistory.astro - GPT-like chat thread
+ * ChatHistory.astro - GPT-like chat thread (RUNTIME renderer)
  * Empty: centered "What's on your mind today?" — no chips visible when Layout empty state
  * Thread: bubble kanan + response kiri + MediaGallery + MediaViewer
+ * Premium generating UX: opacity-only dots + status label + shimmer skeletons (guide-compliant)
  */
 import type { ChatMessage } from '../../../lib/types/chat';
 import type { MediaItem } from '../../../lib/types/chat';
@@ -53,13 +54,18 @@ const { class: className = '' } = Astro.props;
   <div id="chat-thread" class="hidden w-full">
     <div id="chat-thread-inner" class="flex w-full flex-col gap-6 px-4 py-6 md:mx-auto md:max-w-[48rem] md:px-0">
     </div>
-    <div id="typing-indicator" class="hidden mx-auto w-full max-w-[48rem] px-4 md:px-0 pb-2">
+    <!-- Generating indicator: avatar + status label + opacity-only dots + shimmer skeletons (guide §5/§6/§20) -->
+    <div id="typing-indicator" class="hidden mx-auto w-full max-w-[48rem] px-4 md:px-0 pb-2" role="status" aria-live="polite">
       <div class="flex gap-3">
         <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-semibold text-white">F</div>
-        <div class="flex items-center gap-1 pt-2">
-          <span class="typing-dot h-2 w-2 rounded-full bg-zinc-500"></span>
-          <span class="typing-dot h-2 w-2 rounded-full bg-zinc-500"></span>
-          <span class="typing-dot h-2 w-2 rounded-full bg-zinc-500"></span>
+        <div class="min-w-0 flex-1 pt-0.5">
+          <span id="typing-label" class="text-[12px] font-medium text-[rgba(255,255,255,0.42)]">Generating response…</span>
+          <div class="flex items-center gap-1.5 pt-1.5">
+            <span class="r-dot"></span>
+            <span class="r-dot" style="animation-delay:140ms"></span>
+            <span class="r-dot" style="animation-delay:280ms"></span>
+          </div>
+          <div id="typing-skeletons" class="hidden mt-3 w-full"></div>
         </div>
       </div>
     </div>
@@ -72,11 +78,77 @@ const { class: className = '' } = Astro.props;
   .chat-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .chat-scrollbar::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 3px; }
   .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
+</style>
 
-  .typing-dot { animation: typing 1.4s infinite; }
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-4px); } }
+<style is:global>
+  /* ── Runtime (innerHTML-injected) classes — must be global, not scoped ── */
+
+  /* Generating dots — opacity-only, 1000ms loop, 140ms stagger (guide §6) */
+  .r-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.55);
+    animation: r-dot-pulse 1000ms ease-in-out infinite;
+  }
+  @keyframes r-dot-pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  /* Shimmer skeleton — 1.8s linear, low contrast (guide §20) */
+  .r-skeleton {
+    background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.06) 60%);
+    background-size: 200% 100%;
+    animation: r-shimmer 1.8s linear infinite;
+  }
+  @keyframes r-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Runtime gallery image — blur reveal (guide §14) */
+  .r-img {
+    opacity: 0.5;
+    filter: blur(8px);
+    transition: opacity 250ms ease, filter 250ms ease, transform 180ms ease;
+  }
+  .r-img.loaded {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  /* Runtime actions — fade-in on complete (guide §12/§14) */
+  .r-actions {
+    animation: r-actions-in 140ms ease backwards;
+  }
+  @keyframes r-actions-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Newest message enter motion — opacity 0→1 + 4px up, 200ms (guide §14) */
+  .r-enter {
+    animation: r-enter-in 200ms ease backwards;
+  }
+  @keyframes r-enter-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Two-image gallery stacks below ~400px (guide §8) — !important beats inline grid */
+  @media (max-width: 400px) {
+    .media-gallery[data-count="2"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .r-dot { animation: none; opacity: 0.55; }
+    .r-skeleton { animation: none; background: rgba(255,255,255,0.06); }
+    .r-img, .r-img.loaded { transition: none; opacity: 1; filter: none; }
+    .r-actions, .r-enter { animation: none; }
+  }
 </style>
 
 <script>
@@ -97,8 +169,13 @@ const { class: className = '' } = Astro.props;
   const threadEl = document.getElementById('chat-thread');
   const innerEl = document.getElementById('chat-thread-inner');
   const typingEl = document.getElementById('typing-indicator');
+  const typingLabel = document.getElementById('typing-label');
+  const typingSkeletons = document.getElementById('typing-skeletons');
   const anchorEl = document.getElementById('chat-bottom-anchor');
   const historyEl = document.getElementById('chat-history');
+
+  // Enter-animation guard: only animate the newest message on each render
+  let prevIds: Set<string> = new Set();
 
   function load() {
     try {
@@ -147,7 +224,7 @@ const { class: className = '' } = Astro.props;
     return lines.join('\n').trim();
   }
 
-  // Render gallery HTML for a set of images
+  // Render gallery HTML for a set of images (mirrors MediaGallery.astro inline)
   function renderGallery(images: MediaItem[], msgId: string): string {
     if (!images || images.length === 0) return '';
     const count = images.length;
@@ -160,10 +237,17 @@ const { class: className = '' } = Astro.props;
       : count === 3 ? 'three'
       : 'grid';
 
+    const tileBase = (extra: string) =>
+      `position:relative;display:block;width:100%;aspect-ratio:4/3;overflow:hidden;background:rgba(255,255,255,.055);cursor:zoom-in;border:1px solid rgba(255,255,255,.07);${extra}`;
+
     function tileImg(item: MediaItem, i: number, layoutClass: string) {
-      return `<button type="button" class="gallery-tile ${layoutClass}" data-gallery-id="${galleryId}" data-tile-index="${i}" aria-label="${i === 0 ? `Open image 1 of ${count}` : `Open image ${i + 1} of ${count}`}" style="position:relative;display:block;width:100%;aspect-ratio:4/3;overflow:hidden;background:rgba(255,255,255,.04);cursor:zoom-in;">
-        <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt || 'Image')}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
-        <div style="position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:1;transition:opacity 300ms ease;" class="skeleton"></div>
+      return `<button type="button" class="gallery-tile ${layoutClass}" data-gallery-id="${galleryId}" data-tile-index="${i}" aria-label="${i === 0 ? `Open image 1 of ${count}` : `Open image ${i + 1} of ${count}`}" style="${tileBase('')}">
+        <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt || 'Image')}" loading="lazy" class="r-img" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
+        <div class="r-skeleton" style="position:absolute;inset:0;opacity:1;transition:opacity 300ms ease;"></div>
+        <div class="r-error" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.045);color:rgba(255,255,255,.62);cursor:pointer;z-index:2;">
+          <span style="font-size:13px;line-height:1.4;padding:0 12px;text-align:center;">Image couldn't be generated</span>
+          <span class="r-retry" style="font-size:12px;font-weight:500;color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px 12px;">Try again</span>
+        </div>
       </button>`;
     }
 
@@ -174,9 +258,13 @@ const { class: className = '' } = Astro.props;
       tilesHtml = previewItems.map((item, i) => tileImg(item, i, 'tile-two')).join('');
     } else if (layout === 'three') {
       tilesHtml = `
-        <button type="button" class="gallery-tile tile-three-hero" data-gallery-id="${galleryId}" data-tile-index="0" aria-label="Open image 1 of ${count}" style="grid-row:1/span 2;position:relative;display:block;width:100%;height:100%;overflow:hidden;background:rgba(255,255,255,.04);cursor:zoom-in;">
-          <img src="${escapeHtml(previewItems[0].src)}" alt="${escapeHtml(previewItems[0].alt || 'Image 1')}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
-          <div style="position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:1;transition:opacity 300ms ease;" class="skeleton"></div>
+        <button type="button" class="gallery-tile tile-three-hero" data-gallery-id="${galleryId}" data-tile-index="0" aria-label="Open image 1 of ${count}" style="grid-row:1/span 2;position:relative;display:block;width:100%;height:100%;overflow:hidden;background:rgba(255,255,255,.055);cursor:zoom-in;border:1px solid rgba(255,255,255,.07);">
+          <img src="${escapeHtml(previewItems[0].src)}" alt="${escapeHtml(previewItems[0].alt || 'Image 1')}" loading="lazy" class="r-img" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          <div class="r-skeleton" style="position:absolute;inset:0;opacity:1;transition:opacity 300ms ease;"></div>
+          <div class="r-error" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.045);color:rgba(255,255,255,.62);cursor:pointer;z-index:2;">
+            <span style="font-size:13px;line-height:1.4;padding:0 12px;text-align:center;">Image couldn't be generated</span>
+            <span class="r-retry" style="font-size:12px;font-weight:500;color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px 12px;">Try again</span>
+          </div>
         </button>
         ${previewItems.slice(1, 3).map((item, i) => tileImg(item, i + 1, 'tile-three-sub')).join('')}
       `;
@@ -185,22 +273,37 @@ const { class: className = '' } = Astro.props;
       tilesHtml = previewItems.slice(0, 3).map((item, i) => tileImg(item, i, 'tile-grid')).join('');
       // 4th tile with +N overlay
       const lastItem = previewItems[Math.min(3, previewItems.length - 1)];
-      tilesHtml += `<button type="button" class="gallery-tile tile-grid tile-more" data-gallery-id="${galleryId}" data-tile-index="${maxPreview - 1}" aria-label="${remaining > 0 ? `View ${remaining + 1} more images` : `Open image ${maxPreview} of ${count}`}" style="position:relative;display:block;width:100%;aspect-ratio:4/3;overflow:hidden;background:rgba(255,255,255,.04);cursor:zoom-in;">
-        <img src="${escapeHtml(lastItem?.src || '')}" alt="${escapeHtml(lastItem?.alt || 'Image')}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 180ms ease;" />
+      tilesHtml += `<button type="button" class="gallery-tile tile-grid tile-more" data-gallery-id="${galleryId}" data-tile-index="${maxPreview - 1}" aria-label="${remaining > 0 ? `View ${remaining + 1} more images` : `Open image ${maxPreview} of ${count}`}" style="position:relative;display:block;width:100%;aspect-ratio:4/3;overflow:hidden;background:rgba(255,255,255,.055);cursor:zoom-in;border:1px solid rgba(255,255,255,.07);">
+        <img src="${escapeHtml(lastItem?.src || '')}" alt="${escapeHtml(lastItem?.alt || 'Image')}" loading="lazy" class="r-img" style="width:100%;height:100%;object-fit:cover;display:block;" />
         ${remaining > 0 ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.52);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:600;pointer-events:none;">+${remaining}</div>` : ''}
-        <div style="position:absolute;inset:0;background:rgba(255,255,255,.06);opacity:1;transition:opacity 300ms ease;" class="skeleton"></div>
+        <div class="r-skeleton" style="position:absolute;inset:0;opacity:1;transition:opacity 300ms ease;"></div>
+        <div class="r-error" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.045);color:rgba(255,255,255,.62);cursor:pointer;z-index:2;">
+          <span style="font-size:13px;line-height:1.4;padding:0 12px;text-align:center;">Image couldn't be generated</span>
+          <span class="r-retry" style="font-size:12px;font-weight:500;color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:4px 12px;">Try again</span>
+        </div>
       </button>`;
     }
 
-    // Grid style
-    const gridStyle = layout === 'single' ? 'grid-template-columns:1fr;'
-      : layout === 'two' ? 'grid-template-columns:repeat(2,minmax(0,1fr));'
-      : layout === 'three' ? 'grid-template-columns:2fr 1fr;grid-template-rows:repeat(2,minmax(0,1fr));'
-      : 'grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));';
+    // Grid style — single: contain + max 640px; two: 8px gap (guide §8/§19)
+    const gridStyle = layout === 'single'
+      ? 'grid-template-columns:1fr;max-width:640px;gap:0px;'
+      : layout === 'two' ? 'grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;'
+      : layout === 'three' ? 'grid-template-columns:2fr 1fr;grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;'
+      : 'grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;';
 
-    return `<div class="media-gallery" data-count="${count}" data-layout="${layout}" data-gallery-id="${galleryId}" role="group" aria-label="${count} images" style="display:grid;${gridStyle}gap:4px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.04);max-width:100%;margin-bottom:16px;">
+    return `<div class="media-gallery" data-count="${count}" data-layout="${layout}" data-gallery-id="${galleryId}" role="group" aria-label="${count} images" style="display:grid;${gridStyle}border-radius:14px;overflow:hidden;background:rgba(255,255,255,.055);max-width:100%;margin-bottom:16px;">
       ${tilesHtml}
     </div>`;
+  }
+
+  // Skeleton tiles for generating state — mirrors guide §20
+  function skeletonHtml(count: number): string {
+    const n = Math.min(count, 4);
+    const cols = n >= 2 ? 'repeat(2,minmax(0,1fr))' : '1fr';
+    const tiles = Array.from({ length: n }, () =>
+      `<div class="r-skeleton" style="aspect-ratio:4/3;border-radius:14px;border:1px solid rgba(255,255,255,.07);overflow:hidden;"></div>`
+    ).join('');
+    return `<div style="display:grid;grid-template-columns:${cols};gap:8px;position:relative;">${tiles}</div>`;
   }
 
   function render() {
@@ -210,12 +313,19 @@ const { class: className = '' } = Astro.props;
       emptyState.classList.add('hidden');
       threadEl.classList.add('hidden');
       window.dispatchEvent(new CustomEvent('chat:state', { detail: { empty: true, count: 0 } }));
+      prevIds = new Set();
       return;
     }
 
     emptyState.classList.add('hidden');
     threadEl.classList.remove('hidden');
     window.dispatchEvent(new CustomEvent('chat:state', { detail: { empty: false, count: chatHistory.length } }));
+
+    // Enter-animation guard: only the newest previously-unseen message animates
+    const newIds = new Set(chatHistory.map(m => m.id));
+    const newest = chatHistory[chatHistory.length - 1];
+    const animateNewest = !!newest && !prevIds.has(newest.id);
+    prevIds = newIds;
 
     innerEl.innerHTML = chatHistory.map((msg) => {
       const safeQ = escapeHtml(msg.question);
@@ -224,19 +334,35 @@ const { class: className = '' } = Astro.props;
       const source = heading ? extractSource(msg.answer) : null;
       const body = stripHeader(msg.answer);
       const galleryHtml = renderGallery(msg.images, msg.id);
+      const isNewest = animateNewest && msg.id === newest.id;
+      const enterClass = isNewest ? ' r-enter' : '';
 
       // Derive source line HTML
       const sourceHtml = source ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer" class="mt-0.5 inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors">${escapeHtml(source.label)} <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 1h6v6M9 1L1 9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : '';
       const headingHtml = heading ? `<h3 class="text-[19px] font-[600] leading-tight tracking-tight text-white mb-0.5">${escapeHtml(heading)}</h3>${sourceHtml ? `<div class="mb-3">${sourceHtml}</div>` : ''}` : '';
 
-      // Body text with streaming cursor
-      const bodyHtml = body ? `<div class="prose prose-invert max-w-none"><div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[#ececec]">${escapeHtml(body)}</div></div>` : '';
+      // Body text — 15px/26px, primary rgba(255,255,255,.92), max 72ch (guide §11)
+      const bodyHtml = body ? `<div class="prose prose-invert max-w-none"><div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[rgba(255,255,255,0.92)] max-w-[72ch]">${escapeHtml(body)}</div></div>` : '';
 
-      // Register images with global viewer
-      const viewerRegister = '';
+      // Actions — Copy / Regenerate / 👍 / 👎; fade-in + hover/focus reveal + mobile always-visible (guide §12)
+      const actionsHtml = `<div class="r-actions mt-3 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/item:opacity-100 focus-within:opacity-100 max-md:opacity-100">
+        <button data-copy="${escapeHtml(msg.answer)}" class="copy-action flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Copy" aria-label="Copy response">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        </button>
+        <button data-regenerate="${msg.id}" class="regenerate-action flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Regenerate" aria-label="Regenerate response">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+        <button class="like-action flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Good response" aria-label="Good response">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+        </button>
+        <button class="dislike-action flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Bad response" aria-label="Bad response">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+        </button>
+        <span class="text-[11px] text-zinc-600 ml-2">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
+      </div>`;
 
       return `
-        <div class="flex flex-col gap-6 group/item" data-chat-id="${msg.id}" id="chat-${msg.id}">
+        <div class="flex flex-col gap-6 group/item${enterClass}" data-chat-id="${msg.id}" id="chat-${msg.id}">
           <!-- User bubble -->
           <div class="flex w-full justify-end">
             <div class="flex max-w-[78%] flex-col items-end gap-1">
@@ -252,21 +378,34 @@ const { class: className = '' } = Astro.props;
               ${galleryHtml}
               ${headingHtml}
               ${bodyHtml}
-              <div class="mt-3 flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                <button data-copy="${escapeHtml(msg.answer)}" class="copy-action flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Copy" aria-label="Copy response">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                </button>
-                <span class="text-[11px] text-zinc-600 ml-2">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
-              </div>
+              ${actionsHtml}
             </div>
           </div>
         </div>
         `;
     }).join('');
 
-    // Image tile hover scale + skeleton hide
+    // Image tile hover scale + skeleton fade + blur reveal + error state
     innerEl.querySelectorAll('.media-gallery img').forEach((img) => {
       const tile = img.parentElement;
+      const skeleton = tile?.querySelector('.r-skeleton') as HTMLElement | null;
+      const errorEl = tile?.querySelector('.r-error') as HTMLElement | null;
+      if (errorEl && (errorEl as HTMLElement).dataset.bound !== 'true') {
+        (errorEl as HTMLElement).dataset.bound = 'true';
+        const attempts = { n: 0 };
+        errorEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          attempts.n += 1;
+          if (attempts.n > 2) return;
+          errorEl.style.display = 'none';
+          img.style.display = '';
+          img.classList.remove('loaded');
+          if (skeleton) skeleton.style.opacity = '';
+          const src = img.getAttribute('src') || '';
+          img.src = '';
+          img.src = src;
+        });
+      }
       img.addEventListener('mouseenter', () => {
         if ((img as HTMLImageElement).complete) {
           (img as HTMLImageElement).style.transform = 'scale(1.015)';
@@ -276,12 +415,21 @@ const { class: className = '' } = Astro.props;
         (img as HTMLImageElement).style.transform = 'scale(1)';
       });
       img.addEventListener('load', () => {
-        const skeleton = tile?.querySelector('.skeleton');
-        if (skeleton) (skeleton as HTMLElement).style.opacity = '0';
+        img.classList.add('loaded');
+        if (skeleton) skeleton.style.opacity = '0';
+      });
+      img.addEventListener('error', () => {
+        if (errorEl) errorEl.style.display = 'flex';
+        if (skeleton) skeleton.style.opacity = '0';
       });
       if ((img as HTMLImageElement).complete) {
-        const skeleton = tile?.querySelector('.skeleton');
-        if (skeleton) (skeleton as HTMLElement).style.opacity = '0';
+        if ((img as HTMLImageElement).naturalWidth > 0) {
+          img.classList.add('loaded');
+          if (skeleton) skeleton.style.opacity = '0';
+        } else if (errorEl) {
+          errorEl.style.display = 'flex';
+          if (skeleton) skeleton.style.opacity = '0';
+        }
       }
     });
 
@@ -322,6 +470,14 @@ const { class: className = '' } = Astro.props;
       });
     });
 
+    // Regenerate action → dispatch; ChatBox listener re-runs flow
+    innerEl.querySelectorAll('.regenerate-action').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-regenerate') || '';
+        window.dispatchEvent(new CustomEvent('chat:regenerate', { detail: { messageId: id } }));
+      });
+    });
+
     window.dispatchEvent(new CustomEvent('chat:updated'));
     scrollToBottom();
   }
@@ -333,10 +489,19 @@ const { class: className = '' } = Astro.props;
     });
   }
 
-  function showTyping(show: boolean) {
+  // Generating indicator — status label + opacity dots + skeletons (guide §5/§6/§20)
+  function showTyping(show: boolean, imageCount = 0) {
     if (!typingEl) return;
-    if (show) typingEl.classList.remove('hidden');
-    else typingEl.classList.add('hidden');
+    if (show) {
+      if (typingLabel) typingLabel.textContent = imageCount > 0 ? 'Generating images…' : 'Writing response…';
+      if (typingSkeletons) {
+        typingSkeletons.innerHTML = imageCount > 0 ? skeletonHtml(imageCount) : '';
+        typingSkeletons.classList.toggle('hidden', !(imageCount > 0));
+      }
+      typingEl.classList.remove('hidden');
+    } else {
+      typingEl.classList.add('hidden');
+    }
     scrollToBottom();
   }
 

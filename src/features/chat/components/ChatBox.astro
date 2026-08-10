@@ -420,14 +420,14 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
 
     const api = window.chatHistoryApi;
     if (api) {
-      api.add(newMessage);
-      api.showTyping(true);
+      // Generating state FIRST (guide §21): status + skeletons → then complete message
+      api.showTyping(true, newMessage.images.length);
       setTimeout(() => {
         api.showTyping(false);
-        api.scrollToBottom();
+        api.add(newMessage);
         isSubmitting.value = false;
         updateSuggestionVisibility();
-      }, 450 + Math.random()*400);
+      }, 600 + Math.random()*300);
     } else {
       let history = [];
       try {
@@ -545,6 +545,36 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
     resizeTextarea(input);
     validateInput();
     submit();
+  });
+
+  // Regenerate action (guide §12): re-run the mocked generating flow for an existing message
+  window.addEventListener('chat:regenerate', (e) => {
+    const messageId = e.detail && e.detail.messageId;
+    if (!messageId) return;
+
+    let history = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) history = JSON.parse(raw);
+    } catch {}
+
+    const existing = history.find(m => m.id === messageId);
+    if (!existing) return;
+    const matched = findExactQuestion(existing.question);
+    if (!matched) return;
+
+    const api = window.chatHistoryApi;
+    if (!api) return;
+    isSubmitting.value = true;
+
+    api.showTyping(true, existing.images.length);
+    setTimeout(() => {
+      const regenerated = { ...existing, timestamp: Date.now() };
+      const updated = history.map(m => m.id === messageId ? regenerated : m);
+      api.set(updated);
+      api.showTyping(false);
+      isSubmitting.value = false;
+    }, 600 + Math.random()*300);
   });
 
   const updateDisclaimer = (show) => {

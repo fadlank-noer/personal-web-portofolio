@@ -7,9 +7,10 @@ import SquarePen from '@lucide/astro/icons/square-pen';
 import Search from '@lucide/astro/icons/search';
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Trash2 from '@lucide/astro/icons/trash-2';
+import X from '@lucide/astro/icons/x';
 import User from '@lucide/astro/icons/user';
 import LogoV2 from '../../../assets/logo-v2.svg';
-import SideToggleMobile from '../../../assets/svgs/side-toggle-mobile.svg';
+import SidebarIcon from '../../../assets/svgs/sidebar.svg';
 import FolderIcon from '../../../assets/svgs/folder.svg';
 import LibraryIcon from '../../../assets/svgs/library.svg';
 
@@ -31,7 +32,7 @@ const data = sidebarData as SidebarData;
   data-collapsed={collapsed ? 'true' : 'false'}
   class="flex h-full flex-col bg-black transition-all duration-200 ease-in-out
          w-[75vw] max-w-[280px] md:w-[12%] md:max-w-none flex-shrink-0
-         data-[collapsed=true]:!w-[60px] data-[collapsed=true]:md:!w-[60px] data-[collapsed=true]:!max-w-[60px]
+         data-[collapsed=true]:md:!w-[60px] data-[collapsed=true]:md:!max-w-[60px]
          fixed md:relative inset-y-0 left-0 z-40
          -translate-x-full md:translate-x-0
          data-[mobile-open=true]:!translate-x-0
@@ -49,9 +50,14 @@ const data = sidebarData as SidebarData;
       <button id="sidebar-search" class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors sidebar-label" title="Search" aria-label="Search chats">
         <Search class="h-[18px] w-[18px]" />
       </button>
+
+      <!-- Side toggle: mobile X, desktop sidebar icon -->
       <button id="sidebar-side-toggle" class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors" title="Close" aria-label="Close sidebar">
-        <SideToggleMobile class="h-[18px] w-[18px]" />
+        <X class="h-[18px] w-[18px]" />
       </button>
+      <button id="sidebar-side-toggle-desktop" class="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors" title="Collapse" aria-label="Collapse sidebar">
+        <SidebarIcon class="h-[18px] w-[18px] [&_path]:!fill-current" />
+      </button> 
     </div>
   </div>
 
@@ -108,36 +114,38 @@ const data = sidebarData as SidebarData;
   .masonry-grid { column-count: 2; column-gap: 0.5rem; }
   .masonry-item { break-inside: avoid; }
   
-  /* Collapsed state */
-  [data-collapsed="true"] .sidebar-section-content { display: none !important; }
-  [data-collapsed="true"] .group\/section .hover-reveal { display: none !important; }
-  [data-collapsed="true"] .sidebar-section-content .sidebar-label { display: none !important; }
-  [data-collapsed="true"] .sidebar-section-content svg { display: none !important; }
-  [data-collapsed="true"] .sidebar-section-content [data-chevron] { display: none !important; }
+  /* Collapsed state — DESKTOP ONLY (mobile drawer always full-width with labels) */
+  @media (min-width: 768px) {
+    [data-collapsed="true"] .sidebar-section-content { display: none !important; }
+    [data-collapsed="true"] .group\/section .hover-reveal { display: none !important; }
+    [data-collapsed="true"] .sidebar-section-content .sidebar-label { display: none !important; }
+    [data-collapsed="true"] .sidebar-section-content svg { display: none !important; }
+    [data-collapsed="true"] .sidebar-section-content [data-chevron] { display: none !important; }
   
-  /* Quick actions body */
-  [data-collapsed="true"] aside > div:nth-child(3) .sidebar-label { display: none !important; }
-  [data-collapsed="true"] aside > div:nth-child(3) svg { display: none !important; }
+    /* Quick actions body */
+    [data-collapsed="true"] aside > div:nth-child(3) .sidebar-label { display: none !important; }
+    [data-collapsed="true"] aside > div:nth-child(3) svg { display: none !important; }
   
-  /* Section headers */
-  [data-collapsed="true"] .bg-black .group\/section .sidebar-label { display: none !important; }
-  [data-collapsed="true"] .bg-black .group\/section svg { display: none !important; }
+    /* Section headers */
+    [data-collapsed="true"] .bg-black .group\/section .sidebar-label { display: none !important; }
+    [data-collapsed="true"] .bg-black .group\/section svg { display: none !important; }
   
-  /* Bottom section */
-  [data-collapsed="true"] #clear-chats-btn .sidebar-label,
-  [data-collapsed="true"] #clear-chats-btn svg { display: none !important; }
+    /* Bottom section */
+    [data-collapsed="true"] #clear-chats-btn .sidebar-label,
+    [data-collapsed="true"] #clear-chats-btn svg { display: none !important; }
   
-  /* User profile area */
-  [data-collapsed="true"] [data-user-section] .sidebar-label,
-  [data-collapsed="true"] [data-user-section] svg { display: none !important; }
+    /* User profile area */
+    [data-collapsed="true"] [data-user-section] .sidebar-label,
+    [data-collapsed="true"] [data-user-section] svg { display: none !important; }
   
-  /* Header area icons */
-  [data-collapsed="true"] aside > div:first-child svg { display: flex !important; }
-  [data-collapsed="true"] aside > div:first-child .sidebar-label { display: none !important; }
+    /* Header area icons */
+    [data-collapsed="true"] aside > div:first-child svg { display: flex !important; }
+    [data-collapsed="true"] aside > div:first-child .sidebar-label { display: none !important; }
   
-  /* Sidebar clips content when collapsed */
-  [data-collapsed="true"] {
-    overflow: hidden !important;
+    /* Sidebar clips content when collapsed */
+    [data-collapsed="true"] {
+      overflow: hidden !important;
+    }
   }
   
   /* Mobile overlay */
@@ -156,6 +164,7 @@ const data = sidebarData as SidebarData;
   const chatListEl = document.getElementById('sidebar-chat-list');
   const emptyEl = document.getElementById('sidebar-empty');
   const sideToggleBtn = document.getElementById('sidebar-side-toggle');
+  const sideToggleBtnDesktop = document.getElementById('sidebar-side-toggle-desktop');
   const searchBtn = document.getElementById('sidebar-search');
   const isMobile = () => window.innerWidth < 768;
   const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
@@ -175,7 +184,8 @@ const data = sidebarData as SidebarData;
   function applyCollapsed(collapsed) {
     if (!sidebar) return;
     sidebar.dataset.collapsed = collapsed ? 'true' : 'false';
-    document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = collapsed ? 'none' : ''; });
+    const mobile = isMobile();
+    document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = (collapsed && !mobile) ? 'none' : ''; });
     if (!collapsed) applySections();
   }
   function applyMobile(open) {
@@ -195,11 +205,21 @@ const data = sidebarData as SidebarData;
     }
   };
   toggleBtn?.addEventListener('click', handleToggle);
-  sideToggleBtn?.addEventListener('click', () => applyMobile(sidebar?.dataset.mobileOpen !== 'true'));
+  sideToggleBtn?.addEventListener('click', () => applyMobile(false));
+  sideToggleBtnDesktop?.addEventListener('click', handleToggle);
   searchBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('sidebar:search')); document.getElementById('chat-input')?.focus(); });
   overlay?.addEventListener('click', () => applyMobile(false));
   newChatBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('chat:clear')); if (isMobile()) applyMobile(false); });
   clearBtn?.addEventListener('click', () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} window.dispatchEvent(new CustomEvent('chat:clear')); });
+  window.addEventListener('resize', () => {
+    // Re-evaluate collapse/label state when crossing mobile↔desktop boundary
+    if (isMobile()) {
+      document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = ''; });
+      applySections();
+    } else {
+      applyCollapsed(loadCollapsed());
+    }
+  });
   document.querySelectorAll('[data-section-toggle]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const key = btn.getAttribute('data-section-toggle'); if (!key) return;

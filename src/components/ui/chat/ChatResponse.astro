@@ -1,12 +1,14 @@
 ---
 /**
- * ChatResponse — Assistant bubble with MediaGallery + action bar
- * - Media rendered as GPT-style editorial gallery (MediaGallery component)
- * - Heading + source line above body text
- * - Copy/like/dislike action bar on hover
+ * ChatResponse — Assistant bubble with MediaGallery + action bar (SSR canonical)
+ * - Borderless, integrated with chat canvas (guide: NO giant card)
+ * - Typography 15px/26px (lh 1.73), primary rgba(255,255,255,.92), max 72ch
+ * - Generating: opacity-only dots + "Generating response…" label (aria-live)
+ * - Actions: Copy / Regenerate / 👍 / 👎 — fade-in on complete + hover/focus reveal + always visible on mobile
  */
 import Copy from '@lucide/astro/icons/copy';
 import Check from '@lucide/astro/icons/check';
+import RefreshCw from '@lucide/astro/icons/refresh-cw';
 import ThumbsUp from '@lucide/astro/icons/thumbs-up';
 import ThumbsDown from '@lucide/astro/icons/thumbs-down';
 import MediaGallery from './MediaGallery.astro';
@@ -74,12 +76,13 @@ const galleryId = `gallery-${messageId}`;
 
 <div class:list={["group/response flex w-full flex-col", className]} data-message-id={messageId} data-streaming={isStreaming ? 'true' : 'false'}>
 
-  {/* Typing indicator when streaming and empty */}
+  {/* Generating indicator when streaming and empty — opacity-only dots (guide §6) */}
   {isStreaming && isEmpty ? (
-    <div class="flex items-center gap-1.5 py-2">
-      <span class="h-2 w-2 animate-bounce rounded-full bg-zinc-500 [animation-delay:-0.3s]"></span>
-      <span class="h-2 w-2 animate-bounce rounded-full bg-zinc-500 [animation-delay:-0.15s]"></span>
-      <span class="h-2 w-2 animate-bounce rounded-full bg-zinc-500"></span>
+    <div class="flex items-center gap-2 py-2" role="status" aria-live="polite">
+      <span class="text-[12px] font-medium text-[rgba(255,255,255,0.42)]">Generating response…</span>
+      <span class="resp-dot"></span>
+      <span class="resp-dot" style="animation-delay:140ms"></span>
+      <span class="resp-dot" style="animation-delay:280ms"></span>
     </div>
   ) : (
     <>
@@ -115,10 +118,10 @@ const galleryId = `gallery-${messageId}`;
         </div>
       )}
 
-      {/* Body text */}
+      {/* Body text — 15px/26px, primary rgba(255,255,255,.92), max 72ch (guide §11) */}
       {body && (
         <div class="prose prose-invert max-w-none">
-          <div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[#ececec]">
+          <div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[rgba(255,255,255,0.92)] max-w-[72ch]">
             {body}
             {isStreaming && (
               <span class="ml-0.5 inline-block h-[16px] w-[2px] animate-pulse bg-white align-middle"></span>
@@ -134,12 +137,12 @@ const galleryId = `gallery-${messageId}`;
     </>
   )}
 
-  {/* Action bar - hover reveal like ChatGPT: copy, like, dislike */}
-  <div class="mt-3 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/response:opacity-100 focus-within:opacity-100">
+  {/* Action bar — fade-in on complete + hover/focus reveal + always visible on mobile (guide §12) */}
+  <div class="resp-actions mt-3 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/response:opacity-100 focus-within:opacity-100 max-md:opacity-100">
     <button
       data-copy-btn
       data-copy-target={messageId}
-      class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
       title="Copy"
       aria-label="Copy response"
     >
@@ -148,7 +151,17 @@ const galleryId = `gallery-${messageId}`;
     </button>
 
     <button
-      class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      data-regenerate-btn
+      data-regenerate-id={messageId}
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      title="Regenerate"
+      aria-label="Regenerate response"
+    >
+      <RefreshCw class="h-4 w-4" />
+    </button>
+
+    <button
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
       title="Good response"
       aria-label="Good response"
     >
@@ -156,7 +169,7 @@ const galleryId = `gallery-${messageId}`;
     </button>
 
     <button
-      class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
       title="Bad response"
       aria-label="Bad response"
     >
@@ -175,9 +188,44 @@ const galleryId = `gallery-${messageId}`;
   </script>
 )}
 
+<style>
+  /* Generating dots — opacity-only, 1000ms loop, 140ms stagger (guide §6) */
+  .resp-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.55);
+    animation: resp-dot 1000ms ease-in-out infinite;
+  }
+  @keyframes resp-dot {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  /* Actions fade-in on complete (140ms, guide §14) — backwards fill so hover-reveal still works */
+  .resp-actions {
+    animation: resp-actions-in 140ms ease backwards;
+  }
+  @keyframes resp-actions-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .resp-dot {
+      animation: none;
+      opacity: 0.55;
+    }
+    .resp-actions {
+      animation: none;
+    }
+  }
+</style>
+
 <script>
-  // Delegated copy logic
-  function initCopyButtons() {
+  // Delegated copy + regenerate logic
+  function initButtons() {
+    // Copy
     document.querySelectorAll('[data-copy-btn]').forEach((btn) => {
       if ((btn as HTMLElement).dataset.bound === 'true') return;
       (btn as HTMLElement).dataset.bound = 'true';
@@ -202,10 +250,21 @@ const galleryId = `gallery-${messageId}`;
         }
       });
     });
+
+    // Regenerate → dispatch event; ChatBox listener re-runs the flow
+    document.querySelectorAll('[data-regenerate-btn]').forEach((btn) => {
+      if ((btn as HTMLElement).dataset.regBound === 'true') return;
+      (btn as HTMLElement).dataset.regBound = 'true';
+
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.regenerateId;
+        window.dispatchEvent(new CustomEvent('chat:regenerate', { detail: { messageId: id } }));
+      });
+    });
   }
 
-  initCopyButtons();
-  const observer = new MutationObserver(() => initCopyButtons());
+  initButtons();
+  const observer = new MutationObserver(() => initButtons());
   observer.observe(document.body, { childList: true, subtree: true });
-  document.addEventListener('astro:page-load', initCopyButtons);
+  document.addEventListener('astro:page-load', initButtons);
 </script>
