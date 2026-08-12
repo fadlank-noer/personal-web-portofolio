@@ -7,10 +7,8 @@ import SquarePen from '@lucide/astro/icons/square-pen';
 import Search from '@lucide/astro/icons/search';
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Trash2 from '@lucide/astro/icons/trash-2';
-import X from '@lucide/astro/icons/x';
 import User from '@lucide/astro/icons/user';
 import LogoV2 from '../../../assets/logo-v2.svg';
-import SidebarIcon from '../../../assets/svgs/sidebar.svg';
 import FolderIcon from '../../../assets/svgs/folder.svg';
 import LibraryIcon from '../../../assets/svgs/library.svg';
 
@@ -51,13 +49,7 @@ const data = sidebarData as SidebarData;
         <Search class="h-[18px] w-[18px]" />
       </button>
 
-      <!-- Side toggle: mobile X, desktop sidebar icon -->
-      <button id="sidebar-side-toggle" class="flex md:hidden h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors" title="Close" aria-label="Close sidebar">
-        <X class="h-[18px] w-[18px]" />
-      </button>
-      <button id="sidebar-side-toggle-desktop" class="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors" title="Collapse" aria-label="Collapse sidebar">
-        <SidebarIcon class="h-[18px] w-[18px] [&_path]:!fill-current" />
-      </button> 
+      <!-- Side toggle: mobile X only — desktop collapse via sidebar-toggle (logo) -->
     </div>
   </div>
 
@@ -67,7 +59,7 @@ const data = sidebarData as SidebarData;
       <SquarePen class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
     </button>
     <a href="/library" data-nav="library" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
-      <LibraryIcon class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors [&_path]:!fill-current" /> <span class="truncate sidebar-label">Library</span>
+      <LibraryIcon class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Library</span>
     </a>
     <a href="/projects" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
       <FolderIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors [&_path]:!fill-current" /> <span class="truncate sidebar-label">Projects</span>
@@ -164,7 +156,6 @@ const data = sidebarData as SidebarData;
   const chatListEl = document.getElementById('sidebar-chat-list');
   const emptyEl = document.getElementById('sidebar-empty');
   const sideToggleBtn = document.getElementById('sidebar-side-toggle');
-  const sideToggleBtnDesktop = document.getElementById('sidebar-side-toggle-desktop');
   const searchBtn = document.getElementById('sidebar-search');
   const isMobile = () => window.innerWidth < 768;
   const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
@@ -206,7 +197,6 @@ const data = sidebarData as SidebarData;
   };
   toggleBtn?.addEventListener('click', handleToggle);
   sideToggleBtn?.addEventListener('click', () => applyMobile(false));
-  sideToggleBtnDesktop?.addEventListener('click', handleToggle);
   searchBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('sidebar:search')); document.getElementById('chat-input')?.focus(); });
   overlay?.addEventListener('click', () => applyMobile(false));
   newChatBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('chat:clear')); if (isMobile()) applyMobile(false); });
