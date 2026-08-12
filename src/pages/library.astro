@@ -1,6 +1,7 @@
 ---
+import "../styles/global.css";
 import LibraryIcon from '../assets/svgs/library.svg';
-import LogoV2 from '../assets/logo-v2.svg';
+import SideToggleMobile from '../assets/svgs/side-toggle-mobile.svg';
 import Sidebar from '../features/sidebar/components/Sidebar.astro';
 import Head from '../layouts/Head.astro';
 import sidebarData from '../data/sidebar.json';
@@ -18,28 +19,34 @@ const videoCount = library.filter(i => i.type === 'video').length;
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <Head />
   </head>
-  <body class="bg-white text-black antialiased overflow-hidden">
-    <div class="flex h-[100dvh] w-full overflow-hidden bg-white">
+  <body class="bg-black text-white antialiased overflow-hidden">
+    <div class="flex h-[100dvh] w-full overflow-hidden bg-black">
       <Sidebar />
 
-      <main class="flex flex-1 flex-col min-w-0 bg-white overflow-y-auto chat-scrollbar">
+      <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
         <!-- Top bar -->
-        <div class="sticky top-0 z-10 flex h-[52px] items-center justify-between border-b border-black/[0.06] bg-white/85 px-4 md:px-6 backdrop-blur">
-          <div class="flex items-center gap-2.5">
-            <span class="hidden md:flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#f5f5f5] border border-black/[0.06]"><LibraryIcon class="h-[18px] w-[18px] text-violet-600" /></span>
-            <h1 class="text-[15px] font-[700] tracking-[-0.02em] text-black">Library</h1>
+        <div class="sticky top-0 z-10 flex h-[52px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 md:px-6 backdrop-blur">
+          <!-- Mobile sidebar toggle -->
+          <div class="flex items-center gap-2">
+            <button id="mobile-sidebar-toggle" class="flex md:hidden h-9 w-9 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
+              <SideToggleMobile class="h-[22px] w-[22px] text-white" />
+            </button>
+            <span class="hidden md:flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
+              <LibraryIcon class="h-[18px] w-[18px] text-violet-500 [&_path]:!stroke-current" />
+            </span>
+            <h1 class="text-[15px] font-[700] tracking-[-0.02em] text-white">Library</h1>
             <div class="ml-1 flex items-center gap-1.5">
-              <span class="rounded-full bg-[#f5f5f5] border border-black/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-500">
+              <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} images
               </span>
-              <span class="rounded-full bg-[#f5f5f5] border border-black/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-500">
+              <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><path d="M7.5 6.5l3 2-3 2V6.5z" fill="currentColor"/></svg>{videoCount} videos
               </span>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button class="flex h-8 w-8 md:w-auto md:gap-1.5 items-center justify-center rounded-full bg-[#f5f5f5] hover:bg-[#eee] md:px-3.5 text-[13px] border border-black/[0.06] text-zinc-600 transition-colors"><span class="hidden md:inline">Search</span><span class="md:hidden text-[14px]">⌕</span></button>
-            <button class="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f5] hover:bg-[#eee] border border-black/[0.06] transition-colors text-zinc-600" aria-label="More options">...</button>
+            <button class="flex h-8 w-8 md:w-auto md:gap-1.5 items-center justify-center rounded-full bg-[#1a1a1a] hover:bg-[#2a2a2a] md:px-3.5 text-[13px] border border-white/[0.06] text-zinc-400 hover:text-white transition-colors"><span class="hidden md:inline">Search</span><span class="md:hidden text-[14px]">⌕</span></button>
+            <button class="flex h-8 w-8 items-center justify-center rounded-full bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-white/[0.06] transition-colors text-zinc-400 hover:text-white" aria-label="More options">...</button>
             <button class="hidden md:flex h-8 items-center gap-1.5 rounded-full bg-violet-600 text-white px-3.5 text-[13px] font-[600] hover:bg-violet-700 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4.5v11M4.5 10h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
               Edit
@@ -51,15 +58,15 @@ const videoCount = library.filter(i => i.type === 'video').length;
           <!-- Masonry grid -->
           <div class="masonry-grid columns-2 md:columns-3 lg:columns-4 column-gap-3 space-y-3">
             {library.map((item) => (
-              <div class={`masonry-item break-inside-avoid relative w-full overflow-hidden rounded-[12px] border border-black/[0.06] bg-gradient-to-br ${item.color} ${item.ratio} group cursor-pointer hover:border-black/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.15)] transition-all duration-200`}>
+              <div class={`masonry-item break-inside-avoid relative w-full overflow-hidden rounded-[12px] border border-white/[0.06] bg-gradient-to-br ${item.color} ${item.ratio} group cursor-pointer hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)] transition-all duration-200`}>
                 <!-- type badge -->
-                <div class="absolute left-2 top-2 z-10 rounded-full bg-white/50 backdrop-blur-sm border border-black/[0.1] px-1.5 py-0.5">
-                  <span class="text-[9px] font-[500] uppercase tracking-wide text-black/70">{item.type}</span>
+                <div class="absolute left-2 top-2 z-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/[0.1] px-1.5 py-0.5">
+                  <span class="text-[9px] font-[500] uppercase tracking-wide text-white/70">{item.type}</span>
                 </div>
                 <!-- video play indicator -->
                 {item.type === 'video' && (
-                  <div class="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white/50 backdrop-blur-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 20 20" fill="black"><path d="M6.5 5.5l10 5-10 5V5.5z"/></svg>
+                  <div class="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 20 20" fill="white"><path d="M6.5 5.5l10 5-10 5V5.5z"/></svg>
                   </div>
                 )}
                 <!-- label -->
@@ -68,7 +75,7 @@ const videoCount = library.filter(i => i.type === 'video').length;
                 </div>
                 <!-- hover overlay -->
                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <span class="rounded-full bg-white/10 backdrop-blur-sm border border-black/20 px-3 py-1.5 text-[11px] font-[500] text-black/90">View</span>
+                  <span class="rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-1.5 text-[11px] font-[500] text-white/90">View</span>
                 </div>
               </div>
             ))}
@@ -76,7 +83,7 @@ const videoCount = library.filter(i => i.type === 'video').length;
 
           <!-- Load more -->
           <div class="mt-8 flex justify-center">
-            <button class="flex items-center gap-2 rounded-full bg-[#f5f5f5] border border-black/[0.06] px-4 py-2 text-[13px] text-zinc-600 hover:text-black hover:bg-[#eee] transition-colors">
+            <button class="flex items-center gap-2 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-4 py-2 text-[13px] text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 5v10M5 10l5 5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Load more
             </button>
@@ -87,13 +94,38 @@ const videoCount = library.filter(i => i.type === 'video').length;
   </body>
 </html>
 
+<script>
+  // Mobile sidebar toggle
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggle = document.getElementById('mobile-sidebar-toggle');
+  const isMobile = () => window.innerWidth < 768;
+  const applyMobile = (open) => {
+    if (!sidebar || !overlay) return;
+    sidebar.dataset.mobileOpen = open ? 'true' : 'false';
+    overlay.classList.toggle('hidden', !open);
+  };
+  toggle?.addEventListener('click', () => {
+    if (!sidebar) return;
+    const cur = sidebar.dataset.mobileOpen === 'true';
+    applyMobile(!cur);
+  });
+  overlay?.addEventListener('click', () => applyMobile(false));
+  window.addEventListener('resize', () => {
+    if (!isMobile() && sidebar && overlay) {
+      sidebar.dataset.mobileOpen = 'false';
+      overlay.classList.add('hidden');
+    }
+  });
+</script>
+
 <style>
-  .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #e0e0e0 #f5f5f5; }
+  .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #2a2a2a #0a0a0a; }
   .chat-scrollbar::-webkit-scrollbar { width: 6px; }
-  .chat-scrollbar::-webkit-scrollbar-track { background: #f5f5f5; }
-  .chat-scrollbar::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 9999px; border: 1px solid #f5f5f5; background-clip: padding-box; }
-  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #bbb; }
-  .chat-scrollbar::-webkit-scrollbar-button { width: 6px; height: 10px; background: #f5f5f5 no-repeat center; display: block; }
-  .chat-scrollbar::-webkit-scrollbar-button:vertical:start:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M3 0 L6 4 L0 4 Z' fill='%23bbb'/%3E%3C/svg%3E"); }
-  .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%23bbb'/%3E%3C/svg%3E"); }
+  .chat-scrollbar::-webkit-scrollbar-track { background: #0a0a0a; }
+  .chat-scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 9999px; border: 1px solid #0a0a0a; background-clip: padding-box; }
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+  .chat-scrollbar::-webkit-scrollbar-button { width: 6px; height: 10px; background: #0a0a0a no-repeat center; display: block; }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:start:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M3 0 L6 4 L0 4 Z' fill='%233a3a3a'/%3E%3C/svg%3E"); }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%233a3a3a'/%3E%3C/svg%3E"); }
 </style>

@@ -1,5 +1,7 @@
 ---
+import "../styles/global.css";
 import FolderIcon from '../assets/svgs/folder.svg';
+import SideToggleMobile from '../assets/svgs/side-toggle-mobile.svg';
 import LogoV2 from '../assets/logo-v2.svg';
 
 import Sidebar from '../features/sidebar/components/Sidebar.astro';
@@ -16,21 +18,27 @@ const projects = (sidebarData as { projects: ProjectItem[] }).projects;
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <Head />
   </head>
-  <body class="bg-white text-black antialiased overflow-hidden">
-    <div class="flex h-[100dvh] w-full overflow-hidden bg-white">
+  <body class="bg-black text-white antialiased overflow-hidden">
+    <div class="flex h-[100dvh] w-full overflow-hidden bg-black">
       <Sidebar />
 
-      <main class="flex flex-1 flex-col min-w-0 bg-white overflow-y-auto chat-scrollbar">
+      <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
         <!-- Top bar -->
-        <div class="sticky top-0 z-10 flex h-[52px] items-center justify-between border-b border-black/[0.06] bg-white/85 px-4 md:px-6 backdrop-blur">
-          <div class="flex items-center gap-2.5">
-            <span class="hidden md:flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#f5f5f5] border border-black/[0.06]"><FolderIcon class="h-[18px] w-[18px] text-violet-600" /></span>
-            <h1 class="text-[15px] font-[700] tracking-[-0.02em] text-black">Projects</h1>
-            <span class="ml-1 rounded-full bg-[#f5f5f5] border border-black/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-500">{projects.length} folders</span>
+        <div class="sticky top-0 z-10 flex h-[52px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 md:px-6 backdrop-blur">
+          <div class="flex items-center gap-2">
+            <!-- Mobile sidebar toggle -->
+            <button id="mobile-sidebar-toggle" class="flex md:hidden h-9 w-9 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
+              <SideToggleMobile class="h-[22px] w-[22px] text-white" />
+            </button>
+            <span class="hidden md:flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
+              <FolderIcon class="h-[18px] w-[18px] text-violet-500 [&_path]:!stroke-current" />
+            </span>
+            <h1 class="text-[15px] font-[700] tracking-[-0.02em] text-white">Projects</h1>
+            <span class="ml-1 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">{projects.length} folders</span>
           </div>
           <div class="flex items-center gap-2">
             <button class="hidden md:flex h-8 items-center gap-1.5 rounded-full bg-violet-600 text-white px-3.5 text-[13px] font-[600] hover:bg-violet-700 transition-colors">+ New folder</button>
-            <button class="flex h-8 w-8 md:w-auto md:gap-1.5 items-center justify-center rounded-full bg-[#f5f5f5] hover:bg-[#eee] md:px-3.5 text-[13px] border border-black/[0.06] text-zinc-600 transition-colors"><span class="hidden md:inline">Search</span><span class="md:hidden text-[14px]">⌕</span></button>
+            <button class="flex h-8 w-8 md:w-auto md:gap-1.5 items-center justify-center rounded-full bg-[#1a1a1a] hover:bg-[#2a2a2a] md:px-3.5 text-[13px] border border-white/[0.06] text-zinc-400 hover:text-white transition-colors"><span class="hidden md:inline">Search</span><span class="md:hidden text-[14px]">⌕</span></button>
           </div>
         </div>
 
@@ -38,70 +46,70 @@ const projects = (sidebarData as { projects: ProjectItem[] }).projects;
           <!-- Description -->
           <div class="mb-5 flex items-start justify-between gap-4">
             <p class="max-w-[55ch] text-[13px] leading-snug text-zinc-500">Koleksi folder project ala ChatGPT Projects. Tiap folder = context terpisah, warna dot = kategori, thumb = inisial, count = file di dalamnya. Hover buat lihat stacked preview.</p>
-            <a href="/" class="hidden md:flex shrink-0 h-8 items-center rounded-full bg-[#f5f5f5] border border-black/[0.06] px-3 text-[12px] text-zinc-600 hover:text-black hover:bg-[#eee]">← Back to chat</a>
+            <a href="/" class="hidden md:flex shrink-0 h-8 items-center rounded-full bg-[#1a1a1a] border border-white/[0.06] px-3 text-[12px] text-zinc-400 hover:text-white hover:bg-[#2a2a2a]">← Back to chat</a>
           </div>
 
           <!-- Folder grid -->
           <div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
             {projects.map((p) => (
-              <a href={p.url} class="group relative flex flex-col overflow-hidden rounded-[18px] border border-black/[0.06] bg-[#fafafa] hover:bg-white transition-all duration-200 hover:border-black/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.15)]">
+              <a href={p.url} class="group relative flex flex-col overflow-hidden rounded-[18px] border border-white/[0.06] bg-[#0a0a0a] hover:bg-[#111] transition-all duration-200 hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
                 <!-- top color accent thin -->
                 <div class={`h-[3px] w-full ${p.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
                 <div class="flex flex-1 flex-col p-4">
                   <!-- folder icon row -->
                   <div class="mb-3.5 flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                      <span class="flex h-[32px] w-[32px] items-center justify-center rounded-[10px] bg-[#f0f0f0] group-hover:bg-[#eee] border border-black/[0.04] transition-colors">
-                        <FolderIcon class="h-[18px] w-[18px] text-zinc-600 group-hover:text-black transition-colors" />
+                      <span class="flex h-[32px] w-[32px] items-center justify-center rounded-[10px] bg-[#1a1a1a] group-hover:bg-[#222] border border-white/[0.06] transition-colors">
+                        <FolderIcon class="h-[18px] w-[18px] text-zinc-400 group-hover:text-white transition-colors [&_path]:!stroke-current" />
                       </span>
-                      <span class={`flex h-[24px] w-[24px] items-center justify-center rounded-[8px] ${p.color} text-[11px] font-[800] tracking-wide text-white -ml-2 border-[2px] border-[#fafafa] group-hover:border-white transition-colors`}>{p.thumb}</span>
+                      <span class={`flex h-[24px] w-[24px] items-center justify-center rounded-[8px] ${p.color} text-[11px] font-[800] tracking-wide text-white -ml-2 border-[2px] border-[#0a0a0a] group-hover:border-[#111] transition-colors`}>{p.thumb}</span>
                     </div>
-                    <span class="flex items-center gap-1 rounded-full bg-white/60 border border-black/[0.06] px-2 py-0.5 backdrop-blur">
+                    <span class="flex items-center gap-1 rounded-full bg-white/10 border border-white/[0.06] px-2 py-0.5 backdrop-blur">
                       <span class={`h-1.5 w-1.5 rounded-full ${p.color}`} />
-                      <span class="text-[11px] font-[500] text-zinc-500 group-hover:text-zinc-600 transition-colors">{p.count} files</span>
+                      <span class="text-[11px] font-[500] text-zinc-400 group-hover:text-zinc-300 transition-colors">{p.count} files</span>
                     </span>
                   </div>
 
-                  <h2 class="line-clamp-1 text-[14px] font-[650] leading-tight tracking-[-0.01em] text-black">{p.title}</h2>
-                  <p class="mt-1 line-clamp-2 text-[12px] leading-[1.4] text-zinc-500 group-hover:text-zinc-600 transition-colors min-h-[33px]">{p.desc}</p>
+                  <h2 class="line-clamp-1 text-[14px] font-[650] leading-tight tracking-[-0.01em] text-white">{p.title}</h2>
+                  <p class="mt-1 line-clamp-2 text-[12px] leading-[1.4] text-zinc-500 group-hover:text-zinc-400 transition-colors min-h-[33px]">{p.desc}</p>
 
                   <!-- Stacked folder preview -->
                   <div class="relative mt-4 h-[88px] w-full select-none">
                     <!-- back paper 1 -->
-                    <div class="absolute left-[6%] right-[14%] top-[8%] bottom-[16%] rotate-[-1.5deg] rounded-[10px] bg-[#f5f5f5] border border-black/[0.05] opacity-90 group-hover:rotate-[-2deg] group-hover:translate-y-[-1px] transition-all" />
+                    <div class="absolute left-[6%] right-[14%] top-[8%] bottom-[16%] rotate-[-1.5deg] rounded-[10px] bg-[#1a1a1a] border border-white/[0.05] opacity-90 group-hover:rotate-[-2deg] group-hover:translate-y-[-1px] transition-all" />
                     <!-- back paper 2 -->
-                    <div class="absolute left-[10%] right-[8%] top-[18%] bottom-[8%] rotate-[1.2deg] rounded-[10px] bg-white border border-black/[0.08] group-hover:rotate-[1.8deg] group-hover:translate-y-[-1px] transition-all" />
+                    <div class="absolute left-[10%] right-[8%] top-[18%] bottom-[8%] rotate-[1.2deg] rounded-[10px] bg-[#0a0a0a] border border-white/[0.08] group-hover:rotate-[1.8deg] group-hover:translate-y-[-1px] transition-all" />
                     <!-- front folder body -->
-                    <div class="absolute inset-x-[2%] bottom-0 top-[28%] flex items-center justify-center overflow-hidden rounded-[12px] bg-gradient-to-br from-[#f8f8f8] to-[#f0f0f0] border border-black/[0.08] group-hover:from-white group-hover:to-[#f5f5f5] transition-colors">
-                      <FolderIcon class="h-[48px] w-[48px] text-black/[0.06] group-hover:text-black/[0.09] transition-colors" />
-                      <span class="absolute text-[11px] font-[500] tracking-wide text-zinc-400/60 group-hover:text-zinc-400/70">{p.thumb} • {p.count}</span>
+                    <div class="absolute inset-x-[2%] bottom-0 top-[28%] flex items-center justify-center overflow-hidden rounded-[12px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-white/[0.08] group-hover:from-[#222] group-hover:to-[#1a1a1a] transition-colors">
+                      <FolderIcon class="h-[48px] w-[48px] text-white/[0.06] group-hover:text-white/[0.09] transition-colors [&_path]:!stroke-current" />
+                      <span class="absolute text-[11px] font-[500] tracking-wide text-zinc-500/60 group-hover:text-zinc-500/70">{p.thumb} • {p.count}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- footer -->
-                <div class="flex h-[36px] items-center justify-between border-t border-black/[0.05] bg-black/5 px-4">
-                  <span class="text-[11px] text-zinc-400 group-hover:text-zinc-500">/</span>
-                  <span class="text-[11px] text-zinc-500 group-hover:text-zinc-700">Open →</span>
+                <div class="flex h-[36px] items-center justify-between border-t border-white/[0.05] bg-white/5 px-4">
+                  <span class="text-[11px] text-zinc-600 group-hover:text-zinc-500">/</span>
+                  <span class="text-[11px] text-zinc-500 group-hover:text-zinc-300">Open →</span>
                 </div>
               </a>
             ))}
 
             <!-- New folder CTA -->
-            <button class="group flex min-h-[232px] flex-col items-center justify-center gap-3 rounded-[18px] border border-dashed border-black/[0.12] bg-transparent hover:bg-[#fafafa] hover:border-black/[0.18] transition-all">
-              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 border border-violet-200 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 20" fill="none" class="text-violet-600"><path d="M10 4.5v11M4.5 10h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <button class="group flex min-h-[232px] flex-col items-center justify-center gap-3 rounded-[18px] border border-dashed border-white/[0.12] bg-transparent hover:bg-white/[0.02] hover:border-white/[0.18] transition-all">
+              <span class="flex h-12 w-12 items-center justify-center rounded-full bg-violet-600/10 border border-violet-500/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 20" fill="none" class="text-violet-500"><path d="M10 4.5v11M4.5 10h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
               </span>
               <div class="text-center">
-                <span class="block text-[13px] font-[600] text-zinc-600 group-hover:text-black">New project folder</span>
-                <span class="mt-0.5 block text-[11px] text-zinc-400 group-hover:text-zinc-500">Create a custom collection</span>
+                <span class="block text-[13px] font-[600] text-zinc-400 group-hover:text-white">New project folder</span>
+                <span class="mt-0.5 block text-[11px] text-zinc-600 group-hover:text-zinc-500">Create a custom collection</span>
               </div>
             </button>
           </div>
 
           <!-- footnote -->
-          <div class="mt-8 flex items-center gap-2 rounded-[12px] border border-black/[0.06] bg-[#fafafa] px-3 py-2.5 md:hidden">
-            <LogoV2 class="h-4 w-4 [&_path]:!fill-violet-600 opacity-80" />
+          <div class="mt-8 flex items-center gap-2 rounded-[12px] border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 md:hidden">
+            <LogoV2 class="h-4 w-4 [&_path]:!fill-violet-500 opacity-80" />
             <span class="text-[12px] text-zinc-500">Pinned from sidebar — tap folder to open.</span>
           </div>
         </div>
@@ -110,13 +118,38 @@ const projects = (sidebarData as { projects: ProjectItem[] }).projects;
   </body>
 </html>
 
+<script>
+  // Mobile sidebar toggle
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggle = document.getElementById('mobile-sidebar-toggle');
+  const isMobile = () => window.innerWidth < 768;
+  const applyMobile = (open) => {
+    if (!sidebar || !overlay) return;
+    sidebar.dataset.mobileOpen = open ? 'true' : 'false';
+    overlay.classList.toggle('hidden', !open);
+  };
+  toggle?.addEventListener('click', () => {
+    if (!sidebar) return;
+    const cur = sidebar.dataset.mobileOpen === 'true';
+    applyMobile(!cur);
+  });
+  overlay?.addEventListener('click', () => applyMobile(false));
+  window.addEventListener('resize', () => {
+    if (!isMobile() && sidebar && overlay) {
+      sidebar.dataset.mobileOpen = 'false';
+      overlay.classList.add('hidden');
+    }
+  });
+</script>
+
 <style>
-  .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #e0e0e0 #f5f5f5; }
+  .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #2a2a2a #0a0a0a; }
   .chat-scrollbar::-webkit-scrollbar { width: 6px; }
-  .chat-scrollbar::-webkit-scrollbar-track { background: #f5f5f5; }
-  .chat-scrollbar::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 9999px; border: 1px solid #f5f5f5; background-clip: padding-box; }
-  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #bbb; }
-  .chat-scrollbar::-webkit-scrollbar-button { width: 6px; height: 10px; background: #f5f5f5 no-repeat center; display: block; }
-  .chat-scrollbar::-webkit-scrollbar-button:vertical:start:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M3 0 L6 4 L0 4 Z' fill='%23bbb'/%3E%3C/svg%3E"); }
-  .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%23bbb'/%3E%3C/svg%3E"); }
+  .chat-scrollbar::-webkit-scrollbar-track { background: #0a0a0a; }
+  .chat-scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 9999px; border: 1px solid #0a0a0a; background-clip: padding-box; }
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+  .chat-scrollbar::-webkit-scrollbar-button { width: 6px; height: 10px; background: #0a0a0a no-repeat center; display: block; }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:start:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M3 0 L6 4 L0 4 Z' fill='%233a3a3a'/%3E%3C/svg%3E"); }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%233a3a3a'/%3E%3C/svg%3E"); }
 </style>
