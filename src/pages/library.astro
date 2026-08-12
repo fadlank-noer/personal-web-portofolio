@@ -7,10 +7,88 @@ import Head from '../layouts/Head.astro';
 import sidebarData from '../data/sidebar.json';
 import type { LibraryItem } from '../lib/types/sidebar';
 
-const library = (sidebarData as { library: LibraryItem[] }).library;
+// Get all image files from the images folder using Vite's glob
+const allImageModules = import.meta.glob('/src/assets/images/**/*', {
+  eager: true,
+});
 
-const imageCount = library.filter(i => i.type === 'image').length;
-const videoCount = library.filter(i => i.type === 'video').length;
+// Build library items with proper URLs for each image
+const library: LibraryItem[] = Object.entries(allImageModules)
+  .filter(([path]) => {
+    // Only include image files (not folders or other files)
+    const ext = path.split('.').pop()?.toLowerCase();
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext || '');
+  })
+  .map(([path, _imageModule], index) => {
+    // Extract path parts: /src/assets/images/[subfolder/]filename.ext
+    const parts = path.replace('/src/assets/images/', '').split('/');
+    const filename = parts[parts.length - 1];
+    const isInSubfolder = parts.length > 1;
+    const subfolder = isInSubfolder ? parts.slice(0, -1).join('/') : null;
+
+    // Convert /src/assets/images/photo.png -> /_astro/photo.png or /images/photo.png
+    // For Vite/Astro, images in src/assets are processed and the URL is derived from the glob path
+    // Use a helper to get the actual URL at runtime via import.meta.url
+    let imageUrl = path;
+    
+    // Try to get the URL from the module
+    try {
+      const mod = _imageModule as { src?: string; default?: { src: string } };
+      if (mod?.src) {
+        imageUrl = mod.src;
+      } else if (mod?.default?.src) {
+        imageUrl = mod.default.src;
+      } else {
+        // Fallback: use path transformation
+        // /src/assets/images/foo.png -> /_astro/foo.XXX hash .png
+        // For now, just strip the /src/assets/ prefix
+        imageUrl = path.replace('/src/assets', '');
+      }
+    } catch {
+      imageUrl = path.replace('/src/assets', '');
+    }
+
+    // Generate a consistent color based on index
+    const colors = [
+      'from-zinc-800 to-zinc-700',
+      'from-indigo-950 to-zinc-800',
+      'from-violet-900/40 to-zinc-800',
+      'from-emerald-950 to-zinc-800',
+      'from-rose-950 to-zinc-800',
+      'from-amber-950 to-zinc-800',
+      'from-cyan-950 to-zinc-800',
+      'from-purple-950 to-zinc-800',
+    ];
+    const color = colors[index % colors.length];
+
+    // Random aspect ratios for visual variety in masonry
+    const ratios = [
+      'aspect-[4/3]',
+      'aspect-[3/4]',
+      'aspect-square',
+      'aspect-[16/10]',
+      'aspect-[2/3]',
+      'aspect-[3/2]',
+      'aspect-[5/4]',
+    ];
+    const ratio = ratios[index % ratios.length];
+
+    // Label: subfolder/filename or just filename
+    const label = subfolder ? `${subfolder}/${filename}` : filename;
+
+    return {
+      id: `img_${index}`,
+      type: 'image' as const,
+      label,
+      ratio,
+      color,
+      wide: index % 7 === 3,
+      src: imageUrl,
+    };
+  });
+
+const imageCount = library.length;
+const videoCount = (sidebarData as { library: LibraryItem[] }).library.filter(i => i.type === 'video').length;
 ---
 
 <html lang="en">
@@ -58,17 +136,18 @@ const videoCount = library.filter(i => i.type === 'video').length;
           <!-- Masonry grid -->
           <div class="masonry-grid columns-2 md:columns-3 lg:columns-4 column-gap-3 space-y-3">
             {library.map((item) => (
-              <div class={`masonry-item break-inside-avoid relative w-full overflow-hidden rounded-[12px] border border-white/[0.06] bg-gradient-to-br ${item.color} ${item.ratio} group cursor-pointer hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)] transition-all duration-200`}>
+              <div class={`masonry-item break-inside-avoid relative w-full overflow-hidden rounded-[12px] border border-white/[0.06] ${item.color} ${item.ratio} group cursor-pointer hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)] transition-all duration-200`}>
+                {/* Actual image */}
+                <img 
+                  src={item.src} 
+                  alt={item.label}
+                  class="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                />
                 <!-- type badge -->
                 <div class="absolute left-2 top-2 z-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/[0.1] px-1.5 py-0.5">
                   <span class="text-[9px] font-[500] uppercase tracking-wide text-white/70">{item.type}</span>
                 </div>
-                <!-- video play indicator -->
-                {item.type === 'video' && (
-                  <div class="absolute right-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 20 20" fill="white"><path d="M6.5 5.5l10 5-10 5V5.5z"/></svg>
-                  </div>
-                )}
                 <!-- label -->
                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
                   <span class="block truncate rounded bg-black/40 px-1.5 py-0.5 text-[10px] text-white/80 backdrop-blur-sm">{item.label}</span>
