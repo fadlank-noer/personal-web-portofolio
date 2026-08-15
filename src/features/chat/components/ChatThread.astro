@@ -7,6 +7,7 @@
  */
 import ChatHistory from './ChatHistory.astro';
 import ChatBox from './ChatBox.astro';
+import LinkConfirmationModal from '../../../components/ui/chat/LinkConfirmationModal.astro';
 import type { ChatMessage } from '../../../lib/types/chat';
 
 interface Props {
@@ -36,5 +37,8 @@ const { messages = [], isStreaming = false, class: className = '' } = Astro.prop
         FadlanGPT can make mistakes. Check important info.
       </p>
     </div>
+
+    {/* Link confirmation modal — portal-like, fixed positioned */}
+    <LinkConfirmationModal />
   </div>
 </div>

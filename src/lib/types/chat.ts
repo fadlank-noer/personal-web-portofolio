@@ -1,3 +1,10 @@
+export interface LinkItem {
+  label: string;
+  url: string;
+  type?: 'external' | 'internal' | 'email' | 'tel';
+  description?: string;
+}
+
 export interface MediaItem {
   src: string
   alt: string
@@ -15,6 +22,7 @@ export interface QuestionTemplate {
   answer: string;
   answer_type: string;
   images: MediaItem[];
+  links?: LinkItem[];
 }
 
 export interface StreamChunk {
@@ -28,6 +36,7 @@ export interface ChatMessage {
   answer: string;
   answer_type: string;
   images: MediaItem[];
+  links?: LinkItem[];
   timestamp: number;
   role?: MessageRole;
 }
@@ -44,6 +53,7 @@ export interface BubbleProps {
 export interface ResponseProps {
   answer: string;
   images?: MediaItem[];
+  links?: LinkItem[];
   answer_type?: string;
   isStreaming?: boolean;
   messageId?: string;

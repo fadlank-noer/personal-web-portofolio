@@ -43,7 +43,27 @@
             "question": "How do I contact you?",
             "answer": "Let's connect!\n\n📧 Email: fadlank.noer@gmail.com\n💼 LinkedIn: https://www.linkedin.com/in/fadlan-kautsar-noer/\n🐙 GitHub: https://github.com/fadlank-noer\n📍 Based: South Jakarta, Indonesia 🇮🇩\n\nResponse time: usually within a few hours. For project inquiries, include scope & timeline. I reply faster with context!",
             "answer_type": "text",
-            "images": []
+            "images": [],
+            "links": [
+                {
+                    "label": "Email",
+                    "url": "mailto:fadlank.noer@gmail.com",
+                    "type": "email",
+                    "description": "fadlank.noer@gmail.com"
+                },
+                {
+                    "label": "LinkedIn",
+                    "url": "https://www.linkedin.com/in/fadlan-kautsar-noer/",
+                    "type": "external",
+                    "description": "Connect on LinkedIn"
+                },
+                {
+                    "label": "GitHub",
+                    "url": "https://github.com/fadlank-noer",
+                    "type": "external",
+                    "description": "Check my open source work"
+                }
+            ]
         },
         {
             "question": "What services do you offer?",

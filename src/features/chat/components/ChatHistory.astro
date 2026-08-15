@@ -5,8 +5,7 @@
  * Thread: bubble kanan + response kiri + MediaGallery + MediaViewer
  * Premium generating UX: opacity-only dots + status label + shimmer skeletons (guide-compliant)
  */
-import type { ChatMessage } from '../../../lib/types/chat';
-import type { MediaItem } from '../../../lib/types/chat';
+import type { ChatMessage, MediaItem, LinkItem } from '../../../lib/types/chat';
 import MediaGallery from '../../../components/ui/chat/MediaGallery.astro';
 import CopyIconComponent from '@lucide/astro/icons/copy';
 
@@ -161,6 +160,7 @@ const { class: className = '' } = Astro.props;
     answer: string;
     answer_type: string;
     images: MediaItem[];
+    links?: LinkItem[];
     timestamp: number;
   }
   let chatHistory: ChatMsg[] = [];
@@ -296,6 +296,24 @@ const { class: className = '' } = Astro.props;
     </div>`;
   }
 
+  // Render links — ChatGPT-style vertical stack (Variant A)
+  function renderLinks(links?: LinkItem[]): string {
+    if (!links || links.length === 0) return '';
+    return `<div class="mt-3 flex flex-col gap-1.5">
+      ${links.map(link => `
+        <button type="button" data-link-trigger data-link-url="${escapeHtml(link.url)}" class="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 border border-[#2f2f2f] bg-[#1e1e1e] hover:bg-[#252525] hover:border-[#3a3a3a] transition-colors text-left group">
+          <div class="min-w-0 flex-1">
+            <span class="block text-[13px] font-medium text-white leading-tight truncate">${escapeHtml(link.label)}</span>
+            ${link.description ? `<span class="block text-[11px] text-zinc-500 leading-tight truncate">${escapeHtml(link.description)}</span>` : ''}
+          </div>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" aria-hidden="true">
+            <path d="M4 2h8v8M12 2L2 12"/>
+          </svg>
+        </button>
+      `).join('')}
+    </div>`;
+  }
+
   // Skeleton tiles for generating state — mirrors guide §20
   function skeletonHtml(count: number): string {
     const n = Math.min(count, 4);
@@ -344,6 +362,9 @@ const { class: className = '' } = Astro.props;
       // Body text — 15px/26px, primary rgba(255,255,255,.92), max 72ch (guide §11)
       const bodyHtml = body ? `<div class="prose prose-invert max-w-none"><div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[rgba(255,255,255,0.92)] max-w-[72ch]">${escapeHtml(body)}</div></div>` : '';
 
+      // Links — ChatGPT-style vertical stack (Variant A)
+      const linksHtml = renderLinks(msg.links);
+
       // Actions — Copy / Regenerate / 👍 / 👎; fade-in + hover/focus reveal + mobile always-visible (guide §12)
       const actionsHtml = `<div class="r-actions mt-3 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/item:opacity-100 focus-within:opacity-100 max-md:opacity-100">
         <button data-copy="${escapeHtml(msg.answer)}" class="copy-action flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100" title="Copy" aria-label="Copy response">
@@ -378,6 +399,7 @@ const { class: className = '' } = Astro.props;
               ${galleryHtml}
               ${headingHtml}
               ${bodyHtml}
+              ${linksHtml}
               ${actionsHtml}
             </div>
           </div>

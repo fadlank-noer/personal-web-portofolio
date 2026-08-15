@@ -290,19 +290,26 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
     return true;
   }
 
-  function filterQuestions(query, limit = 3) {
+  function filterQuestions(query, limit = 5) {
     if (!query || query.trim().length < 1) return [];
     const q = query.toLowerCase().trim();
+    const terms = q.split(/\s+/).filter(Boolean);
     const scored = questions.map(qt => {
-      const lq = qt.question.toLowerCase();
+      const questionText = qt.question.toLowerCase();
+      const answerText = qt.answer.toLowerCase();
       let score = 0;
-      if (lq === q) score = 100;
-      else if (lq.startsWith(q)) score = 80;
-      else if (lq.includes(q)) score = 60;
+      if (questionText === q) score = 100;
+      else if (questionText.startsWith(q)) score = 85;
+      else if (questionText.includes(q)) score = 70;
       else {
-        const words = q.split(/\s+/).filter(Boolean);
-        const matches = words.filter(w => lq.includes(w)).length;
-        if (matches > 0) score = (matches / words.length) * 50;
+        const allTermsMatch = terms.every(term =>
+          questionText.includes(term) || answerText.includes(term)
+        );
+        if (allTermsMatch) {
+          const questionMatches = terms.filter(t => questionText.includes(t)).length;
+          const answerMatches = terms.filter(t => answerText.includes(t)).length;
+          score = ((questionMatches * 1.5 + answerMatches * 0.5) / terms.length) * 60;
+        }
       }
       return { qt, score };
     }).filter(({score}) => score > 0).sort((a,b) => b.score - a.score).slice(0, limit).map(({qt}) => qt);
@@ -415,6 +422,7 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
       answer: matched.answer,
       answer_type: matched.answer_type,
       images: matched.images || [],
+      links: matched.links || [],
       timestamp: Date.now()
     };
 
@@ -466,7 +474,7 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
     validateInput();
 
     if (value.trim().length >= 1) {
-      filteredSuggestions = filterQuestions(value, 3);
+      filteredSuggestions = filterQuestions(value, 5);
       selectedIndex = -1;
       if (filteredSuggestions.length > 0 && !isValidQuestion(value)) {
         renderAutocomplete();

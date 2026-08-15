@@ -12,11 +12,12 @@ import RefreshCw from '@lucide/astro/icons/refresh-cw';
 import ThumbsUp from '@lucide/astro/icons/thumbs-up';
 import ThumbsDown from '@lucide/astro/icons/thumbs-down';
 import MediaGallery from './MediaGallery.astro';
-import type { MediaItem } from '../../../lib/types/chat';
+import type { MediaItem, LinkItem } from '../../../lib/types/chat';
 
 interface Props {
   answer: string;
   images?: MediaItem[];
+  links?: LinkItem[];
   answer_type?: string;
   isStreaming?: boolean;
   messageId?: string;
@@ -26,6 +27,7 @@ interface Props {
 const {
   answer,
   images = [],
+  links = [],
   answer_type = 'text',
   isStreaming = false,
   messageId = `msg-${Math.random().toString(36).slice(2)}`,
@@ -176,6 +178,30 @@ const galleryId = `gallery-${messageId}`;
       <ThumbsDown class="h-4 w-4" />
     </button>
   </div>
+
+  {/* Links — ChatGPT-style vertical stack (Variant A) */}
+  {links && links.length > 0 && (
+    <div class="mt-3 flex flex-col gap-1.5">
+      {links.map((link) => (
+        <button
+          type="button"
+          data-link-trigger
+          data-link-url={link.url}
+          class="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 border border-[#2f2f2f] bg-[#1e1e1e] hover:bg-[#252525] hover:border-[#3a3a3a] transition-colors text-left group"
+        >
+          <div class="min-w-0 flex-1">
+            <span class="block text-[13px] font-medium text-white leading-tight truncate">{link.label}</span>
+            {link.description && (
+              <span class="block text-[11px] text-zinc-500 leading-tight truncate">{link.description}</span>
+            )}
+          </div>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" aria-hidden="true">
+            <path d="M4 2h8v8M12 2L2 12"/>
+          </svg>
+        </button>
+      ))}
+    </div>
+  )}
 
   {/* Hidden plain text for copy */}
   <span data-copy-text={messageId} class="hidden">{answer}</span>
