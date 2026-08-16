@@ -7,42 +7,51 @@
  */
 import Plus from '@lucide/astro/icons/plus';
 import ArrowUp from '@lucide/astro/icons/arrow-up';
-import ChevronRight from '@lucide/astro/icons/chevron-right';
 import Mic from '../../../assets/svgs/mic.svg';
 import SpeakWave from '../../../assets/svgs/speak-wave.svg';
 import questionsData from '../../../data/question-templates.json';
 
 const { cn = "" } = Astro.props;
 
-const FIXED_SUGGESTIONS = [
-  questionsData.questions.find(q => q.question === "Tell us a little about yourself.") ?? questionsData.questions[0],
-  questionsData.questions.find(q => q.question === "What are your skills?") ?? questionsData.questions[2],
-  questionsData.questions.find(q => q.question === "What projects have you built?") ?? questionsData.questions[3],
-].filter(Boolean).slice(0,3);
-
-const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
+// FIXED_SUGGESTIONS removed — suggestions are now dynamic only (3-char threshold + ILIKE filter)
 ---
 
+<!-- Pass questions data to client -->
+<script type="application/json" id="chat-questions-data" set:html={JSON.stringify(questionsData.questions)}></script>
+
 <style>
-  .composer-shell {
+  .composer {
     border-radius: 28px;
     border: 1px solid rgba(255,255,255,.10);
     background: rgba(37,37,37,.96);
     box-shadow: 0 10px 30px rgba(0,0,0,.28);
-    overflow: hidden;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 720px;
+    margin-inline: auto;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
   }
-  .suggest-wrap {
-    display: grid;
-    grid-template-rows: 1fr;
-    transition: grid-template-rows 200ms ease, opacity 140ms ease;
+  .composer:focus-within {
+    border-color: rgba(255,255,255,.22);
+    box-shadow: 0 10px 30px rgba(0,0,0,.28), 0 0 0 2px rgba(255,255,255,.10);
   }
-  .suggest-wrap[data-collapsed="true"] {
-    grid-template-rows: 0fr;
-    opacity: 0;
-  }
-  .suggest-inner { overflow: hidden; }
 
-  .suggest-row {
+  /* Collapsible suggestions panel */
+  :global(.suggestions-panel) {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: height 200ms ease, opacity 140ms ease;
+  }
+  :global(.suggestions-panel[data-collapsed="true"]) {
+    height: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :global(.suggest-row) {
     width: 100%;
     min-height: 44px;
     padding: 0 16px;
@@ -56,20 +65,20 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
     gap: 12px;
     transition: background 140ms ease, color 140ms ease;
   }
-  .suggest-row:hover { background: rgba(255,255,255,.045); color: #fff; }
-  .suggest-row:focus-visible {
+  :global(.suggest-row:hover) { background: rgba(255,255,255,.045); color: #fff; }
+  :global(.suggest-row:focus-visible) {
     outline: none;
     background: rgba(255,255,255,.06);
     box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
   }
-  .suggest-row .chevron {
+  :global(.suggest-row .chevron) {
     opacity: 0;
     transform: translateX(-4px);
     transition: opacity 140ms ease, transform 140ms ease;
     color: rgba(255,255,255,.35);
   }
-  .suggest-row:hover .chevron,
-  .suggest-row:focus-visible .chevron {
+  :global(.suggest-row:hover .chevron),
+  :global(.suggest-row:focus-visible .chevron) {
     opacity: 1;
     transform: translateX(0);
   }
@@ -84,9 +93,10 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
     font-size: 15px;
     line-height: 24px;
     color: #fff;
-    min-height: 24px;
+    min-height: 48px;
     max-height: 200px;
     overflow-y: auto;
+    vertical-align: top;
   }
   .composer-textarea::placeholder { color: rgba(255,255,255,.38); }
   .composer-textarea::-webkit-scrollbar { width: 0; height: 0; }
@@ -95,13 +105,19 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
 
   /* === MOBILE ChatGPT screenshot match === */
   @media (max-width: 768px) {
-    .composer-shell {
-      border-radius: 28px; /* pill like screenshot */
+    .composer {
+      border-radius: 20px;
+      min-height: 112px;
+      width: calc(100% - 24px);
       border: 1px solid rgba(255,255,255,.08);
-      background: #212121; /* dark gray pill — matches screenshot dark charcoal */
+      background: #212121;
       box-shadow: 0 4px 24px rgba(0,0,0,.4);
     }
-    /* inner composer padding to emulate screenshot: input + bottom row */
+    .suggestions-panel[data-collapsed="true"] { height: 0 !important; }
+    .composer-textarea { padding: 8px 12px 6px 12px; font-size: 16px; min-height: 44px; }
+    .composer-textarea::placeholder { color: rgba(255,255,255,.45); }
+    :global(.suggest-row) { min-height: 44px; font-size: 14px; }
+    :global(.suggest-row .chevron) { display: none; }
     .composer-inner {
       padding: 10px 10px 10px 10px !important;
     }
@@ -111,8 +127,8 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
       color: rgba(255,255,255,.92);
     }
     .composer-textarea::placeholder { color: rgba(255,255,255,.45); }
-    .suggest-row { min-height: 44px; font-size: 14px; }
-    .suggest-row .chevron { display: none; }
+    :global(.suggest-row) { min-height: 44px; font-size: 14px; }
+    :global(.suggest-row .chevron) { display: none; }
 
     /* plus button: screenshot shows dark gray circle with white plus at bottom-left of pill */
     #add-btn-main {
@@ -150,15 +166,13 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
       padding-left: 4px !important;
       padding-right: 4px !important;
     }
-    /* autocomplete over pill */
-    #autocomplete-list {
-      bottom: 74px !important;
-      left: 6px !important;
-      right: 6px !important;
-      border-radius: 20px !important;
-    }
+    /* mobile overrides */
   }
 </style>
+
+<script>
+  import '../chatbox-client.ts';
+</script>
 
 <div id="chatbox-container" class:list={["w-full flex-shrink-0 bg-gradient-to-t from-black via-black to-transparent", cn]}>
   <div class="mx-auto w-full max-w-[48rem] px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-6 pt-2">
@@ -167,28 +181,19 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
       ChatGPT can make mistakes. <button type="button" class="underline decoration-zinc-500 underline-offset-2 hover:text-zinc-300 transition-colors">I'm here to fix that.</button>
     </p>
 
-    <!-- Unified Composer Surface — mobile pill like screenshot -->
-    <div class="composer-shell">
-      <!-- Suggestions: DI ATAS textarea box — muncul pas typing -->
-      <div id="suggest-wrap" class="suggest-wrap" data-collapsed="true" style="opacity:0; pointer-events:none">
-        <div class="suggest-inner">
-          <div class="divide-y divide-white/[0.06]">
-            {suggestionLabels.map((label, i) => (
-              <button type="button" data-suggest-fixed={i} class="suggest-row group">
-                <span class="truncate">{label}</span>
-                <span class="chevron flex h-5 w-5 items-center justify-center rounded-full bg-white/10">
-                  <ChevronRight class="h-3.5 w-3.5" />
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+    <!-- Unified Composer Surface — compact stacked (per UI/UX guide redesign) -->
+    <section id="composer" class="composer" aria-label="Message composer">
+
+      <!-- Collapsible suggestions panel (filtered only — no fixed suggestions) -->
+            <div id="suggestions-panel" class="suggestions-panel">
+              <!-- FIXED_SUGGESTIONS removed — suggestions are now dynamic only -->
+              <div id="filtered-suggestions" class="divide-y divide-white/[0.06]"></div>
+            </div>
 
       <!-- Divider — only show when suggestions visible -->
       <div id="composer-divider" class="hidden h-px bg-white/[0.07]"></div>
 
-      <!-- Composer Input: textarea transparent + actions — BOTTOM after suggestions -->
+      <!-- Composer Input: auto-grow textarea + actions -->
       <div class="composer-inner relative w-full px-1.5 pb-2.5 pt-2.5">
         <p id="input-helper" class="hidden text-[11px] text-amber-400/80 px-3 pb-1.5">Please select from suggestions — only questions from list are allowed.</p>
 
@@ -199,10 +204,7 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
           class="composer-textarea pt-0"
         ></textarea>
 
-        <div id="autocomplete-list" class="hidden absolute bottom-[68px] left-2 right-2 rounded-2xl bg-[#212121] border border-[#2f2f2f] shadow-2xl overflow-hidden z-10 max-h-64 overflow-y-auto">
-        </div>
-
-        <!-- Bottom row: plus left, mic + wave white right — exact screenshot layout -->
+        <!-- Bottom row: plus left, mic + wave white right -->
         <div id="composer-actions" class="flex items-center justify-between gap-2 px-1.5 pt-2.5">
           <div id="plus-wrap" class="flex items-center">
             <button id="add-btn-main" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 md:bg-transparent hover:bg-white/10 md:hover:bg-white/10 transition-colors" type="button" aria-label="Add attachment">
@@ -220,394 +222,7 @@ const suggestionLabels = FIXED_SUGGESTIONS.map(s => s.question);
           </div>
         </div>
       </div>
+    </section>
     </div>
   </div>
 </div>
-
-<script define:vars={{ questions: questionsData.questions, fixedLabels: suggestionLabels, fixedData: FIXED_SUGGESTIONS }}>
-  const STORAGE_KEY = 'fadlan-chat-history';
-
-  const suggestWrap = document.getElementById('suggest-wrap');
-  const composerDivider = document.getElementById('composer-divider');
-  const input = document.getElementById('chat-input');
-  const autoList = document.getElementById('autocomplete-list');
-  const inputHelper = document.getElementById('input-helper');
-  const sendBtn = document.getElementById('send-btn');
-  const sendIconDefault = document.getElementById('send-icon-default');
-  const sendIconActive = document.getElementById('send-icon-active');
-  const disclaimer = document.getElementById('disclaimer');
-
-  let filteredSuggestions = [];
-  let selectedIndex = -1;
-  const isSubmitting = { value: false };
-
-  function generateId() { return `msg_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; }
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  function updateSuggestionVisibility() {
-    const trimmed = input.value.trim();
-    const shouldShowFixed = trimmed.length >= 1 && !isSubmitting.value && filteredSuggestions.length === 0;
-    if (suggestWrap) {
-      suggestWrap.dataset.collapsed = shouldShowFixed ? 'false' : 'true';
-      suggestWrap.style.opacity = shouldShowFixed ? '1' : '0';
-      suggestWrap.style.pointerEvents = shouldShowFixed ? 'auto' : 'none';
-    }
-    if (composerDivider) {
-      composerDivider.style.display = shouldShowFixed ? 'block' : 'none';
-    }
-  }
-
-  function updateSuggestionVisibilityTypingMode() {
-    const trimmed = input.value.trim();
-    if (trimmed.length === 0) {
-      if (suggestWrap) {
-        suggestWrap.dataset.collapsed = 'true';
-        suggestWrap.style.opacity = '0';
-        suggestWrap.style.pointerEvents = 'none';
-      }
-      if (composerDivider) composerDivider.style.display = 'none';
-      return false;
-    }
-    if (filteredSuggestions.length > 0) {
-      if (suggestWrap) {
-        suggestWrap.dataset.collapsed = 'true';
-        suggestWrap.style.opacity = '0';
-        suggestWrap.style.pointerEvents = 'none';
-      }
-      if (composerDivider) composerDivider.style.display = 'none';
-      return false;
-    }
-    if (suggestWrap) {
-      suggestWrap.dataset.collapsed = 'false';
-      suggestWrap.style.opacity = '1';
-      suggestWrap.style.pointerEvents = 'auto';
-    }
-    if (composerDivider) composerDivider.style.display = 'block';
-    return true;
-  }
-
-  function filterQuestions(query, limit = 5) {
-    if (!query || query.trim().length < 1) return [];
-    const q = query.toLowerCase().trim();
-    const terms = q.split(/\s+/).filter(Boolean);
-    const scored = questions.map(qt => {
-      const questionText = qt.question.toLowerCase();
-      const answerText = qt.answer.toLowerCase();
-      let score = 0;
-      if (questionText === q) score = 100;
-      else if (questionText.startsWith(q)) score = 85;
-      else if (questionText.includes(q)) score = 70;
-      else {
-        const allTermsMatch = terms.every(term =>
-          questionText.includes(term) || answerText.includes(term)
-        );
-        if (allTermsMatch) {
-          const questionMatches = terms.filter(t => questionText.includes(t)).length;
-          const answerMatches = terms.filter(t => answerText.includes(t)).length;
-          score = ((questionMatches * 1.5 + answerMatches * 0.5) / terms.length) * 60;
-        }
-      }
-      return { qt, score };
-    }).filter(({score}) => score > 0).sort((a,b) => b.score - a.score).slice(0, limit).map(({qt}) => qt);
-    return scored;
-  }
-
-  function findExactQuestion(query) {
-    const q = (query||'').toLowerCase().trim();
-    if (!q) return null;
-    const exact = questions.find(i => i.question.toLowerCase().trim() === q);
-    if (exact) return exact;
-    const loose = questions.find(i => {
-      const lq = i.question.toLowerCase();
-      return lq.includes(q) || q.includes(lq);
-    });
-    return loose ?? null;
-  }
-
-  function isValidQuestion(query) {
-    return !!findExactQuestion(query);
-  }
-
-  function renderAutocomplete() {
-    if (filteredSuggestions.length === 0) {
-      autoList.classList.add('hidden');
-      return;
-    }
-    autoList.innerHTML = filteredSuggestions.map((item, idx) => {
-      const active = idx === selectedIndex ? 'bg-[#3a3a3a] text-white' : 'text-zinc-300 hover:bg-[#2a2a2a]';
-      return `<button type=\"button\" data-suggest-idx=\"${idx}\" class=\"w-full text-left px-4 py-3 text-[14px] leading-snug transition-colors ${active} border-b border-white/[0.06] last:border-0\">${escapeHtml(item.question)}</button>`;
-    }).join('');
-    autoList.classList.remove('hidden');
-
-    autoList.querySelectorAll('[data-suggest-idx]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.getAttribute('data-suggest-idx'), 10);
-        selectSuggestion(idx);
-      });
-    });
-  }
-
-  function selectSuggestion(idx) {
-    if (idx < 0 || idx >= filteredSuggestions.length) return;
-    const q = filteredSuggestions[idx];
-    input.value = q.question;
-    resizeTextarea(input);
-    closeAutocomplete();
-    validateInput();
-    updateSuggestionVisibility();
-    input.focus();
-  }
-
-  function closeAutocomplete() {
-    autoList.classList.add('hidden');
-    selectedIndex = -1;
-    filteredSuggestions = [];
-  }
-
-  function validateInput() {
-    const value = input.value.trim();
-    if (value === '') {
-      sendBtn.disabled = true;
-      sendBtn.classList.add('opacity-50');
-      sendIconDefault.classList.remove('hidden');
-      sendIconActive.classList.add('hidden');
-      inputHelper.classList.add('hidden');
-      return false;
-    }
-    const valid = isValidQuestion(value);
-    if (valid) {
-      sendBtn.disabled = false;
-      sendBtn.classList.remove('opacity-50');
-      sendIconDefault.classList.add('hidden');
-      sendIconActive.classList.remove('hidden');
-      inputHelper.classList.add('hidden');
-      return true;
-    } else {
-      sendBtn.disabled = true;
-      sendBtn.classList.add('opacity-50');
-      sendIconDefault.classList.remove('hidden');
-      sendIconActive.classList.add('hidden');
-      if (value.length >= 2) inputHelper.classList.remove('hidden');
-      return false;
-    }
-  }
-
-  function resizeTextarea(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-  }
-
-  function submit() {
-    const value = input.value.trim();
-    if (!value) return;
-    if (!isValidQuestion(value)) {
-      inputHelper.classList.remove('hidden');
-      input.classList.add('ring-1', 'ring-amber-500/30');
-      setTimeout(() => input.classList.remove('ring-1', 'ring-amber-500/30'), 600);
-      return;
-    }
-    const matched = findExactQuestion(value);
-    if (!matched) return;
-
-    isSubmitting.value = true;
-    updateSuggestionVisibility();
-
-    const newMessage = {
-      id: generateId(),
-      question: matched.question,
-      answer: matched.answer,
-      answer_type: matched.answer_type,
-      images: matched.images || [],
-      links: matched.links || [],
-      timestamp: Date.now()
-    };
-
-    const api = window.chatHistoryApi;
-    if (api) {
-      // Generating state FIRST (guide §21): status + skeletons → then complete message
-      api.showTyping(true, newMessage.images.length);
-      setTimeout(() => {
-        api.showTyping(false);
-        api.add(newMessage);
-        isSubmitting.value = false;
-        updateSuggestionVisibility();
-      }, 600 + Math.random()*300);
-    } else {
-      let history = [];
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) history = JSON.parse(raw);
-      } catch {}
-      history = [...history, newMessage];
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch {}
-      window.dispatchEvent(new CustomEvent('chat:updated'));
-      isSubmitting.value = false;
-      updateSuggestionVisibility();
-    }
-
-    input.value = '';
-    resizeTextarea(input);
-    validateInput();
-    closeAutocomplete();
-    updateSuggestionVisibility();
-  }
-
-  document.querySelectorAll('[data-suggest-fixed]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const idx = parseInt(btn.getAttribute('data-suggest-fixed'), 10);
-      const data = fixedData[idx];
-      if (!data) return;
-      input.value = data.question;
-      resizeTextarea(input);
-      validateInput();
-      submit();
-    });
-  });
-
-  input.addEventListener('input', () => {
-    const value = input.value;
-    resizeTextarea(input);
-    validateInput();
-
-    if (value.trim().length >= 1) {
-      filteredSuggestions = filterQuestions(value, 5);
-      selectedIndex = -1;
-      if (filteredSuggestions.length > 0 && !isValidQuestion(value)) {
-        renderAutocomplete();
-        if (suggestWrap) {
-          suggestWrap.dataset.collapsed = 'true';
-          suggestWrap.style.opacity = '0';
-          suggestWrap.style.pointerEvents = 'none';
-        }
-        if (composerDivider) composerDivider.style.display = 'none';
-      } else {
-        closeAutocomplete();
-        updateSuggestionVisibility();
-      }
-      if (value.trim().length >= 2 && !isValidQuestion(value) && filteredSuggestions.length === 0) inputHelper.classList.remove('hidden');
-      else if (isValidQuestion(value) || filteredSuggestions.length > 0) inputHelper.classList.add('hidden');
-    } else {
-      closeAutocomplete();
-      inputHelper.classList.add('hidden');
-      updateSuggestionVisibility();
-    }
-  });
-
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown') {
-      if (filteredSuggestions.length > 0) {
-        e.preventDefault();
-        selectedIndex = Math.min(selectedIndex + 1, filteredSuggestions.length - 1);
-        renderAutocomplete();
-        const activeBtn = autoList.querySelector(`[data-suggest-idx=\"${selectedIndex}\"]`);
-        if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
-      }
-    } else if (e.key === 'ArrowUp') {
-      if (filteredSuggestions.length > 0) {
-        e.preventDefault();
-        selectedIndex = Math.max(selectedIndex - 1, 0);
-        renderAutocomplete();
-        const activeBtn = autoList.querySelector(`[data-suggest-idx=\"${selectedIndex}\"]`);
-        if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
-      }
-    } else if (e.key === 'Enter') {
-      if (filteredSuggestions.length > 0 && selectedIndex >= 0) {
-        e.preventDefault();
-        selectSuggestion(selectedIndex);
-        return;
-      }
-      if (!e.shiftKey) {
-        e.preventDefault();
-        submit();
-      }
-    } else if (e.key === 'Escape') {
-      closeAutocomplete();
-      inputHelper.classList.add('hidden');
-      if (input.value.trim().length === 0) {
-        if (suggestWrap) {
-          suggestWrap.dataset.collapsed = 'true';
-          suggestWrap.style.opacity = '0';
-        }
-        if (composerDivider) composerDivider.style.display = 'none';
-      }
-    }
-  });
-
-  document.addEventListener('click', (e) => {
-    const target = e.target;
-    if (!autoList.contains(target) && target !== input && !input.closest('.composer-shell')?.contains(target)) {
-      closeAutocomplete();
-    }
-  });
-
-  sendBtn.addEventListener('click', () => submit());
-
-  window.addEventListener('chat:chip-click', (e) => {
-    const q = e.detail && e.detail.question;
-    if (!q) return;
-    input.value = q;
-    resizeTextarea(input);
-    validateInput();
-    submit();
-  });
-
-  // Regenerate action (guide §12): re-run the mocked generating flow for an existing message
-  window.addEventListener('chat:regenerate', (e) => {
-    const messageId = e.detail && e.detail.messageId;
-    if (!messageId) return;
-
-    let history = [];
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) history = JSON.parse(raw);
-    } catch {}
-
-    const existing = history.find(m => m.id === messageId);
-    if (!existing) return;
-    const matched = findExactQuestion(existing.question);
-    if (!matched) return;
-
-    const api = window.chatHistoryApi;
-    if (!api) return;
-    isSubmitting.value = true;
-
-    api.showTyping(true, existing.images.length);
-    setTimeout(() => {
-      const regenerated = { ...existing, timestamp: Date.now() };
-      const updated = history.map(m => m.id === messageId ? regenerated : m);
-      api.set(updated);
-      api.showTyping(false);
-      isSubmitting.value = false;
-    }, 600 + Math.random()*300);
-  });
-
-  const updateDisclaimer = (show) => {
-    if (!disclaimer) return;
-    disclaimer.classList.toggle('hidden', !show);
-  };
-
-  window.addEventListener('chat:state', (e) => {
-    const empty = !!(e.detail && e.detail.empty);
-    updateDisclaimer(!empty);
-    if (empty) {
-      setTimeout(() => updateSuggestionVisibility(), 50);
-    }
-  });
-
-  window.addEventListener('chat:updated', () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const arr = raw ? JSON.parse(raw) : [];
-      updateDisclaimer(Array.isArray(arr) && arr.length > 0);
-    } catch { updateDisclaimer(false); }
-  });
-
-  updateDisclaimer(false);
-  resizeTextarea(input);
-  validateInput();
-  updateSuggestionVisibility();
-</script>

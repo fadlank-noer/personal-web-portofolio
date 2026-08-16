@@ -42,10 +42,7 @@ import MediaViewer from "../components/ui/chat/MediaViewer.astro";
     </div>
     <MediaViewer />
     <slot />
-  </body>
-</html>
-
-<style>
+    <style>
   #main-chat[data-empty="true"] #chatbox-source .thread-only { display: none; }
   #main-chat[data-empty="false"] #empty-wrapper { display: none !important; }
   #main-chat[data-empty="true"] #thread-wrapper { display: none !important; }
@@ -70,8 +67,7 @@ import MediaViewer from "../components/ui/chat/MediaViewer.astro";
     }
   }
 </style>
-
-<script>
+    <script>
   const mainEl = document.getElementById('main-chat');
   const emptyChatbox = document.getElementById('empty-chatbox');
   const threadAnchor = document.getElementById('thread-chatbox-anchor');
@@ -80,7 +76,6 @@ import MediaViewer from "../components/ui/chat/MediaViewer.astro";
   function moveToEmpty() {
     if (!mainEl || !emptyChatbox || !chatBoxEl || !source) return;
     mainEl.dataset.empty = 'true';
-    // desktop: move chatbox into empty wrapper, mobile: keep fixed bottom
     const isMobile = window.innerWidth < 768;
     if (!isMobile) {
       if (chatBoxEl.parentElement !== emptyChatbox) emptyChatbox.appendChild(chatBoxEl);
@@ -109,3 +104,5 @@ import MediaViewer from "../components/ui/chat/MediaViewer.astro";
   setTimeout(checkStorage, 100);
   setTimeout(checkStorage, 400);
 </script>
+  </body>
+</html>
