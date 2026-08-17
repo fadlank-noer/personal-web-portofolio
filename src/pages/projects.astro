@@ -9,7 +9,7 @@ import Head from '../layouts/Head.astro';
 import sidebarData from '../data/sidebar.json';
 import type { ProjectItem } from '../lib/types/sidebar';
 
-const projects = (sidebarData as { projects: ProjectItem[] }).projects;
+const projects = (sidebarData as unknown as { projects: ProjectItem[] }).projects;
 ---
 
 <html lang="en">

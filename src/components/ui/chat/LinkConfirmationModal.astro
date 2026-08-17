@@ -138,6 +138,7 @@
       if (!btn) return;
       const url = (btn as HTMLElement).dataset.linkUrl || '';
       if (!url) return;
+      e.preventDefault(); // suppress native <a> navigation; modal controls the open
       const rect = (btn as HTMLElement).getBoundingClientRect();
       showModal(url, rect);
     });

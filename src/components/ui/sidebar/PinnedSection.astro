@@ -1,15 +1,37 @@
 ---
 /**
- * PinnedSection — dark theme for chat index
+ * PinnedSection — simplified: text-only title, hover bg-[#141414]
+ * project = circular avatar, notion = chat bubble, legacy = gray circle
  */
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Ellipsis from '@lucide/astro/icons/ellipsis';
 import SquarePen from '@lucide/astro/icons/square-pen';
+import ChatBubble from '../../../assets/svgs/chat.svg';
 import type { PinnedItem } from '../../../lib/types/sidebar';
 
 interface Props { items: PinnedItem[]; }
 const { items } = Astro.props;
+
+const AVATAR_COLORS = [
+  'from-violet-500 to-purple-600',
+  'from-blue-500 to-cyan-500',
+  'from-emerald-500 to-teal-500',
+  'from-orange-500 to-amber-500',
+  'from-pink-500 to-rose-500',
+  'from-indigo-500 to-blue-500',
+];
+
+function getAvatarColor(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) hash = id.charAt(i).charCodeAt(0) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+function getInitial(title: string) {
+  return title.trim()[0]?.toUpperCase() ?? '?';
+}
 ---
+
 <div data-section-wrap="pinned" class="group/section bg-black">
   <div class="group/header flex h-[32px] w-full items-center justify-between px-1 rounded-md hover:bg-[#0a0a0a] transition-colors">
     <button data-section-toggle="pinned" class="flex items-center gap-1 bg-black group-hover/header:bg-[#0a0a0a] text-white transition-colors">
@@ -29,9 +51,25 @@ const { items } = Astro.props;
     {items.length === 0 ? (
       <p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No pinned</p>
     ) : items.map((p) => (
-      <a href="#" data-pinned-id={p.id} class="group/item flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left">
-        <span class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-[#1a1a1a] text-[12px]">{p.icon}</span>
-        <span class="flex-1 min-w-0"><span class="truncate block sidebar-label leading-tight">{p.title}</span><span class="block text-[11px] text-zinc-600 group-hover/item:text-zinc-400 sidebar-label truncate">{p.meta}</span></span>
+      <a
+        href={p.meta || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-pinned-id={p.id}
+        data-link-trigger
+        data-link-url={p.meta || ''}
+        class="group/item flex w-full items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left"
+      >
+        {p.type === 'notion' ? (
+          <ChatBubble class="h-4 w-4 flex-shrink-0 text-white/70 group-hover/item:text-white transition-colors [&_path]:fill-white" />
+        ) : p.type === 'project' ? (
+          <div class={`h-6 w-6 flex-shrink-0 rounded-full bg-gradient-to-br ${getAvatarColor(p.id)} flex items-center justify-center text-[10px] font-semibold text-white`}>
+            {getInitial(p.title)}
+          </div>
+        ) : (
+          <div class="h-4 w-4 flex-shrink-0 rounded-full bg-zinc-700" />
+        )}
+        <span class="truncate sidebar-label leading-tight">{p.title}</span>
       </a>
     ))}
   </div>

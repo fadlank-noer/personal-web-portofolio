@@ -1,8 +1,11 @@
+export type PinnedItemType = 'project' | 'notion';
+
 export interface PinnedItem {
   id: string;
   title: string;
-  meta: string;
-  icon: string;
+  meta?: string;
+  icon?: string;
+  type?: PinnedItemType;
 }
 
 export interface ProjectItem {
@@ -22,8 +25,8 @@ export interface LibraryItem {
   id: string;
   type: LibraryMediaType;
   label: string;
-  ratio: string; // tailwind aspect-*
-  color: string; // gradient from-.. to-..
+  ratio: string;
+  color: string;
   wide?: boolean;
   src?: string;
 }
@@ -33,24 +36,19 @@ export interface RecentItem {
   title: string;
   time: string;
   tag: string;
-  icon: string;
   url: string;
   source: string;
 }
 
 export interface SidebarData {
   pinned: PinnedItem[];
-  projects: ProjectItem[];
-  library: LibraryItem[];
   recents: RecentItem[];
 }
 
-export type SidebarSectionKey = 'pinned' | 'projects' | 'library' | 'recents' | 'chats';
+export type SidebarSectionKey = 'pinned' | 'recents' | 'chats';
 
 export interface SidebarSectionsState {
   pinned: boolean;
-  projects: boolean;
-  library: boolean;
   recents: boolean;
   chats: boolean;
 }

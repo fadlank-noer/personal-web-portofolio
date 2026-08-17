@@ -1,24 +1,21 @@
 {
   "pinned": [
-    { "id": "pin_1", "title": "Product Roadmap 2025", "meta": "Pinned • 2d", "icon": "📌" },
-    { "id": "pin_2", "title": "FadlanGPT — Prompt Lab", "meta": "Prompt • lab", "icon": "🧪" },
-    { "id": "pin_3", "title": "Portfolio Copy Revamp", "meta": "Pinned • today", "icon": "✦" }
-  ],
-  "projects": [],
-  "library": [
-    { "id": "lib1", "type": "image", "label": "photo-studio.jpg", "ratio": "aspect-[4/3]", "color": "from-zinc-800 to-zinc-700", "wide": false, "src": "/src/assets/images/photo-in-studio.png" },
-    { "id": "lib2", "type": "image", "label": "boat.png", "ratio": "aspect-[3/4]", "color": "from-indigo-950 to-zinc-800", "wide": false },
-    { "id": "lib3", "type": "video", "label": "reel-launch.mp4", "ratio": "aspect-square", "color": "from-neutral-800 to-zinc-900", "wide": false, "src": "/videos/demo.mp4" },
-    { "id": "lib4", "type": "image", "label": "ui-dashboard.png", "ratio": "aspect-[16/10]", "color": "from-zinc-700 to-zinc-600", "wide": true },
-    { "id": "lib5", "type": "image", "label": "portrait-01.jpg", "ratio": "aspect-[2/3]", "color": "from-zinc-800 to-zinc-900", "wide": false },
-    { "id": "lib6", "type": "video", "label": "demo.mov", "ratio": "aspect-[5/4]", "color": "from-zinc-700 to-indigo-950", "wide": false },
-    { "id": "lib7", "type": "image", "label": "bento-grid.jpg", "ratio": "aspect-[3/2]", "color": "from-violet-900/40 to-zinc-800", "wide": false },
-    { "id": "lib8", "type": "image", "label": "wide-banner.png", "ratio": "aspect-[16/7]", "color": "from-zinc-800 to-zinc-700", "wide": true }
+    {
+      "id": "pin_1",
+      "title": "Exhibition: Work Abroad Festival 2026",
+      "meta": "https://temporal-direction-036.notion.site/Exhibition-Work-Abroad-Festival-2026-38008fb6d6538022bc60d73ecf5c53d6",
+      "icon": "📌",
+      "type": "notion"
+    }
   ],
   "recents": [
-    { "id": "n1", "title": "Weekly Planning — W2 Aug", "time": "2h ago", "tag": "Planning", "icon": "📝", "url": "https://notion.so", "source": "notion" },
-    { "id": "n2", "title": "Research: masonry layouts", "time": "Yesterday", "tag": "Research", "icon": "🔍", "url": "https://notion.so", "source": "notion" },
-    { "id": "n3", "title": "Meeting notes — Vercel sync", "time": "3d ago", "tag": "Notes", "icon": "💬", "url": "https://notion.so", "source": "notion" },
-    { "id": "n4", "title": "Ideas: ChatGPT sidebar UX", "time": "4d ago", "tag": "Ideas", "icon": "💡", "url": "https://notion.so", "source": "notion" }
+    {
+      "id": "n1",
+      "title": "Exhibition: Work Abroad Festival 2026",
+      "time": "now",
+      "tag": "Exhibition",
+      "url": "https://temporal-direction-036.notion.site/Exhibition-Work-Abroad-Festival-2026-38008fb6d6538022bc60d73ecf5c53d6",
+      "source": "notion"
+    }
   ]
 }

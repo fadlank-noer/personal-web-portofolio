@@ -13,8 +13,6 @@ import FolderIcon from '../../../assets/svgs/folder.svg';
 import LibraryIcon from '../../../assets/svgs/library.svg';
 
 import PinnedSection from '../../../components/ui/sidebar/PinnedSection.astro';
-import ProjectsSection from '../../../components/ui/sidebar/ProjectsSection.astro';
-import LibrarySection from '../../../components/ui/sidebar/LibrarySection.astro';
 import RecentsSection from '../../../components/ui/sidebar/RecentsSection.astro';
 
 import sidebarData from '../../../data/sidebar.json';
@@ -28,6 +26,8 @@ const data = sidebarData as SidebarData;
 <aside
   id="sidebar"
   data-collapsed={collapsed ? 'true' : 'false'}
+  data-recents-count={data.recents?.length ?? 0}
+  data-pinned-count={data.pinned?.length ?? 0}
   class="flex h-full flex-col bg-black transition-all duration-200 ease-in-out
          w-[75vw] max-w-[280px] md:w-[12%] md:max-w-none flex-shrink-0
          data-[collapsed=true]:md:!w-[60px] data-[collapsed=true]:md:!max-w-[60px]
@@ -71,12 +71,12 @@ const data = sidebarData as SidebarData;
 
   <div class="mx-3 my-1.5 h-px bg-white/[0.06] sidebar-label"></div>
 
-  <div class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5 bg-black">
+  <div data-sidebar-sections class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5 bg-black">
     <PinnedSection items={data.pinned} />
     <RecentsSection items={data.recents} />
   </div>
 
-  <div class="mt-auto border-t border-white/[0.06] bg-black">
+  <div class="mt-auto border-t border-white/[0.06] bg-black sidebar-profile-separator">
     <div class="px-2 py-1.5">
       <button id="clear-chats-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors"><Trash2 class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label">Clear chats</span></button>
     </div>
@@ -108,6 +108,8 @@ const data = sidebarData as SidebarData;
   
   /* Collapsed state — DESKTOP ONLY (mobile drawer always full-width with labels) */
   @media (min-width: 768px) {
+    /* Collapsed: hide entire Pinned + Recents sections — keep quick actions + profile */
+    [data-collapsed="true"] [data-sidebar-sections] { display: none !important; }
     [data-collapsed="true"] .sidebar-section-content { display: none !important; }
     [data-collapsed="true"] .group\/section .hover-reveal { display: none !important; }
     [data-collapsed="true"] .sidebar-section-content .sidebar-label { display: none !important; }
@@ -160,7 +162,7 @@ const data = sidebarData as SidebarData;
   const isMobile = () => window.innerWidth < 768;
   const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
   const saveCollapsed = (v) => { try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(v)); } catch {} };
-  const defaultSections = { pinned: true, projects: true, library: true, recents: true };
+  const defaultSections = { pinned: true, recents: true };
   const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
   const saveSections = (s) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
   let sectionsState = loadSections();
@@ -183,8 +185,22 @@ const data = sidebarData as SidebarData;
     if (!sidebar || !overlay) return;
     sidebar.dataset.mobileOpen = open ? 'true' : 'false';
     overlay.classList.toggle('hidden', !open);
+    if (open) applyImmersiveBorder(); // re-evaluate border when drawer opens
   }
   applyCollapsed(loadCollapsed());
+  const RECENTS_COUNT = Number(sidebar?.dataset.recentsCount ?? 0);
+  const PINNED_COUNT = Number(sidebar?.dataset.pinnedCount ?? 0);
+  function applyImmersiveBorder() {
+    const bottomBar = document.querySelector('.sidebar-profile-separator');
+    if (!bottomBar) return;
+    const pinnedOn = sectionsState['pinned'] ?? true;
+    const recentsOn = sectionsState['recents'] ?? true;
+    // Border visible only when BOTH sections are open AND combined link count > 17
+    const totalItems = PINNED_COUNT + RECENTS_COUNT;
+    const showBorder = pinnedOn && recentsOn && totalItems > 17;
+    bottomBar.classList.toggle('border-white/0', !showBorder);
+    bottomBar.classList.toggle('border-white/[0.06]', showBorder);
+  }
   applySections();
   const handleToggle = () => {
     if (isMobile()) {
@@ -206,6 +222,7 @@ const data = sidebarData as SidebarData;
     if (isMobile()) {
       document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = ''; });
       applySections();
+      applyImmersiveBorder();
     } else {
       applyCollapsed(loadCollapsed());
     }
@@ -214,7 +231,7 @@ const data = sidebarData as SidebarData;
     btn.addEventListener('click', () => {
       const key = btn.getAttribute('data-section-toggle'); if (!key) return;
       if (sidebar?.dataset.collapsed === 'true') return;
-      sectionsState[key] = !sectionsState[key]; saveSections(sectionsState); applySections();
+      sectionsState[key] = !sectionsState[key]; saveSections(sectionsState); applySections(); applyImmersiveBorder();
     });
   });
   function renderSidebarList() {

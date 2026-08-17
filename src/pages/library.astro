@@ -88,7 +88,7 @@ const library: LibraryItem[] = Object.entries(allImageModules)
   });
 
 const imageCount = library.length;
-const videoCount = (sidebarData as { library: LibraryItem[] }).library.filter(i => i.type === 'video').length;
+const videoCount = (sidebarData as unknown as { library: LibraryItem[] }).library.filter(i => i.type === 'video').length;
 ---
 
 <html lang="en">
