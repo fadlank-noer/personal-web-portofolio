@@ -115,7 +115,8 @@ function selectSuggestion(idx) {
   resizeTextarea(input);
   closeFiltered();
   validateInput();
-  input.focus();
+  // Immediately send — no need to copas to textarea or press Enter
+  submit();
 }
 
 function closeFiltered() {
