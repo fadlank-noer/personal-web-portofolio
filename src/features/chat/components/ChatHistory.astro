@@ -297,11 +297,15 @@ const { class: className = '' } = Astro.props;
   }
 
   // Render links — ChatGPT-style vertical stack (Variant A)
-  function renderLinks(links?: LinkItem[]): string {
+  function escapeHtmlAttr(s: string) {
+    return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderLinks(links) {
     if (!links || links.length === 0) return '';
     return `<div class="mt-3 flex flex-col gap-1.5">
       ${links.map(link => `
-        <button type="button" data-link-trigger data-link-url="${escapeHtml(link.url)}" class="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 border border-[#2f2f2f] bg-[#1e1e1e] hover:bg-[#252525] hover:border-[#3a3a3a] transition-colors text-left group">
+        <button type="button" data-link-trigger data-link-url="${escapeHtmlAttr(link.url)}" data-link-label="${escapeHtmlAttr(link.label)}" class="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 border border-[#2f2f2f] bg-[#1e1e1e] hover:bg-[#252525] hover:border-[#3a3a3a] transition-colors text-left group">
           <div class="min-w-0 flex-1">
             <span class="block text-[13px] font-medium text-white leading-tight truncate">${escapeHtml(link.label)}</span>
             ${link.description ? `<span class="block text-[11px] text-zinc-500 leading-tight truncate">${escapeHtml(link.description)}</span>` : ''}

@@ -47,30 +47,28 @@ function getInitial(title: string) {
       </button>
     </div>
   </div>
-  <div data-section-content="pinned" class="mt-1 space-y-0.5 sidebar-section-content bg-black px-1">
-    {items.length === 0 ? (
-      <p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No pinned</p>
-    ) : items.map((p) => (
-      <a
-        href={p.meta || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        data-pinned-id={p.id}
-        data-link-trigger
-        data-link-url={p.meta || ''}
-        class="group/item flex w-full items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left"
-      >
-        {p.type === 'notion' ? (
-          <ChatBubble class="h-4 w-4 flex-shrink-0 text-white/70 group-hover/item:text-white transition-colors [&_path]:fill-white" />
-        ) : p.type === 'project' ? (
-          <div class={`h-6 w-6 flex-shrink-0 rounded-full bg-gradient-to-br ${getAvatarColor(p.id)} flex items-center justify-center text-[10px] font-semibold text-white`}>
-            {getInitial(p.title)}
-          </div>
-        ) : (
-          <div class="h-4 w-4 flex-shrink-0 rounded-full bg-zinc-700" />
-        )}
-        <span class="truncate sidebar-label leading-tight">{p.title}</span>
-      </a>
-    ))}
-  </div>
+  <div data-section-content="pinned" class="mt-1 space-y-0.5 sidebar-section-content bg-black px-1 overflow-hidden">
+        {items.length === 0 ? (
+          <p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No pinned</p>
+        ) : items.map((p) => (
+          <button
+            type="button"
+            data-link-trigger
+            data-link-url={p.meta || ''}
+            data-link-label={p.title}
+            class="group/item flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left overflow-hidden w-full"
+          >
+            {p.type === 'notion' ? (
+              <ChatBubble class="h-4 w-4 flex-shrink-0 text-white/70 group-hover/item:text-white transition-colors [&_path]:fill-white" />
+            ) : p.type === 'project' ? (
+              <div class={`h-6 w-6 flex-shrink-0 rounded-full bg-gradient-to-br ${getAvatarColor(p.id)} flex items-center justify-center text-[10px] font-semibold text-white`}>
+                {getInitial(p.title)}
+              </div>
+            ) : (
+              <div class="h-4 w-4 flex-shrink-0 rounded-full bg-zinc-700" />
+            )}
+            <span class="truncate sidebar-label leading-tight min-w-0 flex-1">{p.title}</span>
+          </button>
+        ))}
+      </div>
 </div>

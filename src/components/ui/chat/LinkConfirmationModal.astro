@@ -1,153 +1,147 @@
 ---
 /**
  * LinkConfirmationModal — ChatGPT-style confirmation before opening links
- * - Fade-in 150ms
- * - Smart positioning: prefer below-right, flip above/left when viewport is tight
- * - Closes on Cancel / outside click / Escape
- * - Confirm → window.open with noopener,noreferrer
+ * Trigger: any element with data-link-trigger + data-link-url (+ optional data-link-label).
+ * Also exposes window.showLinkModal(url, label, btn) for legacy/inline callers.
+ * Markup: fixed inset-0 overlay, panel centered via flex — no coordinate math,
+ * works on desktop + mobile, no off-screen rendering.
  */
 ---
 
-<div id="link-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="link-confirm-title" class="hidden fixed z-50">
-  <div id="link-confirm-backdrop" class="fixed inset-0" aria-hidden="true"></div>
-  <div id="link-confirm-panel" class="relative bg-[#212121] border border-[#2f2f2f] rounded-2xl shadow-2xl w-72 max-w-[calc(100vw-24px)]">
-    <div class="p-4">
-      <p id="link-confirm-title" class="text-[14px] font-medium text-white mb-1">Open this link?</p>
-      <p id="link-confirm-url" class="text-[12px] text-zinc-400 truncate mb-4" title=""></p>
-      <div class="flex gap-2 justify-end">
-        <button id="link-confirm-cancel" type="button" class="flex-1 px-3 py-2 text-[13px] font-medium rounded-xl bg-white/8 text-zinc-300 hover:bg-white/14 transition-colors border border-white/10">Cancel</button>
-        <button id="link-confirm-open" type="button" class="flex-1 px-3 py-2 text-[13px] font-medium rounded-xl bg-white text-black hover:bg-zinc-100 transition-colors">Open Link</button>
+<style>
+  /* Hidden state: fully transparent + non-interactive */
+  #link-confirm-modal {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 150ms ease, visibility 150ms ease;
+  }
+  /* Open state */
+  #link-confirm-modal.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  #link-confirm-panel {
+    transform: scale(0.95) translateY(4px);
+    transition: transform 150ms ease, opacity 150ms ease;
+    opacity: 0;
+  }
+  #link-confirm-modal.open #link-confirm-panel {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+</style>
+
+<!-- Bundled script, top-level BEFORE the root element (survives the production build;
+     document-level delegation persists across any re-render/navigation) -->
+<script>
+  (() => {
+    let activeUrl = '';
+
+    function getEls() {
+      return {
+        modal: document.getElementById('link-confirm-modal'),
+        urlEl: document.getElementById('link-confirm-url'),
+        cancelBtn: document.getElementById('link-confirm-cancel'),
+        openBtn: document.getElementById('link-confirm-open'),
+        backdrop: document.getElementById('link-confirm-backdrop'),
+      };
+    }
+
+    function normalizeUrl(url: string): string {
+      const lower = (url || '').trim().toLowerCase();
+      if (lower.match(/^[a-z]:[/\\]/) && !lower.startsWith('file://')) {
+        const drive = url.charAt(0).toUpperCase();
+        const path = url.slice(2).replace(/\\/g, '/');
+        return `file:///${drive}:${path}`;
+      }
+      return url;
+    }
+
+    function openUrl(url: string) {
+      const normalized = normalizeUrl(url);
+      if (normalized.startsWith('file://')) {
+        window.location.href = normalized;
+      } else {
+        window.open(normalized, '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    function hideModal() {
+      const els = getEls();
+      if (els.modal) els.modal.classList.remove('open');
+      activeUrl = '';
+    }
+
+    function showModal(url: string, label?: string) {
+      const els = getEls();
+      if (!els.modal || !els.urlEl || !els.openBtn) {
+        // Elements not ready — fall back to direct open so the link still works
+        openUrl(url);
+        return;
+      }
+      activeUrl = url;
+      const display = (label && label.trim()) ? label.trim() : (url.length > 60 ? url.slice(0, 57) + '...' : url);
+      els.urlEl.textContent = display;
+      els.urlEl.setAttribute('title', url);
+      els.modal.classList.add('open');
+      els.openBtn.focus();
+    }
+
+    // Expose global for legacy inline callers — ALWAYS defined
+    (window as any).showLinkModal = function (url: string, label?: string, _btnElement?: unknown) {
+      if (!url) return;
+      showModal(url, label);
+    };
+
+    // Document-level event delegation — catches every [data-link-trigger],
+    // including client-rendered innerHTML nodes, in one persistent listener.
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement | null;
+      const btn = target && target.closest ? target.closest('[data-link-trigger]') : null;
+      if (!btn) return;
+      const url = btn.getAttribute('data-link-url') || '';
+      const label = btn.getAttribute('data-link-label') || '';
+      if (!url) return;
+      e.preventDefault();
+      showModal(url, label);
+    });
+
+    // Bind modal controls (idempotent)
+    function bindControls() {
+      const els = getEls();
+      if (!els.modal || els.modal.dataset.controlsBound === 'true') return;
+      els.modal.dataset.controlsBound = 'true';
+      els.cancelBtn?.addEventListener('click', hideModal);
+      els.openBtn?.addEventListener('click', () => {
+        if (activeUrl) openUrl(activeUrl);
+        hideModal();
+      });
+      els.backdrop?.addEventListener('click', hideModal);
+    }
+    bindControls();
+    document.addEventListener('astro:page-load', bindControls);
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideModal();
+    });
+  })();
+</script>
+
+<div id="link-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="link-confirm-title" class="fixed inset-0 z-50">
+  <div id="link-confirm-backdrop" class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
+  <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+    <div id="link-confirm-panel" class="pointer-events-auto relative bg-[#212121] border border-[#2f2f2f] rounded-2xl shadow-2xl w-80 max-w-full">
+      <div class="p-4">
+        <p id="link-confirm-title" class="text-[14px] font-medium text-white mb-1">Open this link?</p>
+        <p id="link-confirm-url" class="text-[12px] text-zinc-400 break-all mb-4" title=""></p>
+        <div class="flex gap-2 justify-end">
+          <button id="link-confirm-cancel" type="button" class="flex-1 px-3 py-2 text-[13px] font-medium rounded-xl bg-white/8 text-zinc-300 hover:bg-white/14 transition-colors border border-white/10">Cancel</button>
+          <button id="link-confirm-open" type="button" class="flex-1 px-3 py-2 text-[13px] font-medium rounded-xl bg-white text-black hover:bg-zinc-100 transition-colors">Open Link</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-  #link-confirm-modal {
-    animation: link-modal-in 150ms ease backwards;
-  }
-  @keyframes link-modal-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  #link-confirm-panel {
-    animation: link-panel-in 150ms ease backwards;
-  }
-  @keyframes link-panel-in {
-    from { opacity: 0; transform: scale(0.95) translateY(4px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-</style>
-
-<script>
-  function initLinkModal() {
-    const modal = document.getElementById('link-confirm-modal');
-    const panel = document.getElementById('link-confirm-panel');
-    const backdrop = document.getElementById('link-confirm-backdrop');
-    const urlEl = document.getElementById('link-confirm-url');
-    const cancelBtn = document.getElementById('link-confirm-cancel');
-    const openBtn = document.getElementById('link-confirm-open');
-
-    if (!modal || !panel || !urlEl || !cancelBtn || !openBtn) return;
-    if ((modal as HTMLElement).dataset.bound === 'true') return;
-    (modal as HTMLElement).dataset.bound = 'true';
-
-    let activeUrl = '';
-    let triggerRect: DOMRect | null = null;
-
-    function showModal(url: string, rect: DOMRect) {
-      activeUrl = url;
-      triggerRect = rect;
-
-      // Truncate display URL
-      const display = url.length > 50 ? url.slice(0, 47) + '…' : url;
-      urlEl.textContent = display;
-      urlEl.setAttribute('title', url);
-
-      // Smart positioning
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const pW = panel.offsetWidth || 288;
-      const pH = panel.offsetHeight || 140;
-      const GAP = 8;
-
-      let top = 0, left = 0;
-      const below = rect.bottom + GAP + pH <= vh;
-      const above = rect.top - GAP - pH >= 0;
-
-      if (below || !above) {
-        // Place below
-        top = rect.bottom + GAP + window.scrollY;
-      } else {
-        // Place above
-        top = rect.top - GAP - pH + window.scrollY;
-      }
-
-      const rightOf = rect.left + GAP + pW <= vw;
-      const leftOf = rect.left - GAP - pW >= 0;
-
-      if (rightOf) {
-        left = rect.left + window.scrollX;
-      } else if (leftOf) {
-        left = rect.left + rect.width - pW + window.scrollX;
-      } else {
-        // Center horizontally
-        left = Math.max(12, (vw - pW) / 2 + window.scrollX);
-      }
-
-      (panel as HTMLElement).style.top = `${top}px`;
-      (panel as HTMLElement).style.left = `${left}px`;
-      (panel as HTMLElement).style.right = 'auto';
-
-      modal.classList.remove('hidden');
-      openBtn.focus();
-    }
-
-    function hideModal() {
-      modal.classList.add('hidden');
-      activeUrl = '';
-      triggerRect = null;
-    }
-
-    function confirmOpen() {
-      if (activeUrl) {
-        window.open(activeUrl, '_blank', 'noopener,noreferrer');
-      }
-      hideModal();
-    }
-
-    // Close on Cancel
-    cancelBtn.addEventListener('click', hideModal);
-
-    // Close on Open
-    openBtn.addEventListener('click', confirmOpen);
-
-    // Close on backdrop click
-    backdrop?.addEventListener('click', hideModal);
-
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-        hideModal();
-      }
-    });
-
-    // Delegate: listen for [data-link-trigger] clicks anywhere in the page
-    document.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest('[data-link-trigger]');
-      if (!btn) return;
-      const url = (btn as HTMLElement).dataset.linkUrl || '';
-      if (!url) return;
-      e.preventDefault(); // suppress native <a> navigation; modal controls the open
-      const rect = (btn as HTMLElement).getBoundingClientRect();
-      showModal(url, rect);
-    });
-
-    // Update modal position on scroll/resize (for fixed trigger elements)
-    window.addEventListener('scroll', hideModal, { passive: true });
-    window.addEventListener('resize', hideModal);
-  }
-
-  initLinkModal();
-  document.addEventListener('astro:page-load', initLinkModal);
-</script>

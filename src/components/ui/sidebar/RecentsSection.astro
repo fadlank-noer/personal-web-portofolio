@@ -26,24 +26,23 @@ const { items } = Astro.props;
     </div>
   </div>
 
-  <div data-section-content="recents" class="mt-1 space-y-0.5 sidebar-section-content bg-black px-1">
-    {items.length === 0 ? (
-      <div id="notion-recents-list" class="space-y-0.5"><p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No recents</p></div>
-    ) : (
-      <div id="notion-recents-list" class="space-y-0.5">
-        {items.map((n) => (
-          <a
-            href={n.url || '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-link-trigger
-            data-link-url={n.url || ''}
-            class="group/note flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left"
-          >
-            <span class="truncate sidebar-label leading-tight">{n.title}</span>
-          </a>
-        ))}
-      </div>
-    )}
-  </div>
+  <div data-section-content="recents" class="mt-1 space-y-0.5 sidebar-section-content bg-black px-1 overflow-hidden">
+      {items.length === 0 ? (
+        <div id="notion-recents-list" class="space-y-0.5"><p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No recents</p></div>
+      ) : (
+        <div id="notion-recents-list" class="space-y-0.5">
+          {items.map((n) => (
+            <button
+              type="button"
+              data-link-trigger
+              data-link-url={n.url || ''}
+              data-link-label={n.title}
+              class="group/note flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left overflow-hidden w-full"
+            >
+              <span class="truncate sidebar-label leading-tight min-w-0 flex-1">{n.title}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
 </div>
