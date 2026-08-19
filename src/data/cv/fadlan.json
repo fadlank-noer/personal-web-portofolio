@@ -3,7 +3,8 @@
     "name": "Fadlan Kautsar Noer",
     "label": "Fullstack Developer",
     "email": "fadlank.noer@gmail.com",
-    "phone": "+62 812-8471-9526",
+    "phone": "0895352837926",
+    "url": "https://fadlank.web.id",
     "summary": "No failure, no growth. Take your shot, even if your target is the moon. And if you fail along the way, you may still discover the beauty of the stars.",
     "profiles": [
       {
@@ -30,7 +31,7 @@
     {
       "company": "PT Meteor Inovasi Digital",
       "position": "Associate Engineer",
-      "website": "https://meteor.co.id",
+      "website": "https://www.meteor.id/",
       "startDate": "2024-09-01",
       "endDate": "2025-07-31",
       "summary": "Take responsibility for the team, work together as a team, and assign responsibilities. Develop, oversee, and maintain technological applications and systems.",
@@ -42,7 +43,7 @@
     {
       "company": "PT Meteor Inovasi Digital",
       "position": "Mid Fullstack Developer",
-      "website": "https://meteor.co.id",
+      "website": "https://www.meteor.id/",
       "startDate": "2023-10-01",
       "endDate": "2024-10-31",
       "summary": "Owned delivery of 3 projects across the company's web and mobile product lines.",
@@ -53,7 +54,7 @@
     {
       "company": "PT Meteor Inovasi Digital",
       "position": "Fullstack Developer",
-      "website": "https://meteor.co.id",
+      "website": "https://www.meteor.id/",
       "startDate": "2022-07-01",
       "endDate": "2023-10-31",
       "summary": "Meteor Inovasi Digital is recognized as a pioneer in providing Platform as a Service (PaaS) that enables industry stakeholders to transform business ideas into digital services fulfilling market demand in Indonesia.",
@@ -110,7 +111,7 @@
   "skills": [
     {
       "name": "Frontend",
-      "keywords": ["NextJS", "jQuery"]
+      "keywords": ["astro.build", "NextJS", "jQuery"]
     },
     {
       "name": "Mobile",
@@ -126,21 +127,49 @@
     },
     {
       "name": "Cloud/DevOps",
-      "keywords": ["AWS S3", "AWS Rekognition", "Heroku", "Salesforce", "ngrok"]
+      "keywords": ["AWS S3", "AWS Rekognition", "Heroku", "Salesforce", "ngrok", "Google Cloud Platform"]
     },
     {
       "name": "Web3",
       "keywords": ["Solidity"]
+    },
+    {
+      "name": "AI Engineering",
+      "keywords": ["Harness Agent", "Loop Engineering", "MCP", "Toolcall"]
+    },
+    {
+      "name": "Soft Skills",
+      "keywords": ["Problem Solver", "Sales", "Managing Up and Down", "Team Leadership"]
     }
   ],
   "projects": [
     {
-      "name": "Client Website",
-      "description": "Built a transaction website as a client request with PHP, Laravel/Livewire, MySQL and jQuery.",
-      "startDate": "2022-01-01",
+      "name": "Crypto Custodian",
+      "description": "Freelance Lead Engineer for a licensed Indonesian crypto exchange's custody platform: built the backend that moves and settles digital assets across every registered exchange in the country.",
+      "entity": "Licensed Crypto Exchange (under NDA)",
+      "roles": ["Lead Engineer (Freelance)"],
+      "startDate": "2025-08-01",
+      "endDate": "2026-03-31",
       "highlights": [
-        "Fullstack build on PHP with Laravel/Livewire for the UI and MySQL for persistence.",
-        "jQuery used for client-side interactivity on transaction flows."
+        "Exchange settlement was bottlenecked at ~800 RPS with 400ms p99 latency, risking missed windows during volatility spikes: re-architected the hot-path as Go microservices on GCP, cutting p99 to 90ms and raising throughput to 5,000+ RPS (6.2x) without adding nodes.",
+        "Manual reconciliation between custody wallets and exchange ledgers drifted daily, forcing hours of manual fix: built an idempotent Node.js reconciliation service that closed 99.98% of discrepancies automatically within 2 minutes of settlement.",
+        "Next.js operator console couldn't surface real-time risk during outages: delivered a live dashboard consuming the microservice event stream, reducing mean time-to-detect incidents from 15 min to under 90 sec.",
+        "Tight latency budget across all Indonesian exchanges was breaking under concurrent load: introduced a connection-pooling + gRPC layer (Next.js to Go) that held p99 under 100ms at peak 5,000 RPS across 10+ integrated endpoints.",
+        "Stack: NextJS, Golang, Node.js, Google Cloud Platform (GCP), microservices architecture."
+      ]
+    },
+    {
+      "name": "Binary Tree Digital Business",
+      "description": "Fullstack developer for a digital business platform (client under NDA): built the genealogy and commission engine where leaders enroll downlines and earn from their sales.",
+      "entity": "Global Network Marketing Company (under NDA)",
+      "startDate": "2022-01-01",
+      "roles": ["Fullstack Developer (Freelance)"],
+      "highlights": [
+        "Manual downline tracking could not prove a member's placement or bonus eligibility: built an advanced binary tree that classifies every node as a Profit Branch or Power Branch, validating structure in real time.",
+        "Leader bonus relied on spreadsheet reconciliation that broke above 10k members: implemented the tree traversal so any downline sale automatically cascades the correct bonus up the upline, removing manual payout.",
+        "Ten distinct bonus programs each had unique qualifying logic: modeled them as pluggable rule modules sharing one genealogy core, cutting new-bonus delivery from weeks to days.",
+        "Bonus miscalculation disputes spiked during payout runs: added an audit trail per node so every payout traces to the exact branch rule and sale that triggered it.",
+        "Stack: PHP, Laravel, MySQL, binary tree data structure, rule-based commission engine."
       ]
     }
   ],

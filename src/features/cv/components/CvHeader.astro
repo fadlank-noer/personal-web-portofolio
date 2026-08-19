@@ -29,7 +29,12 @@ const profiles = basics.profiles ?? [];
         {basics.email && (
           <a href={`mailto:${basics.email}`} class="hover:underline">{basics.email}</a>
         )}
-        {basics.phone && <span>{basics.phone}</span>}
+        {basics.phone && (
+          <a href={`https://wa.me/62${basics.phone.replace(/^0/, "")}`} target="_blank" rel="noopener noreferrer" class="hover:underline">{basics.phone}</a>
+        )}
+        {basics.url && (
+          <a href={basics.url} target="_blank" rel="noopener noreferrer" class="hover:underline">fadlank.web.id</a>
+        )}
         {profiles.map((p) => (
           <a href={p.url} target="_blank" rel="noopener noreferrer" class="hover:underline">{p.network}</a>
         ))}

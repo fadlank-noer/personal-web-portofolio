@@ -27,6 +27,9 @@ function formatDate(iso: string): string {
               {entry.name}
               {entry.entity && <span class="font-[500] text-zinc-600"> — {entry.entity}</span>}
             </h3>
+            {entry.roles && entry.roles.length > 0 && (
+              <p class="text-[13px] font-[600] text-zinc-700">{entry.roles.join(", ")}</p>
+            )}
             {(entry.startDate || entry.endDate) && (
               <span class="text-[13px] text-zinc-500">
                 {entry.startDate ? formatDate(entry.startDate) : ""}
