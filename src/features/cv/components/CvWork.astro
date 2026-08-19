@@ -1,0 +1,43 @@
+---
+import type { CvWork } from "../types";
+
+interface Props {
+  work: CvWork[];
+}
+
+const { work } = Astro.props;
+
+function formatDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+---
+
+{work.length > 0 && (
+  <section class="cv-section mb-8">
+    <h2 class="mb-3 border-b border-black pb-1.5 text-[13px] font-[700] uppercase tracking-[0.08em] text-black">
+      Work Experience
+    </h2>
+    <div class="space-y-6">
+      {work.map((entry) => (
+        <div>
+          <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+            <h3 class="text-[15px] font-[700] text-black">{entry.company}</h3>
+            <span class="text-[13px] text-zinc-500">
+              {formatDate(entry.startDate)} – {entry.endDate ? formatDate(entry.endDate) : "Present"}
+            </span>
+          </div>
+          {entry.position && <p class="text-[14px] font-[600] text-black">{entry.position}</p>}
+          {entry.summary && <p class="mt-1 text-[13px] leading-relaxed text-zinc-700">{entry.summary}</p>}
+          {entry.description && <p class="mt-1 text-[13px] leading-relaxed text-zinc-700">{entry.description}</p>}
+          {entry.highlights && entry.highlights.length > 0 && (
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-zinc-700">
+              {entry.highlights.map((h) => <li>{h}</li>)}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}

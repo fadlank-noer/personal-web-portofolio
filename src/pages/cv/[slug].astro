@@ -1,0 +1,16 @@
+---
+import { getAvailableSlugs, getCvBySlug } from "../../features/cv/data-loader";
+import CvLayout from "../../features/cv/layouts/CvLayout.astro";
+import CvPage from "../../features/cv/components/CvPage.astro";
+
+export function getStaticPaths() {
+  return getAvailableSlugs().map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const cv = getCvBySlug(slug);
+---
+
+<CvLayout cv={cv} slug={slug ?? "fadlan"}>
+  <CvPage cv={cv} />
+</CvLayout>

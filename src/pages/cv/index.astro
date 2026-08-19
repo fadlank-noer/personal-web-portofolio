@@ -1,0 +1,11 @@
+---
+import { getCvBySlug } from "../../features/cv/data-loader";
+import CvLayout from "../../features/cv/layouts/CvLayout.astro";
+import CvPage from "../../features/cv/components/CvPage.astro";
+
+const cv = getCvBySlug();
+---
+
+<CvLayout cv={cv} slug="fadlan">
+  <CvPage cv={cv} />
+</CvLayout>

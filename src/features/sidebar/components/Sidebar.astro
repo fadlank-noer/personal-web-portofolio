@@ -8,6 +8,7 @@ import Search from '@lucide/astro/icons/search';
 import ChevronDown from '@lucide/astro/icons/chevron-down';
 import Trash2 from '@lucide/astro/icons/trash-2';
 import User from '@lucide/astro/icons/user';
+import FileText from '@lucide/astro/icons/file-text';
 import LogoV2 from '../../../assets/logo-v2.svg';
 import FolderIcon from '../../../assets/svgs/folder.svg';
 import LibraryIcon from '../../../assets/svgs/library.svg';
@@ -63,6 +64,9 @@ const data = sidebarData as SidebarData;
     </a>
     <a href="/projects" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
       <FolderIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Projects</span>
+    </a>
+    <a href="/cv" data-nav="cv" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
+      <FileText class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">CV</span>
     </a>
     <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors">
       <Search class="h-[18px] w-[18px] flex-shrink-0 [&_path]:!fill-none [&_path]:!stroke-current" /> <span class="truncate sidebar-label">Search chats</span>

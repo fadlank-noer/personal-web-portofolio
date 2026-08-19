@@ -1,0 +1,45 @@
+---
+import type { CvEducation } from "../types";
+
+interface Props {
+  education: CvEducation[];
+}
+
+const { education } = Astro.props;
+
+function formatDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+---
+
+{education.length > 0 && (
+  <section class="cv-section mb-8">
+    <h2 class="mb-3 border-b border-black pb-1.5 text-[13px] font-[700] uppercase tracking-[0.08em] text-black">
+      Education
+    </h2>
+    <div class="space-y-6">
+      {education.map((entry) => (
+        <div>
+          <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+            <h3 class="text-[15px] font-[700] text-black">
+              {entry.institution}
+              {entry.area && <span class="font-[500] text-zinc-600"> — {entry.area}</span>}
+            </h3>
+            <span class="text-[13px] text-zinc-500">
+              {formatDate(entry.startDate)} – {entry.endDate ? formatDate(entry.endDate) : "Present"}
+            </span>
+          </div>
+          {entry.studyType && <p class="text-[14px] font-[600] text-black">{entry.studyType}</p>}
+          {entry.score && <p class="text-[13px] text-zinc-600">Score: {entry.score}</p>}
+          {entry.courses && entry.courses.length > 0 && (
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-zinc-700">
+              {entry.courses.map((c) => <li>{c}</li>)}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}

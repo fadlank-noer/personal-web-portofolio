@@ -1,0 +1,20 @@
+---
+import type { CvData } from "../types";
+import CvHeader from "./CvHeader.astro";
+import CvWork from "./CvWork.astro";
+import CvEducation from "./CvEducation.astro";
+import CvSkills from "./CvSkills.astro";
+import CvProjects from "./CvProjects.astro";
+
+interface Props {
+  cv: CvData;
+}
+
+const { cv } = Astro.props;
+---
+
+<CvHeader basics={cv.basics} />
+<CvWork work={cv.work} />
+<CvEducation education={cv.education} />
+<CvSkills skills={cv.skills} />
+<CvProjects projects={cv.projects} />
