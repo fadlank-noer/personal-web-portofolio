@@ -8,7 +8,7 @@
 import Plus from '@lucide/astro/icons/plus';
 import ArrowUp from '@lucide/astro/icons/arrow-up';
 import Mic from '../../../assets/svgs/mic.svg';
-import SpeakWave from '../../../assets/svgs/speak-wave.svg';
+import Dices from '@lucide/astro/icons/dices';
 import questionsData from '../../../data/question-templates.json';
 
 const { cn = "" } = Astro.props;
@@ -156,8 +156,8 @@ const { cn = "" } = Astro.props;
       background: #fff !important;
       color: #000 !important;
     }
-    #send-btn:disabled {
-      opacity: 0.9 !important; /* keep visible like screenshot even when disabled, but still not clickable */
+    #send-btn[aria-disabled='true'] {
+      opacity: 0.7 !important; /* slight dim for non-submittable interim text, still clickable */
     }
 
     /* make bottom row tighter like screenshot */
@@ -167,6 +167,86 @@ const { cn = "" } = Astro.props;
       padding-right: 4px !important;
     }
     /* mobile overrides */
+    .suggestions-panel[data-collapsed="true"] { height: 0 !important; }
+    .suggestions-panel { max-height: min(40vh, 264px); overflow-y: auto; }
+    .suggestions-panel::-webkit-scrollbar { width: 0; height: 0; }
+  }
+
+  /* === DICE SUGGESTIONS === */
+  :global(.dice-row) {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(251,191,36,.20);
+    border-radius: 10px;
+    margin: 0 2px;
+  }
+  :global(.dice-row:hover) { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.35); }
+  :global(.dice-row .dice-glyph) { color: #f59e0b; }
+
+  /* Dice header */
+  :global(.dice-header) {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: rgba(251,191,36,.65);
+    padding: 2px 18px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  :global(.dice-header .reroll-hint) {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgba(255,255,255,.30);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    transition: color 140ms;
+  }
+  :global(.dice-header .reroll-hint:hover) { color: rgba(251,191,36,.65); }
+
+  /* Icon tumble animation */
+  @keyframes dice-tumble {
+    0%   { transform: rotate(0deg)   translateX(0);    }
+    15%  { transform: rotate(-20deg) translateX(-2px); }
+    35%  { transform: rotate(15deg)  translateX(2px);  }
+    55%  { transform: rotate(-12deg) translateX(-1px); }
+    75%  { transform: rotate(8deg)   translateX(1px);  }
+    90%  { transform: rotate(-4deg)  translateX(0);    }
+    100% { transform: rotate(0deg)   translateX(0);    }
+  }
+  :global(.dice-tumbling) { animation: dice-tumble 450ms cubic-bezier(.36,.07,.19,.97) both; }
+
+  /* Staggered row entrance */
+  :global(.dice-row-enter) {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  :global(.dice-row-entered) {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+  :global(.dice-row-entered.pop) { animation: dice-pop 150ms ease-out 1; }
+  @keyframes dice-pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.025); }
+    100% { transform: scale(1); }
+  }
+
+  /* Reduced motion: instant render */
+  @media (prefers-reduced-motion: reduce) {
+    :global(.dice-tumbling),
+    :global(.dice-row-enter),
+    :global(.dice-row-entered),
+    :global(.dice-row-entered.pop) {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
   }
 </style>
 
@@ -193,6 +273,9 @@ const { cn = "" } = Astro.props;
       <!-- Divider — only show when suggestions visible -->
       <div id="composer-divider" class="hidden h-px bg-white/[0.07]"></div>
 
+      <!-- sr-only live region for screen readers -->
+      <div id="dice-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
       <!-- Composer Input: auto-grow textarea + actions -->
       <div class="composer-inner relative w-full px-1.5 pb-2.5 pt-2.5">
         <p id="input-helper" class="hidden text-[11px] text-amber-400/80 px-3 pb-1.5">Please select from suggestions — only questions from list are allowed.</p>
@@ -215,8 +298,8 @@ const { cn = "" } = Astro.props;
             <button id="mic-btn" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 md:bg-transparent hover:bg-white/10 md:hover:bg-white/10 transition-colors" type="button" aria-label="Voice input">
               <Mic class="w-5 h-5 text-zinc-200 md:text-zinc-300" />
             </button>
-            <button id="send-btn" class="flex h-10 w-10 items-center justify-center rounded-full transition-all bg-white text-black shadow-sm hover:bg-zinc-100 active:scale-[.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white" type="button" aria-label="Send message" disabled>
-              <SpeakWave id="send-icon-default" class="w-5 h-5 text-black" />
+            <button id="send-btn" class="flex h-10 w-10 items-center justify-center rounded-full transition-all bg-white text-black shadow-sm hover:bg-zinc-100 active:scale-[.98] cursor-pointer opacity-100" type="button" aria-label="Roll random questions" aria-disabled="false">
+              <Dices id="send-icon-default" class="w-5 h-5 text-black" />
               <ArrowUp id="send-icon-active" class="w-5 h-5 text-black hidden" />
             </button>
           </div>

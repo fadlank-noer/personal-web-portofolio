@@ -20,6 +20,8 @@ const $filteredSuggestions = atom([]);
 const $selectedIndex = atom(-1);
 const $suggestionsVisible = atom(true);
 const $isSubmitting = atom(false);
+const $suggestionsMode = atom('filtered'); // 'filtered' | 'dice'
+const $previousDiceSet = atom(null);        // prevent double-roll déjà vu
 
 // ── Load questions from JSON data element ─────────────────────
 const questionsEl = document.getElementById('chat-questions-data');
@@ -39,6 +41,16 @@ const sendBtn = document.getElementById('send-btn');
 const sendIconDefault = document.getElementById('send-icon-default');
 const sendIconActive = document.getElementById('send-icon-active');
 const disclaimer = document.getElementById('disclaimer');
+const diceStatus = document.getElementById('dice-status');
+let isRolling = false;
+let diceAudio = null;
+function getDiceAudio() {
+  if (!diceAudio) {
+    diceAudio = new Audio('/assets/sfx/dice.mp3');
+    diceAudio.volume = 0.5;
+  }
+  return diceAudio;
+}
 
 function generateId() { return `msg_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; }
 function escapeHtml(str) {
@@ -122,6 +134,7 @@ function selectSuggestion(idx) {
 function closeFiltered() {
   $filteredSuggestions.set([]);
   $selectedIndex.set(-1);
+  $suggestionsMode.set('filtered');
   if (filteredWrap) filteredWrap.innerHTML = '';
 }
 
@@ -129,10 +142,12 @@ function closeFiltered() {
 function updateSuggestionVisibility() {
   const trimmed = input.value.trim();
   const filtered = $filteredSuggestions.get();
-  const hasFiltered = filtered.length > 0 && trimmed.length >= MIN_CHARS;
+  const mode = $suggestionsMode.get();
+  const hasFiltered = mode === 'filtered' && filtered.length > 0 && trimmed.length >= MIN_CHARS;
+  const hasDice = mode === 'dice' && filtered.length > 0;
 
-  if (filteredWrap) filteredWrap.classList.toggle('hidden', !hasFiltered);
-  if (composerDivider) composerDivider.classList.toggle('hidden', !hasFiltered);
+  if (filteredWrap) filteredWrap.classList.toggle('hidden', !hasFiltered && !hasDice);
+  if (composerDivider) composerDivider.classList.toggle('hidden', !hasFiltered && !hasDice);
 }
 
 // ── Validation ────────────────────────────────────────────────
@@ -147,29 +162,45 @@ function findExactQuestion(query) {
 
 function isValidQuestion(query) { return !!findExactQuestion(query); }
 
+function canSubmit() {
+  return input && input.value.trim() !== '' && isValidQuestion(input.value.trim());
+}
+
 function validateInput() {
   const value = input.value.trim();
   if (value === '') {
-    sendBtn.disabled = true;
-    sendBtn.classList.add('opacity-50');
+    // Idle / dice state — button is CLICKABLE (rolls dice), full opacity
+    sendBtn.removeAttribute('disabled');
+    sendBtn.setAttribute('aria-disabled', 'false');
+    sendBtn.classList.remove('opacity-40', 'opacity-70', 'opacity-90', 'cursor-not-allowed');
+    sendBtn.classList.add('opacity-100', 'cursor-pointer');
     sendIconDefault.classList.remove('hidden');
     sendIconActive.classList.add('hidden');
+    sendBtn.setAttribute('aria-label', 'Roll random questions');
     inputHelper.classList.add('hidden');
     return false;
   }
   const valid = isValidQuestion(value);
   if (valid) {
-    sendBtn.disabled = false;
-    sendBtn.classList.remove('opacity-50');
+    // Valid question — button submits, full opacity
+    sendBtn.removeAttribute('disabled');
+    sendBtn.setAttribute('aria-disabled', 'false');
+    sendBtn.classList.remove('opacity-40', 'opacity-70', 'opacity-90', 'cursor-not-allowed');
+    sendBtn.classList.add('opacity-100', 'cursor-pointer');
     sendIconDefault.classList.add('hidden');
     sendIconActive.classList.remove('hidden');
+    sendBtn.setAttribute('aria-label', 'Send message');
     inputHelper.classList.add('hidden');
     return true;
   } else {
-    sendBtn.disabled = true;
-    sendBtn.classList.add('opacity-50');
-    sendIconDefault.classList.remove('hidden');
-    sendIconActive.classList.add('hidden');
+    // Any typed text → ArrowUp (not empty), per requested switcher behavior
+    sendBtn.removeAttribute('disabled');
+    sendBtn.setAttribute('aria-disabled', 'true');
+    sendBtn.classList.remove('opacity-40', 'opacity-100', 'cursor-not-allowed');
+    sendBtn.classList.add('opacity-70', 'cursor-pointer');
+    sendIconDefault.classList.add('hidden');
+    sendIconActive.classList.remove('hidden');
+    sendBtn.setAttribute('aria-label', 'Send message');
     if (value.length >= 2) inputHelper.classList.remove('hidden');
     return false;
   }
@@ -178,6 +209,146 @@ function validateInput() {
 function resizeTextarea(textarea) {
   textarea.style.height = 'auto';
   textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+}
+
+// ── Dice helpers ──────────────────────────────────────────────
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickRandomQuestions(avoidSet = null) {
+  let shuffled = shuffleArray(questions);
+  if (avoidSet) {
+    // Re-shuffle once if identical to previous set (no déjà vu)
+    const currentIds = shuffled.slice(0, 3).map(q => q.question);
+    const avoidIds = avoidSet.map(q => q.question);
+    if (currentIds.every((id, i) => id === avoidIds[i])) {
+      shuffled = shuffleArray(questions);
+    }
+  }
+  return shuffled.slice(0, 3);
+}
+
+async function playDiceSFX() {
+  const audio = getDiceAudio();
+  audio.currentTime = 0;
+  try { await audio.play(); } catch {}
+}
+
+function announceDice(msg) {
+  if (diceStatus) { diceStatus.textContent = msg; }
+}
+
+// ── Render dice suggestions (distinct visual style) ───────────
+function renderDiceSuggestions(list) {
+  if (!filteredWrap) return;
+  const mode = $suggestionsMode.get();
+  if (mode !== 'dice') return;
+
+  filteredWrap.classList.remove('hidden');
+  const selectedIdx = $selectedIndex.get();
+  filteredWrap.innerHTML = `<div class="dice-header">
+    <span>Feeling lucky?</span>
+    <button type="button" class="reroll-hint" id="reroll-btn">↻ roll again</button>
+  </div>` +
+    list.map((item, idx) => {
+      const active = idx === selectedIdx ? 'bg-white/6' : '';
+      return `<button type="button" data-dice-idx="${idx}" class="suggest-row dice-row group ${active}">
+        <span class="dice-glyph flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/15 text-amber-400 text-[10px] font-bold mr-2 flex-shrink-0">
+          ⚄
+        </span>
+        <span class="truncate">${escapeHtml(item.question)}</span>
+      </button>`;
+    }).join('');
+
+  // Re-roll button
+  const rerollBtn = document.getElementById('reroll-btn');
+  if (rerollBtn) rerollBtn.addEventListener('click', (e) => { e.stopPropagation(); rollDiceQuestions(); });
+
+  // Dice row click → submit
+  filteredWrap.querySelectorAll('[data-dice-idx]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-dice-idx') || '0', 10);
+      const list = $filteredSuggestions.get();
+      if (idx < 0 || idx >= list.length) return;
+      const q = list[idx];
+      input.value = q.question;
+      resizeTextarea(input);
+      closeFiltered();
+      validateInput();
+      submit();
+    });
+  });
+
+  // Staggered entrance animation
+  const rows = filteredWrap.querySelectorAll('.dice-row');
+  rows.forEach((row, i) => {
+    row.classList.add('dice-row-enter');
+    setTimeout(() => {
+      row.classList.remove('dice-row-enter');
+      row.classList.add('dice-row-entered');
+    }, i * 70);
+    setTimeout(() => { row.classList.add('pop'); }, i * 70 + 200);
+  });
+}
+
+// ── Roll dice: slot-machine effect + SFX + haptics ────────────
+function rollDiceQuestions() {
+  if (isRolling) return;
+  if (questions.length === 0) return;
+
+  isRolling = true;
+
+  const audio = getDiceAudio();
+  audio.currentTime = 0;
+  try { audio.play(); } catch {}
+  navigator.vibrate?.(10);
+
+  // Icon tumble
+  if (sendIconDefault) {
+    sendIconDefault.classList.remove('dice-tumbling');
+    void sendIconDefault.offsetWidth; // reflow to restart animation
+    sendIconDefault.classList.add('dice-tumbling');
+    sendIconDefault.addEventListener('animationend', () => {
+      sendIconDefault.classList.remove('dice-tumbling');
+    }, { once: true });
+  }
+
+  // Slot machine: show intermediate random picks
+  const finalSet = pickRandomQuestions($previousDiceSet.get());
+  $previousDiceSet.set(finalSet);
+
+  const intermediates = [pickRandomQuestions(), pickRandomQuestions()];
+
+  $suggestionsMode.set('dice');
+  $filteredSuggestions.set(intermediates[0]);
+  renderDiceSuggestions(intermediates[0]);
+  showSuggestionsPanel();
+
+  setTimeout(() => {
+    $filteredSuggestions.set(intermediates[1]);
+    renderDiceSuggestions(intermediates[1]);
+
+    setTimeout(() => {
+      $filteredSuggestions.set(finalSet);
+      renderDiceSuggestions(finalSet);
+      announceDice(`Rolled 3 random questions: ${finalSet.map(q => q.question).join(', ')}`);
+      isRolling = false;
+    }, 120);
+  }, 120);
+}
+
+function showSuggestionsPanel() {
+  if (suggestionsPanel) {
+    suggestionsPanel.dataset.collapsed = 'false';
+    suggestionsPanel.classList.remove('h-0', 'opacity-0');
+  }
+  if (composerDivider) composerDivider.classList.remove('hidden');
 }
 
 // ── Debounced input handler ───────────────────────────────────
@@ -197,6 +368,7 @@ function handleInputWithDebounce() {
   }
 
   debounceTimer = setTimeout(() => {
+    $suggestionsMode.set('filtered'); // exit dice mode on typing
     const results = filterQuestions(query);
     $filteredSuggestions.set(results);
     $selectedIndex.set(-1);
@@ -271,7 +443,7 @@ input.addEventListener('input', () => {
 input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    if (!sendBtn.disabled) submit();
+    if (canSubmit()) submit();
   }
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
     const list = $filteredSuggestions.get();
@@ -285,7 +457,24 @@ input.addEventListener('keydown', (e) => {
   }
 });
 
-sendBtn.addEventListener('click', () => submit());
+// Single delegated handler — replaces both submit and future dice
+  sendBtn.addEventListener('click', () => {
+    const trimmed = input.value.trim();
+
+    if (trimmed === '') {
+      // Empty → roll dice
+      rollDiceQuestions();
+      return;
+    }
+
+    if (isValidQuestion(trimmed)) {
+      // Valid → submit
+      submit();
+    } else {
+      // Invalid typed text → attempt submit (shows helper, no silent clear+roll)
+      submit();
+    }
+  });
 
 window.addEventListener('chat:chip-click', (e) => {
   const q = e.detail && e.detail.question;
