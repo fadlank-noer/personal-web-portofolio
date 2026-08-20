@@ -1,53 +1,26 @@
 ---
 import "../styles/global.css";
-import LibraryIcon from '../assets/svgs/library.svg';
-import SideToggleMobile from '../assets/svgs/side-toggle-mobile.svg';
+import LibraryIcon from '../../public/assets/svgs/library.svg';
+import SideToggleMobile from '../../public/assets/svgs/side-toggle-mobile.svg';
+import photoInBoat from '../../public/assets/images/photo-in-boat.png';
+import photoInStudio from '../../public/assets/images/photo-in-studio.png';
 import Sidebar from "../features/sidebar/components/Sidebar.astro";
 import LinkConfirmationModal from "../components/ui/chat/LinkConfirmationModal.astro";
 import Head from "../layouts/Head.astro";
 import sidebarData from '../data/sidebar.json';
 import type { LibraryItem } from '../lib/types/sidebar';
 
-// Get all image files from the images folder using Vite's glob
-const allImageModules = import.meta.glob('/src/assets/images/**/*', {
-  eager: true,
-});
+// Images moved to public/assets/images — use explicit imports for reliable URL resolution
+const imageFiles = [
+  { path: photoInStudio.src, filename: 'photo-in-studio.png' },
+  { path: photoInBoat.src, filename: 'photo-in-boat.png' },
+];
 
-// Build library items with proper URLs for each image
-const library: LibraryItem[] = Object.entries(allImageModules)
-  .filter(([path]) => {
-    // Only include image files (not folders or other files)
-    const ext = path.split('.').pop()?.toLowerCase();
-    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext || '');
-  })
-  .map(([path, _imageModule], index) => {
-    // Extract path parts: /src/assets/images/[subfolder/]filename.ext
-    const parts = path.replace('/src/assets/images/', '').split('/');
-    const filename = parts[parts.length - 1];
-    const isInSubfolder = parts.length > 1;
-    const subfolder = isInSubfolder ? parts.slice(0, -1).join('/') : null;
-
-    // Convert /src/assets/images/photo.png -> /_astro/photo.png or /images/photo.png
-    // For Vite/Astro, images in src/assets are processed and the URL is derived from the glob path
-    // Use a helper to get the actual URL at runtime via import.meta.url
-    let imageUrl = path;
-    
-    // Try to get the URL from the module
-    try {
-      const mod = _imageModule as { src?: string; default?: { src: string } };
-      if (mod?.src) {
-        imageUrl = mod.src;
-      } else if (mod?.default?.src) {
-        imageUrl = mod.default.src;
-      } else {
-        // Fallback: use path transformation
-        // /src/assets/images/foo.png -> /_astro/foo.XXX hash .png
-        // For now, just strip the /src/assets/ prefix
-        imageUrl = path.replace('/src/assets', '');
-      }
-    } catch {
-      imageUrl = path.replace('/src/assets', '');
-    }
+// Build library items with proper URLs
+const library: LibraryItem[] = imageFiles
+  .map((img, index) => {
+    const imageUrl = img.path;
+    const filename = img.filename;
 
     // Generate a consistent color based on index
     const colors = [
@@ -74,8 +47,8 @@ const library: LibraryItem[] = Object.entries(allImageModules)
     ];
     const ratio = ratios[index % ratios.length];
 
-    // Label: subfolder/filename or just filename
-    const label = subfolder ? `${subfolder}/${filename}` : filename;
+    // Label: just the filename (no subfolder structure in public/)
+    const label = filename;
 
     return {
       id: `img_${index}`,
