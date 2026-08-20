@@ -1,7 +1,7 @@
 {
   "basics": {
     "name": "Fadlan Kautsar Noer",
-    "label": "Fullstack Developer",
+    "label": "Software Engineer",
     "email": "fadlank.noer@gmail.com",
     "phone": "0895352837926",
     "url": "https://fadlank.web.id",
@@ -28,38 +28,30 @@
         "Lead the development of internal tools used across the agency ecosystem."
       ]
     },
+     {
+      "company": "Freelance",
+      "position": "Freelance Software Engineer",
+      "startDate": "2022-01-01",
+      "summary": "Deliver high-impact freelance projects for Indonesian clients: custom web platforms and digital marketing solutions.",
+      "highlights": [
+        "Binary Tree Digital Business: built a genealogy and commission engine for a global network marketing company, classifying every node as Profit Branch or Power Branch and automatically cascading bonuses up the upline.",
+        "Crypto Custodian: served as Lead Engineer for a licensed Indonesian crypto exchange custody platform, re-architecting the settlement hot-path as Go microservices to achieve 5,000+ RPS with p99 under 100ms.",
+        "Managed Google Ads campaigns and built more than 10 company profiles for various clients."
+      ]
+    },
     {
       "company": "PT Meteor Inovasi Digital",
       "position": "Associate Engineer",
       "website": "https://www.meteor.id/",
-      "startDate": "2024-09-01",
+      "startDate": "2023-10-01",
       "endDate": "2025-07-31",
-      "summary": "Take responsibility for the team, work together as a team, and assign responsibilities. Develop, oversee, and maintain technological applications and systems.",
+      "summary": "Delivered and maintained digital products on a PaaS platform serving Indonesian industry stakeholders, then led the engineering team across web and mobile product lines.",
       "highlights": [
+        "Built and maintained products on the PaaS platform serving Indonesia industry stakeholders.",
+        "Delivered 10+ projects spanning web and mobile applications across the company product lines.",
+        "Led technical maintenance for a digital bank mobile app, coordinating hotfixes and feature releases.",
         "Led and coordinated the engineering team, assigning responsibilities across deliveries.",
         "Developed, oversaw, and maintained technological applications and systems."
-      ]
-    },
-    {
-      "company": "PT Meteor Inovasi Digital",
-      "position": "Mid Fullstack Developer",
-      "website": "https://www.meteor.id/",
-      "startDate": "2023-10-01",
-      "endDate": "2024-10-31",
-      "summary": "Owned delivery of 3 projects across the company's web and mobile product lines.",
-      "highlights": [
-        "Delivered 3 projects spanning web and mobile applications."
-      ]
-    },
-    {
-      "company": "PT Meteor Inovasi Digital",
-      "position": "Fullstack Developer",
-      "website": "https://www.meteor.id/",
-      "startDate": "2022-07-01",
-      "endDate": "2023-10-31",
-      "summary": "Meteor Inovasi Digital is recognized as a pioneer in providing Platform as a Service (PaaS) that enables industry stakeholders to transform business ideas into digital services fulfilling market demand in Indonesia.",
-      "highlights": [
-        "Built and maintained products on the PaaS platform serving Indonesia's industry stakeholders."
       ]
     },
     {
@@ -111,65 +103,93 @@
   "skills": [
     {
       "name": "Frontend",
-      "keywords": ["astro.build", "NextJS", "jQuery"]
+      "keywords": [
+        "astro.build",
+        "NextJS",
+        "jQuery"
+      ]
     },
     {
       "name": "Mobile",
-      "keywords": ["React Native", "Unity"]
+      "keywords": [
+        "React Native",
+        "Unity"
+      ]
     },
     {
       "name": "Backend",
-      "keywords": ["NestJS", "Laravel/Livewire", "PHP", "Node.js/Express"]
+      "keywords": [
+        "NestJS",
+        "Laravel/Livewire",
+        "PHP",
+        "Node.js/Express"
+      ]
     },
     {
       "name": "Database",
-      "keywords": ["MySQL", "PostgreSQL", "Redis"]
+      "keywords": [
+        "MySQL",
+        "PostgreSQL",
+        "Redis"
+      ]
     },
     {
       "name": "Cloud/DevOps",
-      "keywords": ["AWS S3", "AWS Rekognition", "Heroku", "Salesforce", "ngrok", "Google Cloud Platform"]
+      "keywords": [
+        "AWS S3",
+        "AWS Rekognition",
+        "Heroku",
+        "Salesforce",
+        "ngrok",
+        "Google Cloud Platform"
+      ]
     },
     {
       "name": "Web3",
-      "keywords": ["Solidity"]
+      "keywords": [
+        "Solidity"
+      ]
     },
     {
       "name": "AI Engineering",
-      "keywords": ["Harness Agent", "Loop Engineering", "MCP", "Toolcall"]
+      "keywords": [
+        "Harness Agent",
+        "Loop Engineering",
+        "MCP",
+        "Toolcall"
+      ]
     },
     {
       "name": "Soft Skills",
-      "keywords": ["Problem Solver", "Sales", "Managing Up and Down", "Team Leadership"]
+      "keywords": [
+        "Problem Solver",
+        "Sales",
+        "Managing Up and Down",
+        "Team Leadership"
+      ]
     }
   ],
   "projects": [
     {
-      "name": "Crypto Custodian",
-      "description": "Freelance Lead Engineer for a licensed Indonesian crypto exchange's custody platform: built the backend that moves and settles digital assets across every registered exchange in the country.",
-      "entity": "Licensed Crypto Exchange (under NDA)",
-      "roles": ["Lead Engineer (Freelance)"],
-      "startDate": "2025-08-01",
-      "endDate": "2026-03-31",
+      "name": "Laundry Landing Page",
+      "description": "Landing page for a laundry service business (https://laundry.fadlank.web.id/): showcasing services, pricing, and contact with smooth animations.",
+      "url": "https://laundry.fadlank.web.id/",
+      "startDate": "2024-01-01",
       "highlights": [
-        "Exchange settlement was bottlenecked at ~800 RPS with 400ms p99 latency, risking missed windows during volatility spikes: re-architected the hot-path as Go microservices on GCP, cutting p99 to 90ms and raising throughput to 5,000+ RPS (6.2x) without adding nodes.",
-        "Manual reconciliation between custody wallets and exchange ledgers drifted daily, forcing hours of manual fix: built an idempotent Node.js reconciliation service that closed 99.98% of discrepancies automatically within 2 minutes of settlement.",
-        "Next.js operator console couldn't surface real-time risk during outages: delivered a live dashboard consuming the microservice event stream, reducing mean time-to-detect incidents from 15 min to under 90 sec.",
-        "Tight latency budget across all Indonesian exchanges was breaking under concurrent load: introduced a connection-pooling + gRPC layer (Next.js to Go) that held p99 under 100ms at peak 5,000 RPS across 10+ integrated endpoints.",
-        "Stack: NextJS, Golang, Node.js, Google Cloud Platform (GCP), microservices architecture."
+        "Built a compelling landing page with smooth scroll animations using GSAP to showcase laundry services and drive customer inquiries.",
+        "Implemented responsive layouts and interactive pricing tables for different service tiers.",
+        "Stack: SvelteKit, Svelte 5, TypeScript, Tailwind CSS v4, GSAP, Lucide Icons, Cloudflare."
       ]
     },
     {
-      "name": "Binary Tree Digital Business",
-      "description": "Fullstack developer for a digital business platform (client under NDA): built the genealogy and commission engine where leaders enroll downlines and earn from their sales.",
-      "entity": "Global Network Marketing Company (under NDA)",
-      "startDate": "2022-01-01",
-      "roles": ["Fullstack Developer (Freelance)"],
+      "name": "Prompt Builder",
+      "description": "Structured prompt builders for GPT Image 2 and Seedance 2.0 (https://prompt-builder.fadlank.web.id/): fill the fields, then copy the result as a polished prompt.",
+      "url": "https://prompt-builder.fadlank.web.id/",
+      "startDate": "2025-01-01",
       "highlights": [
-        "Manual downline tracking could not prove a member's placement or bonus eligibility: built an advanced binary tree that classifies every node as a Profit Branch or Power Branch, validating structure in real time.",
-        "Leader bonus relied on spreadsheet reconciliation that broke above 10k members: implemented the tree traversal so any downline sale automatically cascades the correct bonus up the upline, removing manual payout.",
-        "Ten distinct bonus programs each had unique qualifying logic: modeled them as pluggable rule modules sharing one genealogy core, cutting new-bonus delivery from weeks to days.",
-        "Bonus miscalculation disputes spiked during payout runs: added an audit trail per node so every payout traces to the exact branch rule and sale that triggered it.",
-        "Stack: PHP, Laravel, MySQL, binary tree data structure, rule-based commission engine."
+        "Users struggled with prompt syntax across AI image models: built structured web forms with real-time preview and one-click copy, reducing prompt crafting time.",
+        "Supporting GPT Image 2 and Seedance 2.0 with field categories, syntax hints, and copy-to-clipboard for fast workflow.",
+        "Stack: Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Cloudflare Workers."
       ]
     }
   ],
