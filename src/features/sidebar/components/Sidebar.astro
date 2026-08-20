@@ -154,7 +154,8 @@ const data = sidebarData as SidebarData;
   const STORAGE_KEY = 'fadlan-chat-history';
   const SIDEBAR_COLLAPSED_KEY = 'fadlan-sidebar-collapsed';
   const SECTIONS_KEY = 'fadlan-sidebar-sections-v2';
-  const sidebar = document.getElementById('sidebar');
+    interface ChatMsg { id: string; question: string; }
+    const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const toggleBtn = document.getElementById('sidebar-toggle');
   const newChatBtn = document.getElementById('new-chat-btn');
@@ -165,27 +166,27 @@ const data = sidebarData as SidebarData;
   const searchBtn = document.getElementById('sidebar-search');
   const isMobile = () => window.innerWidth < 768;
   const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
-  const saveCollapsed = (v) => { try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(v)); } catch {} };
-  const defaultSections = { pinned: true, recents: true };
-  const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
-  const saveSections = (s) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
+  const saveCollapsed = (v: boolean) => { try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(v)); } catch {} };
+    const defaultSections = { pinned: true, recents: true };
+    const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
+    const saveSections = (s: typeof defaultSections) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
   let sectionsState = loadSections();
   function applySections() {
     Object.entries(sectionsState).forEach(([key, open]) => {
-      const content = document.querySelector(`[data-section-content="${key}"]`);
-      const chevron = document.querySelector(`[data-chevron="${key}"]`);
-      if (content) content.style.display = open ? '' : 'none';
-      if (chevron) chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
-    });
+          const content = document.querySelector(`[data-section-content="${key}"]`);
+          const chevron = document.querySelector(`[data-chevron="${key}"]`);
+          if (content) (content as HTMLElement).style.display = open ? '' : 'none';
+          if (chevron) (chevron as HTMLElement).style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
+        });
   }
-  function applyCollapsed(collapsed) {
+  function applyCollapsed(collapsed: boolean) {
     if (!sidebar) return;
     sidebar.dataset.collapsed = collapsed ? 'true' : 'false';
     const mobile = isMobile();
-    document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = (collapsed && !mobile) ? 'none' : ''; });
+    document.querySelectorAll('.sidebar-label').forEach((el: Element) => { (el as HTMLElement).style.display = (collapsed && !mobile) ? 'none' : ''; });
     if (!collapsed) applySections();
   }
-  function applyMobile(open) {
+  function applyMobile(open: boolean) {
     if (!sidebar || !overlay) return;
     sidebar.dataset.mobileOpen = open ? 'true' : 'false';
     overlay.classList.toggle('hidden', !open);
@@ -224,7 +225,7 @@ const data = sidebarData as SidebarData;
   window.addEventListener('resize', () => {
     // Re-evaluate collapse/label state when crossing mobile↔desktop boundary
     if (isMobile()) {
-      document.querySelectorAll('.sidebar-label').forEach((el) => { el.style.display = ''; });
+      document.querySelectorAll('.sidebar-label').forEach((el: Element) => { el.classList.remove('hidden'); });
       applySections();
       applyImmersiveBorder();
     } else {
@@ -247,7 +248,7 @@ const data = sidebarData as SidebarData;
     }
     if (emptyEl) emptyEl.style.display = 'none';
     chatListEl.querySelectorAll('[data-sidebar-item]').forEach(el => el.remove());
-    history.slice().reverse().forEach((msg) => {
+    history.slice().reverse().forEach((msg: ChatMsg) => {
       const btn = document.createElement('button');
       btn.setAttribute('data-sidebar-item', msg.id);
       btn.className = 'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#141414] transition-colors text-left';
@@ -257,7 +258,7 @@ const data = sidebarData as SidebarData;
       chatListEl.appendChild(btn);
     });
   }
-  function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
+  function escapeHtml(str: string) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
   renderSidebarList();
   window.addEventListener('chat:updated', renderSidebarList);
   window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) renderSidebarList(); });
@@ -272,11 +273,11 @@ const data = sidebarData as SidebarData;
   };
   document.getElementById('library-add-random')?.addEventListener('click', () => {
     const ratios = ['aspect-[4/3]','aspect-[3/4]','aspect-square','aspect-[16/10]','aspect-[2/3]','aspect-[16/7]']; const r = ratios[Math.floor(Math.random()*ratios.length)]; const wide = Math.random() > 0.7;
-    window.addLibraryMedia({ ratio: r, wide, label: `rand-${Date.now().toString().slice(-4)}`, type: wide ? 'wide' : 'image', color: 'from-zinc-800 to-zinc-700' });
+    window.addLibraryMedia?.({ ratio: r, wide, label: `rand-${Date.now().toString().slice(-4)}`, type: wide ? 'wide' : 'image', color: 'from-zinc-800 to-zinc-700' });
   });
-  document.getElementById('sync-notion')?.addEventListener('click', async (e) => {
-    const btn = e.currentTarget; const orig = btn.textContent; btn.textContent='Syncing...';
-    try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); } catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
-  });
+  document.getElementById('sync-notion')?.addEventListener('click', async (e: MouseEvent) => {
+      const btn = e.currentTarget as HTMLButtonElement; const orig = btn.textContent ?? ''; btn.textContent='Syncing...';
+      try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); } catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
+    });
   window.toggleSidebar = () => { if (isMobile()) applyMobile(sidebar?.dataset.mobileOpen !== 'true'); };
 </script>

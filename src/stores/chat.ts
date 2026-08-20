@@ -275,7 +275,7 @@ export function buildChatMessage(
   question: string,
   answer: string,
   answer_type: string = 'text',
-  images: string[] = []
+  images: import('../lib/types/chat').MediaItem[] = []
 ): ChatMessage {
   return {
     id: genId(),

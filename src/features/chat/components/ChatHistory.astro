@@ -5,9 +5,7 @@
  * Thread: bubble kanan + response kiri + MediaGallery + MediaViewer
  * Premium generating UX: opacity-only dots + status label + shimmer skeletons (guide-compliant)
  */
-import type { ChatMessage, MediaItem, LinkItem } from '../../../lib/types/chat';
-import MediaGallery from '../../../components/ui/chat/MediaGallery.astro';
-import CopyIconComponent from '@lucide/astro/icons/copy';
+import type { ChatMessage } from '../../../lib/types/chat';
 
 interface Props {
   class?: string;
@@ -159,8 +157,8 @@ const { class: className = '' } = Astro.props;
     question: string;
     answer: string;
     answer_type: string;
-    images: MediaItem[];
-    links?: LinkItem[];
+    images: { src: string; alt: string; caption?: string; sourceLabel?: string; sourceUrl?: string; width?: number; height?: number }[];
+    links?: { label: string; url: string; type?: 'external' | 'internal' | 'email' | 'tel'; description?: string }[];
     timestamp: number;
   }
   let chatHistory: ChatMsg[] = [];
@@ -301,10 +299,10 @@ const { class: className = '' } = Astro.props;
     return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function renderLinks(links) {
+  function renderLinks(links: ChatMsg['links']) {
     if (!links || links.length === 0) return '';
     return `<div class="mt-3 flex flex-col gap-1.5">
-      ${links.map(link => `
+      ${links.map((link) => `
         <button type="button" data-link-trigger data-link-url="${escapeHtmlAttr(link.url)}" data-link-label="${escapeHtmlAttr(link.label)}" class="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 border border-[#2f2f2f] bg-[#1e1e1e] hover:bg-[#252525] hover:border-[#3a3a3a] transition-colors text-left group">
           <div class="min-w-0 flex-1">
             <span class="block text-[13px] font-medium text-white leading-tight truncate">${escapeHtml(link.label)}</span>
@@ -351,7 +349,6 @@ const { class: className = '' } = Astro.props;
 
     innerEl.innerHTML = chatHistory.map((msg) => {
       const safeQ = escapeHtml(msg.question);
-      const safeA = escapeHtml(msg.answer);
       const heading = extractHeading(msg.answer);
       const source = heading ? extractSource(msg.answer) : null;
       const body = stripHeader(msg.answer);
@@ -424,12 +421,12 @@ const { class: className = '' } = Astro.props;
           attempts.n += 1;
           if (attempts.n > 2) return;
           errorEl.style.display = 'none';
-          img.style.display = '';
-          img.classList.remove('loaded');
+          (img as HTMLElement).style.display = '';
+          (img as HTMLElement).classList.remove('loaded');
           if (skeleton) skeleton.style.opacity = '';
-          const src = img.getAttribute('src') || '';
-          img.src = '';
-          img.src = src;
+          const src = (img as HTMLImageElement).getAttribute('src') || '';
+          (img as HTMLImageElement).src = '';
+          (img as HTMLImageElement).src = src;
         });
       }
       img.addEventListener('mouseenter', () => {

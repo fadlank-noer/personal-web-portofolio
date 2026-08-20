@@ -90,10 +90,10 @@ import LinkConfirmationModal from "../components/ui/chat/LinkConfirmationModal.a
     mainEl.dataset.empty = 'false';
     if (chatBoxEl.parentElement !== threadAnchor) threadAnchor.appendChild(chatBoxEl);
   }
-  const applyState = (empty) => { if (empty) moveToEmpty(); else moveToThread(); };
+  const applyState = (empty: boolean) => { if (empty) moveToEmpty(); else moveToThread(); };
   moveToEmpty();
   if (mainEl) mainEl.dataset.empty = 'true';
-  window.addEventListener('chat:state', (e) => { const isEmpty = !!(e.detail && e.detail.empty); applyState(isEmpty); });
+  window.addEventListener('chat:state', (e: Event) => { const detail = (e as CustomEvent<{empty: boolean}>).detail; const isEmpty = !!(detail && detail.empty); applyState(isEmpty); });
   const checkStorage = () => {
     try { const raw = localStorage.getItem('fadlan-chat-history'); if (!raw) { applyState(true); return; } const arr = JSON.parse(raw); applyState(!Array.isArray(arr) || arr.length === 0); } catch { applyState(true); }
   };

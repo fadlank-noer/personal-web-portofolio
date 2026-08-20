@@ -1,10 +1,11 @@
 ---
 import ChatResponse from './ChatResponse.astro';
+import type { MediaItem } from '../../../lib/types/chat';
 
 interface Props {
   role: 'user' | 'assistant';
   content: string;
-  images?: string[];
+  images?: MediaItem[];
   timestamp?: number;
   isStreaming?: boolean;
   avatarLabel?: string;

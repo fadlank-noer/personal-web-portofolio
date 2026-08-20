@@ -56,15 +56,14 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
            Background grid + vignette
            ======================================================= -->
       <div class="pointer-events-none absolute inset-0 z-0">
-        <div
-          class="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.12]"
-        >
+          <!-- Radial vignette: adds depth on large screens without a grid -->
+          <div
+            class="absolute inset-0"
+            style="background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(40,40,40,0.15) 0%, transparent 70%);"
+          ></div>
+          <!-- Subtle top/bottom fade for card fade-out -->
+          <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-40"></div>
         </div>
-        <div class="absolute inset-0 bg-gradient-to-b from-black via-black/20 to-black">
-        </div>
-        <div class="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black">
-        </div>
-      </div>
 
       <!-- =======================================================
            Marquees — space-between: top = max top, bottom = max bottom
@@ -72,6 +71,7 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
            ======================================================= -->
       <div
         class="pointer-events-none absolute inset-0 z-[1] flex h-full w-full flex-col justify-between overflow-hidden select-none py-3 md:py-4"
+        style="perspective: 600px; perspective-origin: 50% 50%;"
       >
         <!-- Fade masks for left/right edges -->
         <div class="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black to-transparent">
@@ -84,32 +84,32 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
         >
         </div>
 
-        <!-- TOP: pinned to top via flex parent justify-between -->
+        <!-- TOP: ceiling fan — perspective tilt + slow right drift -->
         <div class="flex shrink-0 flex-col gap-2.5 pt-1 md:gap-3">
           {top.map((row, i) => (
             <div class="relative w-full overflow-hidden">
-              <div class={`marq flex w-max gap-2.5 ${i % 2 ? 'mr' : 'ml'} d${[40, 55, 48][i]}`}>
+              <div class={`persp-top drift-right flex w-max gap-2.5 d${[45, 55, 48][i]}`}>
                 {x3(row).map((t) => (
-                  <div class="box">
+                  <a href="#" class="box">
                     <span class="truncate">{t}</span>
                     <span class="ico">↗</span>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
           ))}
         </div>
 
-        <!-- BOTTOM: pinned to bottom via flex parent justify-between -->
+        <!-- BOTTOM: floor fan — perspective tilt + slow left drift -->
         <div class="flex shrink-0 flex-col gap-2.5 pb-1 md:gap-3">
           {bottom.map((row, i) => (
             <div class="relative w-full overflow-hidden">
-              <div class={`marq flex w-max gap-2.5 ${i % 2 ? 'ml' : 'mr'} d${[38, 60, 44][i]}`}>
+              <div class={`persp-bottom drift-left flex w-max gap-2.5 d${[38, 55, 44][i]}`}>
                 {x3(row).map((t) => (
-                  <div class="box">
+                  <a href="#" class="box">
                     <span class="truncate">{t}</span>
                     <span class="ico">↗</span>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
@@ -135,14 +135,15 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
           <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
               href="/"
-              class="rounded-full bg-white px-6 py-2.5 text-[14px] font-semibold text-black hover:bg-zinc-100 active:scale-[0.98] md:px-7 md:py-[11px] md:text-[15px]"
+              class="rounded-full border border-white/20 bg-white/[0.07] px-6 py-2.5 text-[14px] font-semibold text-zinc-100 backdrop-blur-sm hover:bg-white/[0.12] active:scale-[0.98] md:px-7 md:py-[11px] md:text-[15px]"
+              style="@supports not (backdrop-filter: blur(1px)) { background: rgba(255,255,255,0.12); }"
             >
               Back to Home
             </a>
 
             <button
               id="back"
-              class="rounded-full border border-white/15 bg-white/[0.06] px-6 py-2.5 text-[14px] font-medium text-zinc-200 backdrop-blur hover:bg-white/[0.1] active:scale-[0.98] md:px-7 md:py-[11px]"
+              class="rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-[14px] font-medium text-zinc-400 hover:border-white/20 hover:text-zinc-200 active:scale-[0.98] md:px-7 md:py-[11px]"
             >
               Go Back
             </button>
@@ -150,6 +151,7 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
 
           <p class="mt-6 max-w-[28ch] text-balance text-[12px] leading-5 text-zinc-500 md:text-[13px]">
             <span
+              id="url-path"
               class="rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 font-mono text-zinc-400"
             >
               {Astro.url.pathname}
@@ -189,7 +191,7 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
           }
         }
 
-        /* CARD: white bg, black text, arrow icon black — as requested */
+        /* CARD: glassmorphism — semi-transparent grey, light border, luminous */
         .box {
           display: inline-flex;
           align-items: center;
@@ -199,16 +201,23 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
           max-width: min(420px, 78vw);
           padding: 11px 14px 11px 16px;
           border-radius: 14px;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          background: #ffffff;
-          color: #0a0a0a;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          background: rgba(255, 255, 255, 0.07);
+          color: #d4d4d4;
           font-size: 13px;
-          font-weight: 500;
+          font-weight: 400;
           line-height: 1.35;
           white-space: nowrap;
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
           box-shadow:
-            0 1px 3px rgba(0, 0, 0, 0.12),
-            0 1px 2px rgba(0, 0, 0, 0.06);
+            0 2px 8px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        @supports not (backdrop-filter: blur(1px)) {
+          .box {
+            background: rgba(255, 255, 255, 0.12);
+          }
         }
         .ico {
           display: flex;
@@ -218,37 +227,52 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
           align-items: center;
           justify-content: center;
           border-radius: 9999px;
-          background: rgba(0, 0, 0, 0.08);
-          color: #0a0a0a;
+          background: rgba(255, 255, 255, 0.12);
+          color: #d4d4d4;
           font-size: 12px;
-          font-weight: 700;
+          font-weight: 600;
           line-height: 1;
         }
 
-        /* Marquee */
-        .marq {
+        /* Perspective grid — ceiling (top) fans up, floor (bottom) fans down */
+        .persp-top {
+          transform: rotateX(-32deg);
+          transform-origin: center bottom;
+        }
+        .persp-bottom {
+          transform: rotateX(32deg);
+          transform-origin: center top;
+        }
+
+        /* Seamless slow drift — content is tripled (x3) so -33.333% = exactly one loop */
+        .drift-right {
+          animation-name: drift-right;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
           will-change: transform;
         }
-        .ml { animation-name: ml; }
-        .mr { animation-name: mr; }
-
-        @keyframes ml {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
-        }
-        @keyframes mr {
-          0% { transform: translateX(-33.333%); }
-          100% { transform: translateX(0); }
+        .drift-left {
+          animation-name: drift-left;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          will-change: transform;
         }
 
-        .d38 { animation-duration: 38s; }
-        .d40 { animation-duration: 40s; }
-        .d44 { animation-duration: 44s; }
-        .d48 { animation-duration: 48s; }
-        .d55 { animation-duration: 55s; }
-        .d60 { animation-duration: 60s; }
+        @keyframes drift-right {
+          0%   { transform: rotateX(-32deg) translateX(0); }
+          100% { transform: rotateX(-32deg) translateX(-33.333%); }
+        }
+        @keyframes drift-left {
+          0%   { transform: rotateX(32deg) translateX(-33.333%); }
+          100% { transform: rotateX(32deg) translateX(0); }
+        }
+
+        /* Per-row speeds — all referenced classes defined (was missing d38/d44/d48) */
+        .d38 { animation-duration: 26s; }
+        .d44 { animation-duration: 30s; }
+        .d45 { animation-duration: 32s; }
+        .d48 { animation-duration: 35s; }
+        .d55 { animation-duration: 40s; }
 
         @media (max-width: 768px) {
           .box {
@@ -261,22 +285,30 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
           .t404 {
             font-size: clamp(72px, 26vw, 140px);
           }
-          .d38 { animation-duration: 28s; }
-          .d40 { animation-duration: 30s; }
-          .d44 { animation-duration: 32s; }
-          .d48 { animation-duration: 36s; }
-          .d55 { animation-duration: 40s; }
-          .d60 { animation-duration: 44s; }
+          /* Clamp perspective tilt on mobile — prevent off-screen content */
+          .persp-top { transform: rotateX(-20deg); }
+          .persp-bottom { transform: rotateX(20deg); }
+          .drift-right, .drift-left { animation: none; }
+          .d45 { animation-duration: 28s; }
+          .d55 { animation-duration: 32s; }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .in { animation: none; }
-          .marq { animation: none; }
+          .persp-top, .persp-bottom { transform: none; }
+          .drift-right, .drift-left { animation: none; }
         }
       </style>
     </main>
 
-    <script>
+    <!-- Capture real pathname client-side (static build bakes /404/ at build time) -->
+    <script define:vars={{ currentPath: Astro.url.pathname }}>
+      // Fix: update the URL display span with the real client-side pathname
+      const urlSpan = document.getElementById("url-path");
+      if (urlSpan) {
+        urlSpan.textContent = currentPath;
+      }
+      // Back button logic
       document.getElementById("back")?.addEventListener("click", (e) => {
         e.preventDefault();
         if (history.length > 1) {

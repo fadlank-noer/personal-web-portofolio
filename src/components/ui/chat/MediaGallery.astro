@@ -10,9 +10,9 @@ import type { MediaItem } from '../../../lib/types/chat';
 
 interface Props {
   items: MediaItem[];
-  maxPreview?: number; // max tiles to show before +N overlay (default 4)
-  galleryId: string;   // unique id for this gallery instance (used by viewer)
-  onOpenViewer?: (index: number) => void; // callback: open viewer at index
+  maxPreview?: number;
+  galleryId: string;
+  onOpenViewer?: (index: number) => void;
 }
 
 const {
@@ -20,7 +20,7 @@ const {
   maxPreview = 4,
   galleryId = `gallery-${Math.random().toString(36).slice(2, 8)}`,
   onOpenViewer,
-} = Astro.props;
+} = Astro.props as Props & { onOpenViewer?: (index: number) => void };
 
 const count = items.length;
 const hasImages = count > 0;
@@ -66,7 +66,7 @@ const layout = hasImages
     )}
 
     {layout === 'two' && (
-      previewItems.map((item, i) => (
+      previewItems.map((item: MediaItem, i: number) => (
         <button
           type="button"
           class="gallery-tile tile-two"
@@ -111,7 +111,7 @@ const layout = hasImages
           </div>
         </button>
         <div class="tile-three-stack">
-          {previewItems.slice(1, 3).map((item, i) => (
+          {previewItems.slice(1, 3).map((item: MediaItem, i: number) => (
             <button
               type="button"
               class="gallery-tile tile-three-sub"
@@ -462,8 +462,8 @@ const layout = hasImages
 <script>
   // Skeleton fade-out, blur reveal, and error state — component tiles only
   // (runtime inline galleries in ChatHistory handle themselves via .skeleton)
-  function initTiles(scope) {
-    scope.querySelectorAll('.gallery-tile').forEach((tile) => {
+  function initTiles(scope: HTMLElement) {
+    scope.querySelectorAll('.gallery-tile').forEach((tile: Element) => {
       if ((tile as HTMLElement).dataset.bound === 'true') return;
       const errorEl = tile.querySelector('.tile-error');
       if (!errorEl) return; // runtime gallery tile — handled by ChatHistory
@@ -514,7 +514,7 @@ const layout = hasImages
     });
   }
 
-  initTiles(document);
-  const observer = new MutationObserver(() => initTiles(document));
+  initTiles(document.body);
+  const observer = new MutationObserver(() => initTiles(document.body));
   observer.observe(document.body, { childList: true, subtree: true });
 </script>

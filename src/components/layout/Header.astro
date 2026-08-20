@@ -29,7 +29,7 @@ const { title = 'FadlanGPT' } = Astro.props;
   const toggle = document.getElementById('chatroom-sidebar-toggle');
   const trademark = document.getElementById('fadlangpt-trademark');
   const isMobile = () => window.innerWidth < 768;
-  const applyMobile = (open) => {
+  const applyMobile = (open: boolean) => {
     if (!sidebar || !overlay) return;
     sidebar.dataset.mobileOpen = open ? 'true' : 'false';
     overlay.classList.toggle('hidden', !open);

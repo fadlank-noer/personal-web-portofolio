@@ -125,7 +125,7 @@ const projects = (sidebarData as unknown as { projects?: ProjectItem[] }).projec
   const overlay = document.getElementById('sidebar-overlay');
   const toggle = document.getElementById('mobile-sidebar-toggle');
   const isMobile = () => window.innerWidth < 768;
-  const applyMobile = (open) => {
+  const applyMobile = (open: boolean) => {
     if (!sidebar || !overlay) return;
     sidebar.dataset.mobileOpen = open ? 'true' : 'false';
     overlay.classList.toggle('hidden', !open);

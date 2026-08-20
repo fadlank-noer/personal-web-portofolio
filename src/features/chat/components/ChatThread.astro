@@ -21,7 +21,7 @@ const { messages = [], isStreaming = false, class: className = '' } = Astro.prop
 <div class:list={["flex h-full min-h-0 w-full flex-col bg-black", className]}>
   {/* Thread - scrollable */}
   <div class="flex flex-1 flex-col min-h-0 overflow-hidden">
-    <ChatHistory messages={messages} isStreaming={isStreaming} class="flex-1" />
+    <ChatHistory class="flex-1" />
   </div>
 
   {/* Sticky input with gradient fade like ChatGPT */}
