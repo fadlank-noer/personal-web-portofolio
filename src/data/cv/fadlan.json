@@ -1,11 +1,11 @@
 {
   "basics": {
     "name": "Fadlan Kautsar Noer",
-    "label": "Software Engineer",
+    "label": "Full Stack Software Engineer",
     "email": "fadlank.noer@gmail.com",
-    "phone": "0895352837926",
+    "phone": "+62 895-3528-37926",
     "url": "https://fadlank.web.id",
-    "summary": "No failure, no growth. Take your shot, even if your target is the moon. And if you fail along the way, you may still discover the beauty of the stars.",
+    "summary": "Full Stack Software Engineer: 4 years across fintech and digital banking. Led a Go microservices settlement layer at 5,000+ RPS (p99 <100ms) for a licensed crypto exchange, maintained a digital bank mobile app, and shipped 10+ web/mobile products on Next.js, React Native, Node.js, and AWS. Now engineering AI-augmented products with agents and MCP.",
     "profiles": [
       {
         "network": "LinkedIn",
@@ -15,12 +15,13 @@
         "network": "GitHub",
         "url": "https://github.com/fadlank-noer"
       }
-    ]
+    ],
+    "location": "Jakarta, Indonesia (open to relocation)"
   },
   "work": [
     {
       "company": "SOCIOTRAX",
-      "position": "AI Augmented Software Developer",
+      "position": "AI Augmented Software Developer (Full Stack Engineer)",
       "startDate": "2026-05-01",
       "summary": "Responsible for building and evolving digital products across the agency ecosystem by combining software engineering best practices with modern AI technologies. Lead the development of internal tools.",
       "highlights": [
@@ -28,11 +29,11 @@
         "Lead the development of internal tools used across the agency ecosystem."
       ]
     },
-     {
+    {
       "company": "Freelance",
       "position": "Freelance Software Engineer",
       "startDate": "2022-01-01",
-      "summary": "Deliver high-impact freelance projects for Indonesian clients: custom web platforms and digital marketing solutions.",
+      "summary": "Deliver high-impact freelance projects for Indonesian clients (concurrent with full-time employment): custom web platforms and digital marketing solutions.",
       "highlights": [
         "Binary Tree Digital Business: built a genealogy and commission engine for a global network marketing company, classifying every node as Profit Branch or Power Branch and automatically cascading bonuses up the upline.",
         "Crypto Custodian: served as Lead Engineer for a licensed Indonesian crypto exchange custody platform, re-architecting the settlement hot-path as Go microservices to achieve 5,000+ RPS with p99 under 100ms.",
@@ -49,8 +50,8 @@
       "highlights": [
         "Built and maintained products on the PaaS platform serving Indonesia industry stakeholders.",
         "Delivered 10+ projects spanning web and mobile applications across the company product lines.",
-        "Led technical maintenance for a digital bank mobile app, coordinating hotfixes and feature releases.",
-        "Led and coordinated the engineering team, assigning responsibilities across deliveries.",
+        "Led technical maintenance for a digital bank mobile app serving thousands of active users, coordinating hotfixes and feature releases under regulated environment (OJK).",
+        "Led and coordinated a 4-person engineering team, assigning responsibilities across deliveries.",
         "Developed, oversaw, and maintained technological applications and systems."
       ]
     },
@@ -62,11 +63,8 @@
       "endDate": "2021-11-30",
       "summary": "Since 1967, PT Dwidaya Worldwide has been trusted as one of the biggest travel agencies in Indonesia, with annual achievements including Top Agent from major airlines (Singapore Airlines, Cathay Pacific, Qatar Airways, KLM, Garuda Indonesia, Eva Air, Lufthansa, and more).",
       "highlights": [
-        "Ticketing with Travelport Galileo, Amadeus, and Sabre.",
-        "Fulfilling customer needs and exceeding expectations through tailored services.",
-        "Planning customer trips (flights, hotels, land packages, travel documents, and more).",
-        "Tour leading and guiding on guided tours.",
-        "Resolving internal and external operational problems."
+        "Handled ticketing operations using Travelport Galileo, Amadeus, and Sabre GDS for high-volume travel bookings.",
+        "Planned and led customer trips including flights, hotels, land packages, and travel documents; resolved operational problems for internal and external stakeholders."
       ]
     }
   ],
@@ -89,7 +87,6 @@
       "institution": "57 Vocational Highschool",
       "studyType": "High School Diploma",
       "area": "Tourism",
-      "score": "3.26/4.00",
       "startDate": "2015-06-01",
       "endDate": "2018-03-31",
       "courses": [
@@ -102,10 +99,19 @@
   ],
   "skills": [
     {
+      "name": "Languages",
+      "keywords": [
+        "English (professional working proficiency)",
+        "Bahasa Indonesia (native)"
+      ]
+    },
+    {
       "name": "Frontend",
       "keywords": [
-        "astro.build",
-        "NextJS",
+        "Next.js",
+        "Astro",
+        "TypeScript",
+        "React",
         "jQuery"
       ]
     },
@@ -119,6 +125,8 @@
     {
       "name": "Backend",
       "keywords": [
+        "TypeScript",
+        "Go",
         "NestJS",
         "Laravel/Livewire",
         "PHP",
@@ -140,7 +148,6 @@
         "AWS Rekognition",
         "Heroku",
         "Salesforce",
-        "ngrok",
         "Google Cloud Platform"
       ]
     },
@@ -153,17 +160,17 @@
     {
       "name": "AI Engineering",
       "keywords": [
-        "Harness Agent",
-        "Loop Engineering",
-        "MCP",
-        "Toolcall"
+        "AI agent development (Harness)",
+        "MCP (Model Context Protocol)",
+        "LLM tool calling",
+        "Loop Engineering"
       ]
     },
     {
       "name": "Soft Skills",
       "keywords": [
         "Problem Solver",
-        "Sales",
+        "Stakeholder Management",
         "Managing Up and Down",
         "Team Leadership"
       ]
@@ -195,5 +202,12 @@
   ],
   "meta": {
     "draft": false
-  }
+  },
+  "certifications": [
+    {
+      "name": "Dumbways Fullstack Developer Bootcamp",
+      "date": "2022",
+      "url": ""
+    }
+  ]
 }
