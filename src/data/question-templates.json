@@ -92,7 +92,7 @@
     {
       "question": "Can you show your CV?",
       "answer": "Of course! Here's my full CV:\n\n\ud83d\udcc4 [View my CV \u2192](/cv)\n\nThe CV includes:\n- Full work history (Travel Consultant \u2192 Associate Engineer \u2192 AI Augmented Developer)\n- 2 personal projects with tech stacks and live URLs\n- Skills matrix\n- Education timeline\n\nWant me to highlight anything specific? Just ask!",
-      "answer_type": "text",
+      "answer_type": "links",
       "images": [
         {
           "src": "/assets/images/photo-in-studio.png",
