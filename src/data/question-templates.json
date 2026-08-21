@@ -1,118 +1,118 @@
 {
-    "questions": [
+  "questions": [
+    {
+      "question": "Tell us a little about yourself.",
+      "answer": "I'm Fadlan Kautsar Noer \u2014 a Full Stack Software Engineer with 4+ years of production experience across fintech, digital banking, and AI-augmented products. I specialize in Go microservices, React/Next.js frontend, and building AI-powered applications with agents and MCP. Based in Jakarta, open to relocation.",
+      "answer_type": "text",
+      "images": [
         {
-            "question": "Tell us a little about yourself.",
-            "answer": "I'm Fadlan Kautsar Noer — a Full Stack Software Engineer with 4+ years of production experience across fintech, digital banking, and AI-augmented products. I specialize in Go microservices, React/Next.js frontend, and building AI-powered applications with agents and MCP. Based in Jakarta, open to relocation.",
-            "answer_type": "text",
-            "images": [
-                {
-                    "src": "/assets/images/photo-in-studio.png",
-                    "alt": "Fadlan Kautsar Noer. professional photo in studio setting"
-                },
-                {
-                    "src": "/assets/images/photo-in-boat.png",
-                    "alt": "Fadlan Kautsar Noer. casual photo on a boat, Jakarta area"
-                }
-            ]
+          "src": "/assets/images/photo-in-studio.png",
+          "alt": "Fadlan Kautsar Noer. professional photo in studio setting"
         },
         {
-            "question": "Who are you?",
-            "answer": "I'm a Full Stack Software Engineer with a non-traditional background — I made the switch from travel consulting to software engineering, and that perspective shapes how I build. I understand both the business side and the technical side, which means I ask better questions, write clearer specs, and ship things that actually solve problems.\n\nCurrently working at an AI agency where I build AI-powered applications for Indonesian SMEs (UMKM): live streaming AI avatars with real-time audience interaction, WhatsApp-based AI agents with autoreply and knowledge base capabilities, AI-powered brand presence testing across frontier models, and automated content pillar ideation pipelines. Previously built fintech systems at scale — a Go microservices settlement layer for a licensed crypto exchange handling 5,000+ requests per second with p99 latency under 100ms.\n\nMy stack: Go, TypeScript, Next.js, Astro, React Native, NestJS, PostgreSQL, Redis, AWS, and AI engineering (MCP, LLM tool calling, agent orchestration).",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "What are your skills?",
-            "answer": "**Languages & Runtimes:** Go, TypeScript, PHP\n\n**Frontend:** Next.js, Astro, Svelte 5, React 19, React Native, Tailwind CSS v4, shadcn/ui\n\n**Backend:** NestJS, Laravel/Livewire, Node.js/Express, REST APIs\n\n**Databases & Cache:** MySQL, PostgreSQL, Redis\n\n**Cloud & DevOps:** AWS (S3, Rekognition), Cloudflare Workers, Google Cloud Platform, Heroku\n\n**AI Engineering:** AI agent development, MCP (Model Context Protocol), LLM tool calling, Loop Engineering\n\n**Leadership:** Led a 4-person engineering team across web and mobile product lines. Stakeholder management, technical roadmapping, and cross-functional delivery.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "What projects have you built?",
-            "answer": "Here are the projects I can speak to directly:\n\n**Prompt Builder** (prompt-builder.fadlank.web.id)\nBuilt structured web forms for AI image generation — users fill in fields, get a polished prompt they can copy in one click. Supports GPT Image 2 and Seedance 2.0. Stack: Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Cloudflare Workers.\n\n**Laundry Landing Page** (laundry.fadlank.web.id)\nLanding page with GSAP scroll animations, responsive layouts, and interactive pricing tables. Stack: SvelteKit 5, Svelte 5, TypeScript, Tailwind CSS v4, GSAP, Cloudflare.\n\n**Go Microservices for a Crypto Exchange** (freelance)\nRe-architected the settlement hot-path as Go microservices for a licensed Indonesian crypto exchange. Hit 5,000+ RPS with p99 under 100ms. Designed wallet, ledger, and KYC services with Redis caching and AWS Rekognition face-match.\n\n**Genealogy & Commission Engine** (freelance)\nBuilt a node-classification and bonus cascading system for a global network marketing company. Classified every node as Profit Branch or Power Branch, automatically cascading bonuses up the upline.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "What is your experience?",
-            "answer": "**2026–present | AI Augmented Software Developer @ an AI Agency**\nBuilding AI-powered products for Indonesian SMEs (UMKM): live streaming AI avatars with real-time audience interaction, WhatsApp-based AI agents with autoreply and knowledge base capabilities, AI-powered brand presence testing across frontier models, and automated content pillar ideation pipelines.\n\n**2022–2026 | Associate Engineer @ a Digital Products Company**\nDelivered 10+ web and mobile applications. Led a 4-person engineering team across product lines. Maintained a digital bank mobile app serving thousands of active users in a regulated environment (OJK compliance). Built microservice architectures for fintech products.\n\n**2018–2021 | Travel Consultant @ PT Dwidaya Worldwide**\nTop Agent recognition from 8+ major airlines (Singapore Airlines, Qatar Airways, KLM, Garuda Indonesia, Lufthansa, Eva Air, Cathay Pacific, KLM). Mastered high-volume ticketing via Galileo, Amadeus, and Sabre GDS. Trip planning, tour leadership, and MICE events.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "How do I contact you?",
-            "answer": "Let's connect!\n\n📧 Email: fadlank.noer@gmail.com\n💼 LinkedIn: https://www.linkedin.com/in/fadlan-kautsar-noer/\n🐙 GitHub: https://github.com/fadlank-noer\n📍 Based: Jakarta, Indonesia — open to relocation\n\nResponse time: usually within a few hours. For project or job inquiries, include scope and timeline — I reply faster with context!",
-            "answer_type": "text",
-            "images": [],
-            "links": [
-                {
-                    "label": "Email",
-                    "url": "mailto:fadlank.noer@gmail.com",
-                    "type": "email",
-                    "description": "fadlank.noer@gmail.com"
-                },
-                {
-                    "label": "LinkedIn",
-                    "url": "https://www.linkedin.com/in/fadlan-kautsar-noer/",
-                    "type": "external",
-                    "description": "Connect on LinkedIn"
-                },
-                {
-                    "label": "GitHub",
-                    "url": "https://github.com/fadlank-noer",
-                    "type": "external",
-                    "description": "Check my open source work"
-                }
-            ]
-        },
-        {
-            "question": "What services do you offer?",
-            "answer": "Based on what I've actually shipped:\n\n**Fullstack Web & Mobile Development**\nEnd-to-end product delivery: frontend, backend, and deployment. I've built fintech mobile apps, landing pages, SaaS tools, and admin dashboards. Stack: React Native, Next.js, Astro, NestJS, Laravel.\n\n**Go Microservices & Backend Architecture**\nHigh-throughput backend systems in Go. I've designed wallet, ledger, and settlement services handling 5,000+ RPS. Experience with PostgreSQL, Redis caching, and distributed system patterns (saga, idempotency, eventual consistency).\n\n**AI-Powered Application Development**\nBuilding with AI agents, MCP, and LLM tool calling. WhatsApp-based agents, AI avatar integrations, prompt engineering, and knowledge base systems for business automation.\n\n**Frontend Engineering (Performance-Focused)**\nModern React/Next.js/Astro with Tailwind CSS. Performance optimization, accessibility, and responsive design. Cloudflare Workers for edge deployments.\n\nEngagement: freelance per project or full-time. Let's discuss your needs.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "What's your educational background?",
-            "answer": "**2022 | Fullstack Developer Bootcamp — PT Dumbways Indonesia Teknologi**\nFour-month intensive program covering HTML/CSS/JS, React JS, React Native, Node.js & Express. Built 2 web applications and 1 mobile app as final projects. This is where I made the transition from travel to tech.\n\n**2015–2018 | High School Diploma in Tourism — 57 Vocational Highschool, Jakarta**\nStrong academic performance with a focus on Tour Planning, Tour Guide, MICE events, and Airline Ticketing & Reservation. The travel background gave me communication skills and customer empathy that I use every day in software engineering.\n\n**Continuous learning:** Currently focused on AI engineering — agents, MCP, and LLM tool calling — applied to real client products.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "Why should we hire you?",
-            "answer": "Here's what I bring:\n\n**I understand the business, not just the code.** My background in travel consulting taught me to listen to what clients actually need, not just what they say they want. I ask better questions before I write a single line. In fintech, this meant designing for regulatory scrutiny from day one. In product teams, it meant fewer rework cycles.\n\n**I ship fullstack, end-to-end.** I don't just handle my slice. I've owned mobile apps, backend services, and deployments — from spec to production. For a team, this means fewer hand-off bottlenecks.\n\n**I know how to lead technical work.** I led a 4-person engineering team, assigning responsibilities and coordinating delivery across web and mobile product lines. I can communicate technical trade-offs to non-technical stakeholders.\n\n**I'm building with AI now.** Current work focuses on AI agents, MCP, and LLM tool calling — building products that combine traditional software engineering with modern AI capabilities. This is where the industry is going, and I'm already doing it.\n\n**I'm based in Jakarta and open to relocation.** Visa sponsorship is welcome.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "What tech stack do you use?",
-            "answer": "I pick the right tool for the problem:\n\n**Backend & Systems:** Go (high-throughput microservices), NestJS, Node.js/Express, Laravel/Livewire\n\n**Frontend:** Next.js 16, Astro (this portfolio!), Svelte 5, React 19, React Native (mobile), Tailwind CSS v4, shadcn/ui\n\n**Databases:** PostgreSQL (ACID transactions), MySQL, Redis (caching and distributed locks)\n\n**Cloud & Infrastructure:** AWS (S3, Rekognition), Cloudflare Workers (edge), Google Cloud Platform, Heroku\n\n**AI Engineering:** MCP (Model Context Protocol), LLM tool calling, AI agent orchestration, Harness\n\nFor this very portfolio, I used Astro + Tailwind — islands architecture, zero JS by default, excellent SEO performance. Ask me why I chose a specific stack and I'll give you a real answer.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "Can you show your CV?",
-            "answer": "Of course! Here's my CV:\n\n📄 Download: [cv-fadlan.pdf](/assets/cv-fadlan.pdf)\n\nThe CV includes:\n- Full work history (Travel Consultant → Associate Engineer → AI Augmented Developer)\n- 2 personal projects with tech stacks and live URLs\n- Skills matrix\n- Education timeline\n\nWant me to highlight anything specific? Just ask!",
-            "answer_type": "text",
-            "images": [
-                {
-                    "src": "/assets/images/photo-in-studio.png",
-                    "alt": "Fadlan Kautsar Noer. professional portrait photo for CV",
-                    "sourceLabel": "Fadlan's Portfolio",
-                    "sourceUrl": "/"
-                }
-            ]
-        },
-        {
-            "question": "What is your biggest challenge?",
-            "answer": "The hardest thing I've built was the Go microservices settlement layer for a crypto exchange — it had to handle real money with zero tolerance for error.\n\n**Money = zero tolerance.** Every transaction is a financial contract. A single miscalculation means real loss. I designed atomic transactions, idempotent APIs, and reconciliation pipelines to ensure no double-spend and no discrepancies.\n\n**Distributed systems complexity.** Coordinating wallet, ledger, and KYC across services while maintaining eventual consistency required the saga pattern, message queues, and designing for failure at every hop.\n\n**Concurrency & race conditions.** Preventing balance corruption under simultaneous top-up, transfer, and withdrawal requests demanded optimistic locking plus Redis-based distributed locks on critical paths.\n\n**KYC & compliance.** Integrating AWS Rekognition for face-match identity verification while maintaining audit trails for every cent moved — in a regulated environment.\n\n**What I learned:** Correctness beats features every time. Build defensively, instrument for observability, and treat every transaction as a contract. That mindset now applies to everything I build.",
-            "answer_type": "text",
-            "images": []
-        },
-        {
-            "question": "What AI projects have you built?",
-            "answer": "At an AI agency, I've worked on 4+ AI-powered products for Indonesian SMEs (UMKM):\n\n**Live Streaming AI Avatars**\nBuilt a system where AI avatars respond to audience comments in real-time during live streams. The agent reads incoming comments, generates contextually appropriate responses, and delivers them through the avatar — all with low latency.\n\n**WhatsApp AI Agents**\nDeveloped WhatsApp-based AI agents with autoreply and knowledge base capabilities. Businesses can train the agent on their product documentation, FAQs, and policies — the agent answers customer inquiries automatically while maintaining brand voice.\n\n**Brand Presence Testing Across Frontier Models**\nBuilt a pipeline to evaluate how a brand's content and messaging performs across multiple frontier AI models. Helps businesses understand how their brand is perceived and represented by different AI systems.\n\n**Automated Content Pillar Ideation**\nDeveloped a system that takes a brand's niche and generates content pillar ideas — topic clusters, angle suggestions, and sample hooks — for ongoing content marketing.\n\n**Technical approach:** All built using AI agent frameworks, MCP (Model Context Protocol) for tool calling, and LLM orchestration patterns. No black-box SaaS — these are custom-built agent architectures.",
-            "answer_type": "text",
-            "images": []
+          "src": "/assets/images/photo-in-boat.png",
+          "alt": "Fadlan Kautsar Noer. casual photo on a boat, Jakarta area"
         }
-    ]
+      ]
+    },
+    {
+      "question": "Who are you?",
+      "answer": "I'm a Full Stack Software Engineer with a non-traditional background \u2014 I made the switch from travel consulting to software engineering, and that perspective shapes how I build. I understand both the business side and the technical side, which means I ask better questions, write clearer specs, and ship things that actually solve problems.\n\nCurrently working at an AI agency where I build AI-powered applications for Indonesian SMEs (UMKM): live streaming AI avatars with real-time audience interaction, WhatsApp-based AI agents with autoreply and knowledge base capabilities, AI-powered brand presence testing across frontier models, and automated content pillar ideation pipelines. Previously built fintech systems at scale \u2014 a Go microservices settlement layer for a licensed crypto exchange handling 5,000+ requests per second with p99 latency under 100ms.\n\nMy stack: Go, TypeScript, Next.js, Astro, React Native, NestJS, PostgreSQL, Redis, AWS, and AI engineering (MCP, LLM tool calling, agent orchestration).",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "What are your skills?",
+      "answer": "**Languages & Runtimes:** Go, TypeScript, PHP\n\n**Frontend:** Next.js, Astro, Svelte 5, React 19, React Native, Tailwind CSS v4, shadcn/ui\n\n**Backend:** NestJS, Laravel/Livewire, Node.js/Express, REST APIs\n\n**Databases & Cache:** MySQL, PostgreSQL, Redis\n\n**Cloud & DevOps:** AWS (S3, Rekognition), Cloudflare Workers, Google Cloud Platform, Heroku\n\n**AI Engineering:** AI agent development, MCP (Model Context Protocol), LLM tool calling, Loop Engineering\n\n**Leadership:** Led a 4-person engineering team across web and mobile product lines. Stakeholder management, technical roadmapping, and cross-functional delivery.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "What projects have you built?",
+      "answer": "Here are the projects I can speak to directly:\n\n**Prompt Builder** (prompt-builder.fadlank.web.id)\nBuilt structured web forms for AI image generation \u2014 users fill in fields, get a polished prompt they can copy in one click. Supports GPT Image 2 and Seedance 2.0. Stack: Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Cloudflare Workers.\n\n**Laundry Landing Page** (laundry.fadlank.web.id)\nLanding page with GSAP scroll animations, responsive layouts, and interactive pricing tables. Stack: SvelteKit 5, Svelte 5, TypeScript, Tailwind CSS v4, GSAP, Cloudflare.\n\n**Go Microservices for a Crypto Exchange** (freelance)\nRe-architected the settlement hot-path as Go microservices for a licensed Indonesian crypto exchange. Hit 5,000+ RPS with p99 under 100ms. Designed wallet, ledger, and KYC services with Redis caching and AWS Rekognition face-match.\n\n**Genealogy & Commission Engine** (freelance)\nBuilt a node-classification and bonus cascading system for a global network marketing company. Classified every node as Profit Branch or Power Branch, automatically cascading bonuses up the upline.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "What is your experience?",
+      "answer": "**2026\u2013present | AI Augmented Software Developer @ an AI Agency**\nBuilding AI-powered products for Indonesian SMEs (UMKM): live streaming AI avatars with real-time audience interaction, WhatsApp-based AI agents with autoreply and knowledge base capabilities, AI-powered brand presence testing across frontier models, and automated content pillar ideation pipelines.\n\n**2022\u20132026 | Associate Engineer @ a Digital Products Company**\nDelivered 10+ web and mobile applications. Led a 4-person engineering team across product lines. Maintained a digital bank mobile app serving thousands of active users in a regulated environment (OJK compliance). Built microservice architectures for fintech products.\n\n**2018\u20132021 | Travel Consultant @ PT Dwidaya Worldwide**\nTop Agent recognition from 8+ major airlines (Singapore Airlines, Qatar Airways, KLM, Garuda Indonesia, Lufthansa, Eva Air, Cathay Pacific, KLM). Mastered high-volume ticketing via Galileo, Amadeus, and Sabre GDS. Trip planning, tour leadership, and MICE events.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "How do I contact you?",
+      "answer": "Let's connect!\n\n\ud83d\udce7 Email: fadlank.noer@gmail.com\n\ud83d\udcbc LinkedIn: https://www.linkedin.com/in/fadlan-kautsar-noer/\n\ud83d\udc19 GitHub: https://github.com/fadlank-noer\n\ud83d\udccd Based: Jakarta, Indonesia \u2014 open to relocation\n\nResponse time: usually within a few hours. For project or job inquiries, include scope and timeline \u2014 I reply faster with context!",
+      "answer_type": "text",
+      "images": [],
+      "links": [
+        {
+          "label": "Email",
+          "url": "mailto:fadlank.noer@gmail.com",
+          "type": "email",
+          "description": "fadlank.noer@gmail.com"
+        },
+        {
+          "label": "LinkedIn",
+          "url": "https://www.linkedin.com/in/fadlan-kautsar-noer/",
+          "type": "external",
+          "description": "Connect on LinkedIn"
+        },
+        {
+          "label": "GitHub",
+          "url": "https://github.com/fadlank-noer",
+          "type": "external",
+          "description": "Check my open source work"
+        }
+      ]
+    },
+    {
+      "question": "What services do you offer?",
+      "answer": "Based on what I've actually shipped:\n\n**Fullstack Web & Mobile Development**\nEnd-to-end product delivery: frontend, backend, and deployment. I've built fintech mobile apps, landing pages, SaaS tools, and admin dashboards. Stack: React Native, Next.js, Astro, NestJS, Laravel.\n\n**Go Microservices & Backend Architecture**\nHigh-throughput backend systems in Go. I've designed wallet, ledger, and settlement services handling 5,000+ RPS. Experience with PostgreSQL, Redis caching, and distributed system patterns (saga, idempotency, eventual consistency).\n\n**AI-Powered Application Development**\nBuilding with AI agents, MCP, and LLM tool calling. WhatsApp-based agents, AI avatar integrations, prompt engineering, and knowledge base systems for business automation.\n\n**Frontend Engineering (Performance-Focused)**\nModern React/Next.js/Astro with Tailwind CSS. Performance optimization, accessibility, and responsive design. Cloudflare Workers for edge deployments.\n\nEngagement: freelance per project or full-time. Let's discuss your needs.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "What's your educational background?",
+      "answer": "**2022 | Fullstack Developer Bootcamp \u2014 PT Dumbways Indonesia Teknologi**\nFour-month intensive program covering HTML/CSS/JS, React JS, React Native, Node.js & Express. Built 2 web applications and 1 mobile app as final projects. This is where I made the transition from travel to tech.\n\n**2015\u20132018 | High School Diploma in Tourism \u2014 57 Vocational Highschool, Jakarta**\nStrong academic performance with a focus on Tour Planning, Tour Guide, MICE events, and Airline Ticketing & Reservation. The travel background gave me communication skills and customer empathy that I use every day in software engineering.\n\n**Continuous learning:** Currently focused on AI engineering \u2014 agents, MCP, and LLM tool calling \u2014 applied to real client products.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "Why should we hire you?",
+      "answer": "Here's what I bring:\n\n**I understand the business, not just the code.** My background in travel consulting taught me to listen to what clients actually need, not just what they say they want. I ask better questions before I write a single line. In fintech, this meant designing for regulatory scrutiny from day one. In product teams, it meant fewer rework cycles.\n\n**I ship fullstack, end-to-end.** I don't just handle my slice. I've owned mobile apps, backend services, and deployments \u2014 from spec to production. For a team, this means fewer hand-off bottlenecks.\n\n**I know how to lead technical work.** I led a 4-person engineering team, assigning responsibilities and coordinating delivery across web and mobile product lines. I can communicate technical trade-offs to non-technical stakeholders.\n\n**I'm building with AI now.** Current work focuses on AI agents, MCP, and LLM tool calling \u2014 building products that combine traditional software engineering with modern AI capabilities. This is where the industry is going, and I'm already doing it.\n\n**I'm based in Jakarta and open to relocation.** Visa sponsorship is welcome.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "What tech stack do you use?",
+      "answer": "I pick the right tool for the problem:\n\n**Backend & Systems:** Go (high-throughput microservices), NestJS, Node.js/Express, Laravel/Livewire\n\n**Frontend:** Next.js 16, Astro (this portfolio!), Svelte 5, React 19, React Native (mobile), Tailwind CSS v4, shadcn/ui\n\n**Databases:** PostgreSQL (ACID transactions), MySQL, Redis (caching and distributed locks)\n\n**Cloud & Infrastructure:** AWS (S3, Rekognition), Cloudflare Workers (edge), Google Cloud Platform, Heroku\n\n**AI Engineering:** MCP (Model Context Protocol), LLM tool calling, AI agent orchestration, Harness\n\nFor this very portfolio, I used Astro + Tailwind \u2014 islands architecture, zero JS by default, excellent SEO performance. Ask me why I chose a specific stack and I'll give you a real answer.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "Can you show your CV?",
+      "answer": "Of course! Here's my full CV:\n\n\ud83d\udcc4 [View my CV \u2192](/cv)\n\nThe CV includes:\n- Full work history (Travel Consultant \u2192 Associate Engineer \u2192 AI Augmented Developer)\n- 2 personal projects with tech stacks and live URLs\n- Skills matrix\n- Education timeline\n\nWant me to highlight anything specific? Just ask!",
+      "answer_type": "text",
+      "images": [
+        {
+          "src": "/assets/images/photo-in-studio.png",
+          "alt": "Fadlan Kautsar Noer. professional portrait photo for CV",
+          "sourceLabel": "Fadlan's Portfolio",
+          "sourceUrl": "/"
+        }
+      ]
+    },
+    {
+      "question": "What is your biggest challenge?",
+      "answer": "The hardest thing I've built was the Go microservices settlement layer for a crypto exchange \u2014 it had to handle real money with zero tolerance for error.\n\n**Money = zero tolerance.** Every transaction is a financial contract. A single miscalculation means real loss. I designed atomic transactions, idempotent APIs, and reconciliation pipelines to ensure no double-spend and no discrepancies.\n\n**Distributed systems complexity.** Coordinating wallet, ledger, and KYC across services while maintaining eventual consistency required the saga pattern, message queues, and designing for failure at every hop.\n\n**Concurrency & race conditions.** Preventing balance corruption under simultaneous top-up, transfer, and withdrawal requests demanded optimistic locking plus Redis-based distributed locks on critical paths.\n\n**KYC & compliance.** Integrating AWS Rekognition for face-match identity verification while maintaining audit trails for every cent moved \u2014 in a regulated environment.\n\n**What I learned:** Correctness beats features every time. Build defensively, instrument for observability, and treat every transaction as a contract. That mindset now applies to everything I build.",
+      "answer_type": "text",
+      "images": []
+    },
+    {
+      "question": "What AI projects have you built?",
+      "answer": "At an AI agency, I've worked on 4+ AI-powered products for Indonesian SMEs (UMKM):\n\n**Live Streaming AI Avatars**\nBuilt a system where AI avatars respond to audience comments in real-time during live streams. The agent reads incoming comments, generates contextually appropriate responses, and delivers them through the avatar \u2014 all with low latency.\n\n**WhatsApp AI Agents**\nDeveloped WhatsApp-based AI agents with autoreply and knowledge base capabilities. Businesses can train the agent on their product documentation, FAQs, and policies \u2014 the agent answers customer inquiries automatically while maintaining brand voice.\n\n**Brand Presence Testing Across Frontier Models**\nBuilt a pipeline to evaluate how a brand's content and messaging performs across multiple frontier AI models. Helps businesses understand how their brand is perceived and represented by different AI systems.\n\n**Automated Content Pillar Ideation**\nDeveloped a system that takes a brand's niche and generates content pillar ideas \u2014 topic clusters, angle suggestions, and sample hooks \u2014 for ongoing content marketing.\n\n**Technical approach:** All built using AI agent frameworks, MCP (Model Context Protocol) for tool calling, and LLM orchestration patterns. No black-box SaaS \u2014 these are custom-built agent architectures.",
+      "answer_type": "text",
+      "images": []
+    }
+  ]
 }
