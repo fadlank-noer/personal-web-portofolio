@@ -7,10 +7,10 @@ import LogoV2 from '../../public/assets/logo-v2.svg';
 import Sidebar from '../features/sidebar/components/Sidebar.astro';
 import LinkConfirmationModal from '../components/ui/chat/LinkConfirmationModal.astro';
 import Head from '../layouts/Head.astro';
-import sidebarData from '../data/sidebar.json';
+import cvData from '../data/cv/fadlan.json';
 import type { ProjectItem } from '../lib/types/sidebar';
 
-const projects = (sidebarData as unknown as { projects?: ProjectItem[] }).projects ?? [];
+const projects = (cvData.projects ?? []) as ProjectItem[];
 ---
 
 <html lang="en">
@@ -53,7 +53,7 @@ const projects = (sidebarData as unknown as { projects?: ProjectItem[] }).projec
           <!-- Folder grid -->
           <div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
             {projects.map((p) => (
-              <a href={p.url} class="group relative flex flex-col overflow-hidden rounded-[18px] border border-white/[0.06] bg-[#0a0a0a] hover:bg-[#111] transition-all duration-200 hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
+              <a href={p.url ?? '#'} class="group relative flex flex-col overflow-hidden rounded-[18px] border border-white/[0.06] bg-[#0a0a0a] hover:bg-[#111] transition-all duration-200 hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.5)]">
                 <!-- top color accent thin -->
                 <div class={`h-[3px] w-full ${p.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
                 <div class="flex flex-1 flex-col p-4">
