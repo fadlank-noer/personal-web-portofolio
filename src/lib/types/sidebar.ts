@@ -12,11 +12,16 @@ export interface ProjectItem {
   id: string;
   title: string;
   desc: string;
+  description?: string;
+  client?: string;
+  category?: string;
   count: number;
   color: string;
   thumb: string;
   url: string;
   featured?: boolean;
+  cover?: boolean;
+  image?: string;
 }
 
 export type LibraryMediaType = 'image' | 'video' | 'wide' | string;

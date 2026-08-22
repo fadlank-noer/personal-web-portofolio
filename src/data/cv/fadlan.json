@@ -180,12 +180,16 @@
   "projects": [
     {
       "name": "Laundry Landing Page",
+      "client": "LaundryPro",
       "description": "Landing page for a laundry service business (https://laundry.fadlank.web.id/): showcasing services, pricing, and contact with smooth animations.",
       "url": "https://laundry.fadlank.web.id/",
       "startDate": "2024-01-01",
+      "category": "Web Design",
       "color": "from-emerald-500 to-teal-600",
       "thumb": "LL",
       "count": 3,
+      "cover": true,
+      "image": "/assets/projects/laundry-preview.png",
       "highlights": [
         "Built a compelling landing page with smooth scroll animations using GSAP to showcase laundry services and drive customer inquiries.",
         "Implemented responsive layouts and interactive pricing tables for different service tiers.",
