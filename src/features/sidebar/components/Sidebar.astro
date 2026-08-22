@@ -55,44 +55,38 @@ const data = sidebarData as SidebarData;
   </div>
 
   <!-- Quick actions -->
-  <div class="px-2.5 pb-2 space-y-0.5 bg-black">
-    <a href="/" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors">
-      <SquarePen class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
-    </a>
-    <a href="/library" data-nav="library" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
-      <LibraryIcon class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Library</span>
-    </a>
-    <a href="/projects" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
-      <FolderIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Projects</span>
-    </a>
-    <a href="/cv" data-nav="cv" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
-      <FileText class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">CV</span>
-    </a>
-    <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors">
-      <Search class="h-[18px] w-[18px] flex-shrink-0 [&_path]:!fill-none [&_path]:!stroke-current" /> <span class="truncate sidebar-label">Search chats</span>
-    </button>
-  </div>
-
-  <div class="mx-3 my-1.5 h-px bg-white/[0.06] sidebar-label"></div>
-
-  <div data-sidebar-sections class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5 bg-black">
-    <PinnedSection items={data.pinned} />
-    <RecentsSection items={data.recents} />
-  </div>
-
-  <div class="mt-auto border-t border-white/[0.06] bg-black sidebar-profile-separator">
-    <div class="px-2 py-1.5">
-      <button id="clear-chats-btn" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors"><Trash2 class="h-[18px] w-[18px] flex-shrink-0" /><span class="truncate sidebar-label">Clear chats</span></button>
-    </div>
-    <div class="px-2 py-2 pb-3" data-user-section>
-      <button class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#141414] transition-colors">
-        <div class="h-7 w-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-white">F</div>
-        <span class="truncate flex-1 text-left text-[13px] text-zinc-200 sidebar-label">Fadlan K. Noer</span>
-        <ChevronDown class="h-4 w-4 text-zinc-500 flex-shrink-0 sidebar-label" />
+    <div class="px-2.5 pb-2 space-y-0.5 bg-black">
+      <button id="new-chat-btn" type="button" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors active:scale-[.97]">
+        <SquarePen class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
+      </button>
+      <a href="/library" data-nav="library" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
+        <LibraryIcon class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Library</span>
+      </a>
+      <a href="/projects" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
+        <FolderIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Projects</span>
+      </a>
+      <button class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors">
+        <Search class="h-[18px] w-[18px] flex-shrink-0 [&_path]:!fill-none [&_path]:!stroke-current" /> <span class="truncate sidebar-label">Search chats</span>
       </button>
     </div>
-  </div>
-</aside>
+
+    <div class="mx-3 my-1.5 h-px bg-white/[0.06] sidebar-label"></div>
+
+    <div data-sidebar-sections class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5 bg-black">
+      <PinnedSection items={data.pinned} />
+      <RecentsSection items={data.recents} />
+    </div>
+
+    <div class="mt-auto border-t border-white/[0.06] bg-black sidebar-profile-separator">
+      <div class="px-2 py-2 pb-3" data-user-section>
+        <button class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#141414] transition-colors">
+          <div class="h-7 w-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-white">F</div>
+          <span class="truncate flex-1 text-left text-[13px] text-zinc-200 sidebar-label">Fadlan K. Noer</span>
+          <ChevronDown class="h-4 w-4 text-zinc-500 flex-shrink-0 sidebar-label" />
+        </button>
+      </div>
+    </div>
+  </aside>
 
 <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/50 hidden md:hidden"></div>
 
@@ -109,43 +103,38 @@ const data = sidebarData as SidebarData;
   .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%23444'/%3E%3C/svg%3E"); }
   .masonry-grid { column-count: 2; column-gap: 0.5rem; }
   .masonry-item { break-inside: avoid; }
-  
-  /* Collapsed state — DESKTOP ONLY (mobile drawer always full-width with labels) */
+
+  /* Collapsed state — DESKTOP ONLY */
   @media (min-width: 768px) {
-    /* Collapsed: hide entire Pinned + Recents sections — keep quick actions + profile */
     [data-collapsed="true"] [data-sidebar-sections] { display: none !important; }
     [data-collapsed="true"] .sidebar-section-content { display: none !important; }
     [data-collapsed="true"] .group\/section .hover-reveal { display: none !important; }
     [data-collapsed="true"] .sidebar-section-content .sidebar-label { display: none !important; }
     [data-collapsed="true"] .sidebar-section-content svg { display: none !important; }
     [data-collapsed="true"] .sidebar-section-content [data-chevron] { display: none !important; }
-  
+
     /* Quick actions body */
     [data-collapsed="true"] aside > div:nth-child(3) .sidebar-label { display: none !important; }
     [data-collapsed="true"] aside > div:nth-child(3) svg { display: none !important; }
-  
+
     /* Section headers */
     [data-collapsed="true"] .bg-black .group\/section .sidebar-label { display: none !important; }
     [data-collapsed="true"] .bg-black .group\/section svg { display: none !important; }
-  
-    /* Bottom section */
-    [data-collapsed="true"] #clear-chats-btn .sidebar-label,
-    [data-collapsed="true"] #clear-chats-btn svg { display: none !important; }
-  
-    /* User profile area */
+
+    /* Bottom section (profile only — clear-chats removed) */
     [data-collapsed="true"] [data-user-section] .sidebar-label,
     [data-collapsed="true"] [data-user-section] svg { display: none !important; }
-  
+
     /* Header area icons */
     [data-collapsed="true"] aside > div:first-child svg { display: flex !important; }
     [data-collapsed="true"] aside > div:first-child .sidebar-label { display: none !important; }
-  
+
     /* Sidebar clips content when collapsed */
     [data-collapsed="true"] {
       overflow: hidden !important;
     }
   }
-  
+
   /* Mobile overlay */
   [data-mobile-open="false"] + #sidebar-overlay { display: none !important; }
 </style>
@@ -154,12 +143,11 @@ const data = sidebarData as SidebarData;
   const STORAGE_KEY = 'fadlan-chat-history';
   const SIDEBAR_COLLAPSED_KEY = 'fadlan-sidebar-collapsed';
   const SECTIONS_KEY = 'fadlan-sidebar-sections-v2';
-    interface ChatMsg { id: string; question: string; }
-    const sidebar = document.getElementById('sidebar');
+  interface ChatMsg { id: string; question: string; }
+  const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const toggleBtn = document.getElementById('sidebar-toggle');
   const newChatBtn = document.getElementById('new-chat-btn');
-  const clearBtn = document.getElementById('clear-chats-btn');
   const chatListEl = document.getElementById('sidebar-chat-list');
   const emptyEl = document.getElementById('sidebar-empty');
   const sideToggleBtn = document.getElementById('sidebar-side-toggle');
@@ -167,17 +155,17 @@ const data = sidebarData as SidebarData;
   const isMobile = () => window.innerWidth < 768;
   const loadCollapsed = () => { try { return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true'; } catch { return false; } };
   const saveCollapsed = (v: boolean) => { try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(v)); } catch {} };
-    const defaultSections = { pinned: true, recents: true };
-    const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
-    const saveSections = (s: typeof defaultSections) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
+  const defaultSections = { pinned: true, recents: true };
+  const loadSections = () => { try { const raw = localStorage.getItem(SECTIONS_KEY); if (raw) return { ...defaultSections, ...JSON.parse(raw) }; } catch {} return { ...defaultSections }; };
+  const saveSections = (s: typeof defaultSections) => { try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(s)); } catch {} };
   let sectionsState = loadSections();
   function applySections() {
     Object.entries(sectionsState).forEach(([key, open]) => {
-          const content = document.querySelector(`[data-section-content="${key}"]`);
-          const chevron = document.querySelector(`[data-chevron="${key}"]`);
-          if (content) (content as HTMLElement).style.display = open ? '' : 'none';
-          if (chevron) (chevron as HTMLElement).style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
-        });
+      const content = document.querySelector(`[data-section-content="${key}"]`);
+      const chevron = document.querySelector(`[data-chevron="${key}"]`);
+      if (content) (content as HTMLElement).style.display = open ? '' : 'none';
+      if (chevron) (chevron as HTMLElement).style.transform = open ? 'rotate(0deg)' : 'rotate(-90deg)';
+    });
   }
   function applyCollapsed(collapsed: boolean) {
     if (!sidebar) return;
@@ -190,7 +178,7 @@ const data = sidebarData as SidebarData;
     if (!sidebar || !overlay) return;
     sidebar.dataset.mobileOpen = open ? 'true' : 'false';
     overlay.classList.toggle('hidden', !open);
-    if (open) applyImmersiveBorder(); // re-evaluate border when drawer opens
+    if (open) applyImmersiveBorder();
   }
   applyCollapsed(loadCollapsed());
   const RECENTS_COUNT = Number(sidebar?.dataset.recentsCount ?? 0);
@@ -200,13 +188,13 @@ const data = sidebarData as SidebarData;
     if (!bottomBar) return;
     const pinnedOn = sectionsState['pinned'] ?? true;
     const recentsOn = sectionsState['recents'] ?? true;
-    // Border visible only when BOTH sections are open AND combined link count > 17
     const totalItems = PINNED_COUNT + RECENTS_COUNT;
     const showBorder = pinnedOn && recentsOn && totalItems > 17;
     bottomBar.classList.toggle('border-white/0', !showBorder);
     bottomBar.classList.toggle('border-white/[0.06]', showBorder);
   }
   applySections();
+  applyImmersiveBorder(); // invisible by default on page load
   const handleToggle = () => {
     if (isMobile()) {
       applyMobile(sidebar?.dataset.mobileOpen !== 'true');
@@ -220,10 +208,12 @@ const data = sidebarData as SidebarData;
   sideToggleBtn?.addEventListener('click', () => applyMobile(false));
   searchBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('sidebar:search')); document.getElementById('chat-input')?.focus(); });
   overlay?.addEventListener('click', () => applyMobile(false));
-  newChatBtn?.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('chat:clear')); if (isMobile()) applyMobile(false); });
-  clearBtn?.addEventListener('click', () => { try { localStorage.removeItem(STORAGE_KEY); } catch {} window.dispatchEvent(new CustomEvent('chat:clear')); });
+  newChatBtn?.addEventListener('click', () => {
+    if (isMobile()) applyMobile(false);
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    window.location.href = '/';
+  });
   window.addEventListener('resize', () => {
-    // Re-evaluate collapse/label state when crossing mobile↔desktop boundary
     if (isMobile()) {
       document.querySelectorAll('.sidebar-label').forEach((el: Element) => { el.classList.remove('hidden'); });
       applySections();
@@ -262,7 +252,6 @@ const data = sidebarData as SidebarData;
   renderSidebarList();
   window.addEventListener('chat:updated', renderSidebarList);
   window.addEventListener('storage', (e) => { if (e.key === STORAGE_KEY) renderSidebarList(); });
-  // library masonry preserved minimal
   window.addLibraryMedia = (item) => {
     const container = document.querySelector('.masonry-grid'); if (!container) return;
     const div = document.createElement('div');
@@ -276,8 +265,25 @@ const data = sidebarData as SidebarData;
     window.addLibraryMedia?.({ ratio: r, wide, label: `rand-${Date.now().toString().slice(-4)}`, type: wide ? 'wide' : 'image', color: 'from-zinc-800 to-zinc-700' });
   });
   document.getElementById('sync-notion')?.addEventListener('click', async (e: MouseEvent) => {
-      const btn = e.currentTarget as HTMLButtonElement; const orig = btn.textContent ?? ''; btn.textContent='Syncing...';
-      try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); } catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
-    });
+    const btn = e.currentTarget as HTMLButtonElement; const orig = btn.textContent ?? ''; btn.textContent='Syncing...';
+    try { await new Promise(res=>setTimeout(res,800)); btn.textContent='Synced ✓'; setTimeout(()=>btn.textContent=orig,1500); } catch { btn.textContent='Failed'; setTimeout(()=>btn.textContent=orig,1500); }
+  });
   window.toggleSidebar = () => { if (isMobile()) applyMobile(sidebar?.dataset.mobileOpen !== 'true'); };
+
+  // Hero re-entrance stagger after chat clears
+  window.addEventListener('chat:state', (e) => {
+    if (!e.detail?.empty) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    const targets = ['#chat-empty-state h1', '#chat-empty-state p', '#chat-empty-state .chip-btn'];
+    document.querySelectorAll(targets.join(',')).forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(8px)';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.transition = `opacity 320ms cubic-bezier(.25,1,.5,1) ${i * 60}ms, transform 320ms cubic-bezier(.25,1,.5,1) ${i * 60}ms`;
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }));
+    });
+  });
 </script>

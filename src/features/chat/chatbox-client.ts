@@ -42,6 +42,12 @@ const sendIconDefault = document.getElementById('send-icon-default');
 const sendIconActive = document.getElementById('send-icon-active');
 const disclaimer = document.getElementById('disclaimer');
 const diceStatus = document.getElementById('dice-status');
+const cvDropup = document.getElementById('cv-dropup');
+const addBtnMain = document.getElementById('add-btn-main');
+const addBtnIcon = document.getElementById('add-btn-icon');
+let dropupVisible = false;
+
+const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let isRolling = false;
 let diceAudio = null;
 function getDiceAudio() {
@@ -50,6 +56,77 @@ function getDiceAudio() {
     diceAudio.volume = 0.5;
   }
   return diceAudio;
+}
+
+// ── Plus button → dropup ─────────────────────────────────────
+function toggleDropup() {
+  if (prefersReducedMotion) {
+    dropupVisible = !dropupVisible;
+    if (!cvDropup || !addBtnMain) return;
+    cvDropup.classList.toggle('hidden');
+    addBtnMain.setAttribute('aria-expanded', String(dropupVisible));
+    return;
+  }
+
+  dropupVisible = !dropupVisible;
+  if (!cvDropup || !addBtnMain) return;
+
+  if (dropupVisible) {
+    cvDropup.classList.remove('hidden', 'cv-dropup-exit-active');
+    addBtnMain.setAttribute('aria-expanded', 'true');
+    navigator.vibrate?.(5);
+    cvDropup.classList.add('cv-dropup-enter');
+    requestAnimationFrame(() => {
+      cvDropup.classList.remove('cv-dropup-enter');
+      cvDropup.classList.add('cv-dropup-enter-active');
+    });
+    const items = cvDropup.querySelectorAll('[data-dropup-item]');
+    items.forEach((el, i) => {
+      el.classList.add('cv-dropup-item-enter');
+      el.style.transitionDelay = `${i * 35}ms`;
+      setTimeout(() => {
+        el.classList.remove('cv-dropup-item-enter');
+        el.classList.add('cv-dropup-item-enter-active');
+        el.addEventListener('transitionend', () => { el.style.transitionDelay = ''; }, { once: true });
+      }, 10);
+    });
+    setTimeout(() => document.addEventListener('click', handleDropupOutsideClick, { once: true }), 0);
+  } else {
+    closeDropup();
+  }
+}
+
+function closeDropup() {
+  if (!cvDropup || !addBtnMain) return;
+  dropupVisible = false;
+  addBtnMain.setAttribute('aria-expanded', 'false');
+  cvDropup.classList.add('cv-dropup-exit-active');
+  setTimeout(() => {
+    cvDropup.classList.add('hidden');
+    cvDropup.classList.remove('cv-dropup-exit-active', 'cv-dropup-enter-active');
+  }, 110);
+}
+
+function handleDropupOutsideClick(e) {
+  if (!cvDropup || !addBtnMain) return;
+  if (!cvDropup.contains(e.target) && !addBtnMain.contains(e.target)) {
+    closeDropup();
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && dropupVisible) {
+    closeDropup();
+    addBtnMain?.focus();
+  }
+});
+
+// ── Plus button → dropup toggle ──────────────────────────────
+if (addBtnMain) {
+  addBtnMain.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleDropup();
+  });
 }
 
 function generateId() { return `msg_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; }
