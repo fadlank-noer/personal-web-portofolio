@@ -15,6 +15,7 @@ import LibraryIcon from '../../../../public/assets/svgs/library.svg';
 
 import PinnedSection from '../../../components/ui/sidebar/PinnedSection.astro';
 import RecentsSection from '../../../components/ui/sidebar/RecentsSection.astro';
+import CmdKDialog from '../../../components/CmdKDialog.astro';
 
 import sidebarData from '../../../data/sidebar.json';
 import type { SidebarData } from '../../../lib/types/sidebar';
@@ -87,6 +88,8 @@ const data = sidebarData as SidebarData;
       </div>
     </div>
   </aside>
+
+  <CmdKDialog />
 
 <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black/50 hidden md:hidden"></div>
 
