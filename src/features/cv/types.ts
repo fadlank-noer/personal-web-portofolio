@@ -49,6 +49,7 @@ export interface CvProject {
   highlights?: string[];
   github?: string;
   url?: string;
+  image?: string;
   roles?: string[];
   entity?: string;
   type?: string;

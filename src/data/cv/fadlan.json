@@ -200,6 +200,7 @@
       "name": "Prompt Builder",
       "description": "Structured prompt builders for GPT Image 2 and Seedance 2.0 (https://prompt-builder.fadlank.web.id/): fill the fields, then copy the result as a polished prompt.",
       "url": "https://prompt-builder.fadlank.web.id/",
+      "image": "/assets/projects/prompt-builder-preview.png",
       "startDate": "2025-01-01",
       "color": "from-violet-500 to-purple-600",
       "thumb": "PB",

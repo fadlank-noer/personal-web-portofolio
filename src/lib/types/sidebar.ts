@@ -20,8 +20,13 @@ export interface ProjectItem {
   thumb: string;
   url: string;
   featured?: boolean;
-  cover?: boolean;
-  image?: string;
+    cover?: boolean;
+    /**
+     * Optional screenshot/preview image for the project card.
+     * Path is relative to /public/assets/projects/ (e.g. "/assets/projects/prompt-builder-preview.png").
+     * Will be displayed with 1:1 aspect ratio and object-fit: cover.
+     */
+    image?: string;
 }
 
 export type LibraryMediaType = 'image' | 'video' | 'wide' | string;
