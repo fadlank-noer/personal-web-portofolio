@@ -2,68 +2,13 @@
 import "../styles/global.css";
 import LibraryIcon from '../../public/assets/svgs/library.svg';
 import SideToggleMobile from '../../public/assets/svgs/side-toggle-mobile.svg';
-import photoInBoat from '../../public/assets/images/photo-in-boat.png';
-import photoInStudio from '../../public/assets/images/photo-in-studio.png';
 import Sidebar from "../features/sidebar/components/Sidebar.astro";
 import LinkConfirmationModal from "../components/ui/chat/LinkConfirmationModal.astro";
 import Head from "../layouts/Head.astro";
-import sidebarData from '../data/sidebar.json';
-import type { LibraryItem } from '../lib/types/sidebar';
+import { libraryItems } from '../data/library';
 
-// Images moved to public/assets/images — use explicit imports for reliable URL resolution
-const imageFiles = [
-  { path: photoInStudio.src, filename: 'photo-in-studio.png' },
-  { path: photoInBoat.src, filename: 'photo-in-boat.png' },
-];
-
-// Build library items with proper URLs
-const library: LibraryItem[] = imageFiles
-  .map((img, index) => {
-    const imageUrl = img.path;
-    const filename = img.filename;
-
-    // Generate a consistent color based on index
-    const colors = [
-      'from-zinc-800 to-zinc-700',
-      'from-indigo-950 to-zinc-800',
-      'from-violet-900/40 to-zinc-800',
-      'from-emerald-950 to-zinc-800',
-      'from-rose-950 to-zinc-800',
-      'from-amber-950 to-zinc-800',
-      'from-cyan-950 to-zinc-800',
-      'from-purple-950 to-zinc-800',
-    ];
-    const color = colors[index % colors.length];
-
-    // Random aspect ratios for visual variety in masonry
-    const ratios = [
-      'aspect-[4/3]',
-      'aspect-[3/4]',
-      'aspect-square',
-      'aspect-[16/10]',
-      'aspect-[2/3]',
-      'aspect-[3/2]',
-      'aspect-[5/4]',
-    ];
-    const ratio = ratios[index % ratios.length];
-
-    // Label: just the filename (no subfolder structure in public/)
-    const label = filename;
-
-    return {
-      id: `img_${index}`,
-      type: 'image' as const,
-      label,
-      ratio,
-      color,
-      wide: index % 7 === 3,
-      src: imageUrl,
-    };
-  });
-
-const imageCount = library.length;
-const librarySource = (sidebarData as unknown as { library?: LibraryItem[] }).library ?? [];
-const videoCount = librarySource.filter(i => i.type === 'video').length;
+// libraryItems imported from src/data/library.ts
+const imageCount = libraryItems.filter(i => i.type === 'image').length;
 ---
 
 <html lang="en">
@@ -90,54 +35,51 @@ const videoCount = librarySource.filter(i => i.type === 'video').length;
             <h1 class="text-[15px] font-[700] tracking-[-0.02em] text-white">Library</h1>
             <div class="ml-1 flex items-center gap-1.5">
               <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} images
-              </span>
-              <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><path d="M7.5 6.5l3 2-3 2V6.5z" fill="currentColor"/></svg>{videoCount} videos
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} {imageCount === 1 ? 'item' : 'items'}
               </span>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button class="flex h-8 w-8 md:w-auto md:gap-1.5 items-center justify-center rounded-full bg-[#1a1a1a] hover:bg-[#2a2a2a] md:px-3.5 text-[13px] border border-white/[0.06] text-zinc-400 hover:text-white transition-colors"><span class="hidden md:inline">Search</span><span class="md:hidden text-[14px]">⌕</span></button>
-            <button class="flex h-8 w-8 items-center justify-center rounded-full bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-white/[0.06] transition-colors text-zinc-400 hover:text-white" aria-label="More options">...</button>
-            <button class="hidden md:flex h-8 items-center gap-1.5 rounded-full bg-violet-600 text-white px-3.5 text-[13px] font-[600] hover:bg-violet-700 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4.5v11M4.5 10h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              Edit
-            </button>
+            <!-- reserved for future controls -->
           </div>
         </div>
 
-        <div class="mx-auto w-full max-w-[1280px] px-3 py-4 md:px-6 md:py-8">
+        <div class="w-full px-3 py-4 md:px-6 md:py-8">
           <!-- Masonry grid -->
-          <div class="masonry-grid columns-2 md:columns-3 lg:columns-4 column-gap-3 space-y-3">
-            {library.map((item) => (
-              <div class={`masonry-item break-inside-avoid relative w-full overflow-hidden rounded-[12px] border border-white/[0.06] ${item.color} ${item.ratio} group cursor-pointer hover:border-white/[0.12] hover:-translate-y-[1px] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)] transition-all duration-200`}>
-                {/* Actual image */}
-                <img 
-                  src={item.src} 
+          <div class="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3">
+            {libraryItems.map((item, index) => (
+              <a
+                href={item.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                class={`group relative block w-full overflow-hidden rounded-xl border border-white/[0.06] bg-zinc-900 transition-all duration-300 ease-out hover:border-white/[0.16] hover:shadow-[0_12px_40px_-12px_rgba(139,92,246,0.25)] hover:-translate-y-0.5 focus-visible:border-violet-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40 break-inside-avoid mb-3${index >= 9 ? ' library-hidden-item' : ''}`}
+              >
+                <img
+                  src={item.src}
                   alt={item.label}
-                  class="absolute inset-0 w-full h-full object-cover"
+                  class="block w-full h-auto object-cover"
                   loading="lazy"
+                  decoding="async"
                 />
-                <!-- type badge -->
-                <div class="absolute left-2 top-2 z-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/[0.1] px-1.5 py-0.5">
+                <div class="absolute left-2 top-2 z-10 rounded-full bg-black/60 backdrop-blur-sm border border-white/[0.1] px-1.5 py-0.5">
                   <span class="text-[9px] font-[500] uppercase tracking-wide text-white/70">{item.type}</span>
                 </div>
-                <!-- label -->
                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
                   <span class="block truncate rounded bg-black/40 px-1.5 py-0.5 text-[10px] text-white/80 backdrop-blur-sm">{item.label}</span>
                 </div>
-                <!-- hover overlay -->
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <span class="rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-1.5 text-[11px] font-[500] text-white/90">View</span>
+                <div class="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                  <span class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-medium text-white/90">View</span>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
 
           <!-- Load more -->
-          <div class="mt-8 flex justify-center">
-            <button class="flex items-center gap-2 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-4 py-2 text-[13px] text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors">
+          <div id="load-more-wrapper" class="mt-8 flex justify-center hidden">
+            <button
+              id="load-more-btn"
+              class="flex items-center gap-2 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-4 py-2 text-[13px] text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 5v10M5 10l5 5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               Load more
             </button>
@@ -149,7 +91,7 @@ const videoCount = librarySource.filter(i => i.type === 'video').length;
 </html>
 
 <script>
-  // Mobile sidebar toggle
+  // ── Mobile sidebar toggle ──────────────────────────────────────────
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const toggle = document.getElementById('mobile-sidebar-toggle');
@@ -171,6 +113,19 @@ const videoCount = librarySource.filter(i => i.type === 'video').length;
       overlay.classList.add('hidden');
     }
   });
+
+  // ── Load more: show-all reveal (gated > 9 items) ──────────────────
+  const wrapper = document.getElementById('load-more-wrapper');
+  const btn = document.getElementById('load-more-btn');
+  const hiddenItems = document.querySelectorAll('.library-hidden-item');
+
+  if (wrapper && btn && hiddenItems.length > 0) {
+    wrapper.classList.remove('hidden');
+    btn.addEventListener('click', () => {
+      hiddenItems.forEach((el) => el.classList.remove('library-hidden-item'));
+      wrapper.classList.add('hidden');
+    });
+  }
 </script>
 
 <style>
