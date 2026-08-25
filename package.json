@@ -8,7 +8,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "deploy": "npm run build && npx wrangler pages deploy dist --project-name=personal-web-portfolio"
+    "deploy": "npm run build && npx wrangler pages deploy dist --project-name=personal-web-portofolio"
   },
   "dependencies": {
     "@lucide/astro": "^1.25.0",
