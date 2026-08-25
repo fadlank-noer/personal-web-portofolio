@@ -12,8 +12,10 @@ import type { ProjectItem } from '../lib/types/sidebar';
 
 export type { ProjectItem };
 
-const projects = (cvData.projects ?? []).map((p: any) => ({
+const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
   ...p,
+  id: p.id ?? p.name ?? `project-${i}`,
+  title: p.title ?? p.name ?? '',
   desc: p.desc ?? p.description ?? '',
 })) as ProjectItem[];
 ---
@@ -30,16 +32,16 @@ const projects = (cvData.projects ?? []).map((p: any) => ({
 
       <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
         <!-- Top bar -->
-        <div class="sticky top-0 z-10 flex h-[52px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 md:px-6 backdrop-blur">
+        <div class="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 py-3 md:px-6 md:py-4 backdrop-blur">
           <div class="flex items-center gap-2">
             <!-- Mobile sidebar toggle -->
-            <button id="mobile-sidebar-toggle" class="flex md:hidden h-9 w-9 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
+            <button id="mobile-sidebar-toggle" class="flex md:hidden h-10 w-10 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
               <SideToggleMobile class="h-[22px] w-[22px] text-white" />
             </button>
-            <span class="hidden md:flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
-              <FolderIcon class="h-[18px] w-[18px] text-violet-500 [&_path]:!stroke-current" />
+            <span class="hidden md:flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
+              <FolderIcon class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
             </span>
-            <h1 class="text-[15px] font-[700] tracking-[-0.02em] text-white">Projects</h1>
+            <h1 class="text-[16px] font-[700] tracking-[-0.02em] text-white">Projects</h1>
             <span class="ml-1 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">{projects.length} projects</span>
           </div>
         </div>

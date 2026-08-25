@@ -178,39 +178,90 @@
     }
   ],
   "projects": [
-    {
-      "name": "Laundry Landing Page",
-      "client": "LaundryPro",
-      "description": "Landing page for a laundry service business (https://laundry.fadlank.web.id/): showcasing services, pricing, and contact with smooth animations.",
-      "url": "https://laundry.fadlank.web.id/",
-      "startDate": "2024-01-01",
-      "category": "Web Design",
-      "color": "from-emerald-500 to-teal-600",
-      "thumb": "LL",
-      "count": 3,
-      "cover": true,
-      "image": "/assets/projects/laundry-preview.png",
-      "highlights": [
-        "Built a compelling landing page with smooth scroll animations using GSAP to showcase laundry services and drive customer inquiries.",
-        "Implemented responsive layouts and interactive pricing tables for different service tiers.",
-        "Stack: SvelteKit, Svelte 5, TypeScript, Tailwind CSS v4, GSAP, Lucide Icons, Cloudflare."
-      ]
-    },
-    {
-      "name": "Prompt Builder",
-      "description": "Structured prompt builders for GPT Image 2 and Seedance 2.0 (https://prompt-builder.fadlank.web.id/): fill the fields, then copy the result as a polished prompt.",
-      "url": "https://prompt-builder.fadlank.web.id/",
-      "image": "/assets/projects/prompt-builder-preview.png",
-      "startDate": "2025-01-01",
-      "color": "from-violet-500 to-purple-600",
-      "thumb": "PB",
-      "count": 3,
-      "highlights": [
-        "Users struggled with prompt syntax across AI image models: built structured web forms with real-time preview and one-click copy, reducing prompt crafting time.",
-        "Supporting GPT Image 2 and Seedance 2.0 with field categories, syntax hints, and copy-to-clipboard for fast workflow.",
-        "Stack: Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Cloudflare Workers."
-      ]
-    }
+      {
+          "name": "Laundry Landing Page",
+          "client": "LaundryPro",
+          "description": "Landing page for a laundry service business (https://laundry.fadlank.web.id/): showcasing services, pricing, and contact with smooth animations.",
+          "url": "https://laundry.fadlank.web.id/",
+          "startDate": "2024-01-01",
+          "category": "Web Design",
+          "color": "from-emerald-500 to-teal-600",
+          "thumb": "LL",
+          "count": 3,
+          "cover": true,
+          "image": "/assets/projects/laundry-preview.png",
+          "highlights": [
+            "Built a compelling landing page with smooth scroll animations using GSAP to showcase laundry services and drive customer inquiries.",
+            "Implemented responsive layouts and interactive pricing tables for different service tiers.",
+            "Stack: SvelteKit, Svelte 5, TypeScript, Tailwind CSS v4, GSAP, Lucide Icons, Cloudflare."
+          ]
+      },
+      {
+        "name": "Prompt Builder",
+        "description": "Structured prompt builders for GPT Image 2 and Seedance 2.0 (https://prompt-builder.fadlank.web.id/): fill the fields, then copy the result as a polished prompt.",
+        "url": "https://prompt-builder.fadlank.web.id/",
+        "image": "/assets/projects/prompt-builder-preview.png",
+        "startDate": "2025-01-01",
+        "color": "from-violet-500 to-purple-600",
+        "thumb": "PB",
+        "count": 3,
+        "highlights": [
+          "Users struggled with prompt syntax across AI image models: built structured web forms with real-time preview and one-click copy, reducing prompt crafting time.",
+          "Supporting GPT Image 2 and Seedance 2.0 with field categories, syntax hints, and copy-to-clipboard for fast workflow.",
+          "Stack: Next.js 16, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Cloudflare Workers."
+        ]
+      },
+      {
+        "name": "EXPlan Gaming",
+        "description": "YouTube gaming channel where I share live gameplays, monster hunting adventures, and gaming reactions — from Monster Hunter to indie horror games. @explan-vibing.",
+        "url": "https://www.youtube.com/@explan-vibing",
+        "startDate": "2024-01-01",
+        "category": "Gaming",
+        "color": "from-red-500 to-orange-600",
+        "thumb": "XG",
+        "count": 145,
+        "cover": true,
+        "image": "/assets/projects/explan-gaming-preview.png",
+        "highlights": [
+          "YouTube gaming channel with 50+ subscribers and 145+ videos.",
+          "Live streaming archive featuring Monster Hunter, indie horror, and multiplayer sessions.",
+          "Stack: OBS, YouTube Live, gaming peripherals."
+        ]
+      },
+      {
+        "name": "@exp.lan",
+        "description": "TikTok content page where I talk about pop culture — reactions, opinions, and commentary on what's trending. Disini tempat saya NGOMONG.",
+        "url": "https://www.tiktok.com/@exp.lan",
+        "startDate": "2024-06-01",
+        "category": "Content",
+        "color": "from-cyan-500 to-blue-600",
+        "thumb": "EL",
+        "count": 569,
+        "cover": true,
+        "image": "/assets/projects/exp-lan-preview.png",
+        "highlights": [
+          "TikTok pop culture content page with 29 followers and 569 total likes.",
+          "Covers reactions, commentary, and trending topics in Indonesian.",
+          "Stack: TikTok, video editing, content creation."
+        ]
+      },
+      {
+        "name": "@mochicimmi",
+        "description": "TikTok page dedicated to Mochi & Cimmi — two cats with different personalities. Daily chaos, funny moments, and cat content. 2 kucing, 2 kepribadian.",
+        "url": "https://www.tiktok.com/@mochicimmi",
+        "startDate": "2025-01-01",
+        "category": "Pet Content",
+        "color": "from-pink-500 to-rose-600",
+        "thumb": "MC",
+        "count": 369,
+        "cover": true,
+        "image": "/assets/projects/mochicimmi-preview.png",
+        "highlights": [
+          "TikTok pet content page for Mochi (orange) and Cimmi (calico/white) with 11 followers and 369 total likes.",
+          "Daily cat chaos, funny moments, and personality showcases.",
+          "Stack: TikTok, video editing, pet content creation."
+        ]
+      }
   ],
   "meta": {
     "draft": false
