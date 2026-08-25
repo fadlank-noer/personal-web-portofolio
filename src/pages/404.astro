@@ -1,42 +1,66 @@
 ---
 Astro.response.status = 404;
-import "../styles/global.css";
-import Head from "../layouts/Head.astro";
+import "src/styles/global.css";
+import Head from "src/layouts/Head.astro";
+import sidebarData from "../data/sidebar.json";
+import socialsData from "../data/socials.json";
 
-// Top groups: flowing prompts above 404, anchored to top via space-between
-const top = [
-  [
-    "Champions League top scorers",
-    "Erstelle einen Content-Kalender für TikTok",
-    "챔피언스리그 하이라이트",
-    "बरसात में मजेदार चीजें",
-    "Buenos sitios con mesas al aire libre",
-  ],
-  [
-    "How come orange juice prices dropped?",
-    "Aide-moi à rédiger un e-mail de suivi",
-    "Erstelle eine Morgenroutine",
-    "Escribe un mensaje para invitar a María",
-    "インドネシアのバティックの歴史",
-  ],
-  [
-    "Membuat kalender konten TikTok",
-    "휴대폰 사진 복구 방법",
-    "Ayúdame a redactar correo de seguimiento",
-    "Planifier un voyage au Japon",
-    "Write a follow-up email after interview",
-  ],
+// TypeScript interfaces
+interface SidebarItem {
+  id: string; title: string; time?: string; tag?: string;
+  url?: string; source?: string; meta?: string; icon?: string; type?: string;
+}
+interface SocialItem {
+  id: string; platform: string; displayName: string; handle: string;
+  url: string; icon: string; description: string; stats: string; category: string;
+}
+interface MarqueeItem { label: string; href: string; }
+interface MarqueeRow { items: MarqueeItem[]; }
+
+// Hardcoded portfolio keywords (fill sparse pinned/recents)
+const hardcodedKeywords: MarqueeItem[] = [
+  { label: "Fadlan Noer — Fullstack Engineer", href: "/" },
+  { label: "Astro + Tailwind + nanostores", href: "/" },
+  { label: "Best AI Product Engineer", href: "/" },
+  { label: "Jakarta Selatan — Remote okay", href: "/" },
+  { label: "Build fast ↗", href: "/" },
+  { label: "Portfolio 2026", href: "/" },
+  { label: "Strong backend di Jagakarsa", href: "/" },
+  { label: "Develop · Design · Deploy", href: "/" },
 ];
 
-// Bottom groups: portfolio keywords, anchored to bottom via space-between
-const bottom = [
-  ["Fadlan — Fullstack Engineer Jakarta", "Develop • Design • Deploy", "Astro • Tailwind • nanostores", "Portfolio 2026", "Build fast ↗"],
-  ["What are your skills?", "What projects have you built?", "Bagaimana hubungi Fadlan?", "Experience timeline", "/about /projects /contact"],
-  ["Über mich — Projekte", "Mon expérience — projets", "포트폴리오 프로젝트", "UI/UX • Frontend • Product", "Jakarta Selatan — Remote okay"],
+// Helper: convert sidebar items to MarqueeItem
+const sidebarToItems = (items: SidebarItem[]): MarqueeItem[] =>
+  items.map((item) => ({
+    label: item.icon ? `${item.icon} ${item.title}` : `#${item.tag ?? ""} ${item.title}`,
+    href: item.meta ?? item.url ?? "/",
+  }));
+
+// Helper: convert social entries to MarqueeItem
+const socialsToItems = (items: SocialItem[]): MarqueeItem[] =>
+  items.map((item) => ({
+    label: `${item.platform} · ${item.handle}`,
+    href: item.url,
+  }));
+
+// Build 6-row marquee structure
+const dataRows: MarqueeRow[] = [
+  // Row 1: pinned items (supplemented with hardcoded keywords if sparse)
+  { items: (sidebarData.pinned.length > 0 ? sidebarToItems(sidebarData.pinned) : []).concat(hardcodedKeywords.slice(0, 4)) },
+  // Row 2: recent items (supplemented with hardcoded keywords if sparse)
+  { items: (sidebarData.recents.length > 0 ? sidebarToItems(sidebarData.recents) : []).concat(hardcodedKeywords.slice(4)) },
+  // Rows 3-4: social media entries (3 per row)
+  { items: socialsToItems(socialsData.slice(0, 3)) },
+  { items: socialsToItems(socialsData.slice(3)) },
+  // Rows 5-6: social media cycle (all 5, rotated) so rows stay content-rich
+  { items: socialsToItems([...socialsData.slice(0, 2), ...socialsData.slice(3), socialsData[2]]) },
+  { items: socialsToItems([...socialsData.slice(2), ...socialsData.slice(0, 2)]) },
 ];
 
-// Triple for seamless marquee loop
-const x3 = (a: string[]) => [...a, ...a, ...a];
+// Duplicate each row's items 6x so the track always exceeds viewport width
+// (prevents "bolong" gaps when a row's base content is narrower than 100vw).
+// 6 identical sets → animate -16.666% (one set) for a seamless loop.
+const x3 = <T,>(a: T[]): T[] => [...a, ...a, ...a, ...a, ...a, ...a];
 ---
 
 <html lang="en">
@@ -44,7 +68,7 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <Head />
-    <title>404 — Page not found | FadlanGPT</title>
+    <title>404 — Page not found | fadlank.web.id</title>
     <meta name="robots" content="noindex" />
   </head>
 
@@ -52,271 +76,81 @@ const x3 = (a: string[]) => [...a, ...a, ...a];
     <main
       class="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-[#050505] selection:bg-white selection:text-black"
     >
-      <!-- =======================================================
-           Background grid + vignette
-           ======================================================= -->
-      <div class="pointer-events-none absolute inset-0 z-0">
-          <!-- Radial vignette: adds depth on large screens without a grid -->
-          <div
-            class="absolute inset-0"
-            style="background: radial-gradient(ellipse 80% 50% at 50% 50%, rgba(40,40,40,0.15) 0%, transparent 70%);"
-          ></div>
-          <!-- Subtle top/bottom fade for card fade-out -->
-          <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-40"></div>
-        </div>
 
       <!-- =======================================================
-           Marquees — space-between: top = max top, bottom = max bottom
-           This ensures 404 text is truly centered (main is justify-center)
+           Ambient aurora background (ChatGPT-like glow)
            ======================================================= -->
-      <div
-        class="pointer-events-none absolute inset-0 z-[1] flex h-full w-full flex-col justify-between overflow-hidden select-none py-3 md:py-4"
-        style="perspective: 600px; perspective-origin: 50% 50%;"
-      >
-        <!-- Fade masks for left/right edges -->
-        <div class="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-black to-transparent">
-        </div>
-        <div class="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20 bg-gradient-to-t from-black to-transparent">
-        </div>
-        <div
-          class="pointer-events-none absolute inset-0 z-10"
-          style="mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,black 7%,black 93%,transparent)"
-        >
-        </div>
-
-        <!-- TOP: ceiling fan — perspective tilt + slow right drift -->
-        <div class="flex shrink-0 flex-col gap-2.5 pt-1 md:gap-3">
-          {top.map((row, i) => (
-            <div class="relative w-full overflow-hidden">
-              <div class={`persp-top drift-right flex w-max gap-2.5 d${[45, 55, 48][i]}`}>
-                {x3(row).map((t) => (
-                  <a href="#" class="box">
-                    <span class="truncate">{t}</span>
-                    <span class="ico">↗</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <!-- BOTTOM: floor fan — perspective tilt + slow left drift -->
-        <div class="flex shrink-0 flex-col gap-2.5 pb-1 md:gap-3">
-          {bottom.map((row, i) => (
-            <div class="relative w-full overflow-hidden">
-              <div class={`persp-bottom drift-left flex w-max gap-2.5 d${[38, 55, 44][i]}`}>
-                {x3(row).map((t) => (
-                  <a href="#" class="box">
-                    <span class="truncate">{t}</span>
-                    <span class="ico">↗</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+      <div class="aurora" aria-hidden="true">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+        <span class="blob blob-3"></span>
       </div>
 
       <!-- =======================================================
-           Center — 404: true center because main justify-center + marquees absolute
+           Layout: marquee rows (flow) above + below 404, space-between
            ======================================================= -->
-      <div class="relative z-20 flex w-full flex-col items-center px-4 py-10 text-center md:px-6">
-        <div class="in flex flex-col items-center">
-          <h1
-            class="t404 select-none font-[800] leading-[0.85] tracking-[-0.08em] text-white"
-          >
+      <div class="relative z-[1] flex min-h-dvh w-full flex-col justify-between overflow-hidden">
+
+        <!-- Top marquee rows (rows 0-2) -->
+        <div class="flex flex-col gap-3 overflow-hidden py-4 select-none">
+          {dataRows.slice(0, 3).map((row, i) => {
+            const isLeft = i % 2 === 0;
+            const speeds = ["spd-42", "spd-48", "spd-38"];
+            return (
+              <div class="relative w-full overflow-hidden">
+                <div class={`marquee-row ${isLeft ? "anim-left" : "anim-right"} ${speeds[i]} gap-4`}>
+                  {x3(row.items).map((item) => (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" class="box">
+                      <span class="truncate">{item.label}</span>
+                      <span class="ico">↗</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <!-- Center 404 — immersive, GPT-like -->
+        <div class="center-in relative z-[1] flex w-full flex-col items-center justify-center px-4 text-center">
+          <div class="center-glow" aria-hidden="true"></div>
+          <span class="eyebrow">This page took a detour</span>
+          <h1 class="t404 select-none font-extrabold tracking-tight text-white">
             404
           </h1>
-
-          <p class="mt-4 text-[18px] font-medium tracking-tight text-white md:text-[20px] md:font-semibold">
-            Page not found
+          <p class="sub">
+            The page you're looking for doesn't exist but me exist in home.
           </p>
+          <a
+            href="/"
+            class="cta-btn mt-9 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-400/40 bg-gradient-to-b from-zinc-700 to-zinc-800 px-8 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-black/40 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300/70 hover:from-emerald-500/80 hover:to-emerald-600/80 hover:shadow-[0_10px_30px_rgba(16,163,127,0.45)] active:scale-[0.98]"
+          >
+            Back to Home
+            <span class="text-base leading-none">↗</span>
+          </a>
+        </div>
 
-          <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="/"
-              class="rounded-full border border-white/20 bg-white/[0.07] px-6 py-2.5 text-[14px] font-semibold text-zinc-100 backdrop-blur-sm hover:bg-white/[0.12] active:scale-[0.98] md:px-7 md:py-[11px] md:text-[15px]"
-              style="@supports not (backdrop-filter: blur(1px)) { background: rgba(255,255,255,0.12); }"
-            >
-              Back to Home
-            </a>
-
-            <button
-              id="back"
-              class="rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-[14px] font-medium text-zinc-400 hover:border-white/20 hover:text-zinc-200 active:scale-[0.98] md:px-7 md:py-[11px]"
-            >
-              Go Back
-            </button>
-          </div>
-
-          <p class="mt-6 max-w-[28ch] text-balance text-[12px] leading-5 text-zinc-500 md:text-[13px]">
-            <span
-              id="url-path"
-              class="rounded border border-white/10 bg-white/[0.06] px-1.5 py-0.5 font-mono text-zinc-400"
-            >
-              {Astro.url.pathname}
-            </span>
-            {" "}doesn't exist.
-          </p>
+        <!-- Bottom marquee rows (rows 3-5) -->
+        <div class="flex flex-col gap-3 overflow-hidden py-4 select-none">
+          {dataRows.slice(3).map((row, i) => {
+            const isLeft = (i + 3) % 2 === 0;
+            const speeds = ["spd-55", "spd-44", "spd-60"];
+            return (
+              <div class="relative w-full overflow-hidden">
+                <div class={`marquee-row ${isLeft ? "anim-left" : "anim-right"} ${speeds[i]} gap-4`}>
+                  {x3(row.items).map((item) => (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" class="box">
+                      <span class="truncate">{item.label}</span>
+                      <span class="ico">↗</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <!-- =======================================================
-           Styles
-           ======================================================= -->
-      <style>
-        /* 404 title responsive */
-        .t404 {
-          font-size: clamp(84px, 28vw, 200px);
-          font-weight: 800;
-          line-height: 0.85;
-          letter-spacing: -0.08em;
-          text-rendering: geometricPrecision;
-        }
-
-        /* Entry animation */
-        .in {
-          animation: in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-        @keyframes in {
-          from {
-            opacity: 0;
-            transform: translateY(16px) scale(0.98);
-            filter: blur(8px);
-          }
-          to {
-            opacity: 1;
-            transform: none;
-            filter: none;
-          }
-        }
-
-        /* CARD: glassmorphism — semi-transparent grey, light border, luminous */
-        .box {
-          display: inline-flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 10px;
-          min-width: 200px;
-          max-width: min(420px, 78vw);
-          padding: 11px 14px 11px 16px;
-          border-radius: 14px;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          background: rgba(255, 255, 255, 0.07);
-          color: #d4d4d4;
-          font-size: 13px;
-          font-weight: 400;
-          line-height: 1.35;
-          white-space: nowrap;
-          backdrop-filter: blur(4px);
-          -webkit-backdrop-filter: blur(4px);
-          box-shadow:
-            0 2px 8px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        }
-        @supports not (backdrop-filter: blur(1px)) {
-          .box {
-            background: rgba(255, 255, 255, 0.12);
-          }
-        }
-        .ico {
-          display: flex;
-          flex-shrink: 0;
-          height: 20px;
-          width: 20px;
-          align-items: center;
-          justify-content: center;
-          border-radius: 9999px;
-          background: rgba(255, 255, 255, 0.12);
-          color: #d4d4d4;
-          font-size: 12px;
-          font-weight: 600;
-          line-height: 1;
-        }
-
-        /* Perspective grid — ceiling (top) fans up, floor (bottom) fans down */
-        .persp-top {
-          transform: rotateX(-32deg);
-          transform-origin: center bottom;
-        }
-        .persp-bottom {
-          transform: rotateX(32deg);
-          transform-origin: center top;
-        }
-
-        /* Seamless slow drift — content is tripled (x3) so -33.333% = exactly one loop */
-        .drift-right {
-          animation-name: drift-right;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          will-change: transform;
-        }
-        .drift-left {
-          animation-name: drift-left;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          will-change: transform;
-        }
-
-        @keyframes drift-right {
-          0%   { transform: rotateX(-32deg) translateX(0); }
-          100% { transform: rotateX(-32deg) translateX(-33.333%); }
-        }
-        @keyframes drift-left {
-          0%   { transform: rotateX(32deg) translateX(-33.333%); }
-          100% { transform: rotateX(32deg) translateX(0); }
-        }
-
-        /* Per-row speeds — all referenced classes defined (was missing d38/d44/d48) */
-        .d38 { animation-duration: 26s; }
-        .d44 { animation-duration: 30s; }
-        .d45 { animation-duration: 32s; }
-        .d48 { animation-duration: 35s; }
-        .d55 { animation-duration: 40s; }
-
-        @media (max-width: 768px) {
-          .box {
-            min-width: 160px;
-            max-width: 70vw;
-            padding: 10px 12px 10px 14px;
-            font-size: 12px;
-            border-radius: 12px;
-          }
-          .t404 {
-            font-size: clamp(72px, 26vw, 140px);
-          }
-          /* Clamp perspective tilt on mobile — prevent off-screen content */
-          .persp-top { transform: rotateX(-20deg); }
-          .persp-bottom { transform: rotateX(20deg); }
-          .drift-right, .drift-left { animation: none; }
-          .d45 { animation-duration: 28s; }
-          .d55 { animation-duration: 32s; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .in { animation: none; }
-          .persp-top, .persp-bottom { transform: none; }
-          .drift-right, .drift-left { animation: none; }
-        }
-      </style>
     </main>
-
-    <!-- Capture real pathname client-side (static build bakes /404/ at build time) -->
-    <script define:vars={{ currentPath: Astro.url.pathname }}>
-      // Fix: update the URL display span with the real client-side pathname
-      const urlSpan = document.getElementById("url-path");
-      if (urlSpan) {
-        urlSpan.textContent = currentPath;
-      }
-      // Back button logic
-      document.getElementById("back")?.addEventListener("click", (e) => {
-        e.preventDefault();
-        if (history.length > 1) {
-          history.back();
-        } else {
-          location.href = "/";
-        }
-      });
-    </script>
   </body>
 </html>
