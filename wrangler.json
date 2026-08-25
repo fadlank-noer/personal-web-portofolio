@@ -2,11 +2,5 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "personal-web-portfolio",
   "compatibility_date": "2026-08-24",
-  "pages_config": {
-    "project_name": "personal-web-portfolio",
-    "branch": "main"
-  },
-  "assets": {
-    "directory": "./dist"
-  }
+  "pages_build_output_dir": "dist"
 }
