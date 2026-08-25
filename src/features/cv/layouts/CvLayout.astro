@@ -1,0 +1,126 @@
+---
+import "@/styles/global.css";
+import faviconIco from '../../../../public/assets/favicon/favicon.ico';
+import favicon16 from '../../../../public/assets/favicon/favicon-16x16.png';
+import favicon32 from '../../../../public/assets/favicon/favicon-32x32.png';
+import appleTouchIcon from '../../../../public/assets/favicon/apple-touch-icon.png';
+import logoLightUrl from '../../../../public/assets/logo-v2-light.webp';
+
+import type { CvData } from "../types";
+
+interface Props {
+  cv: CvData;
+  slug: string;
+}
+
+const { cv, slug } = Astro.props;
+
+const SITE_URL = "https://fadlank.web.id";
+const cvPath = slug && slug !== "fadlan" ? `/cv/${slug}` : "/cv";
+const canonical = `${SITE_URL}${cvPath}`;
+const ogImage = `${SITE_URL}${logoLightUrl}`;
+
+// JSON-LD — ProfilePage -> about: Person (Google-documented pattern; Resume is non-standard).
+// Omits telephone per E2. Escapes '<' as \u003c to prevent </script> breakout (E3).
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  mainEntity: {
+    "@type": "Person",
+    name: cv.basics.name,
+    email: cv.basics.email,
+    jobTitle: cv.basics.label,
+    url: SITE_URL,
+    sameAs: (cv.basics.profiles ?? []).map((p) => p.url),
+  },
+};
+const jsonLdString = JSON.stringify(jsonLd).replaceAll("<", "\\u003c");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>{cv.basics.name} — CV</title>
+    <meta name="description" content={cv.basics.summary ?? `${cv.basics.name} — CV`} />
+    <meta name="author" content={cv.basics.name} />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={`${cv.basics.name} — CV`} />
+    <meta property="og:description" content={cv.basics.summary ?? `${cv.basics.name} — CV`} />
+    <meta property="og:type" content="profile" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${cv.basics.name} — CV`} />
+    <meta name="twitter:description" content={cv.basics.summary ?? `${cv.basics.name} — CV`} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href={faviconIco} />
+    <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src} />
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+    <link rel="apple-touch-icon" href={appleTouchIcon.src} />
+
+    <link rel="canonical" href={canonical} />
+
+    <script type="application/ld+json" set:html={jsonLdString} />
+  </head>
+  <body class="!bg-white !text-black antialiased">
+    <!-- Minimal viewer bar: back to chat + download -->
+    <div
+      data-cv-bar
+      class="sticky top-0 z-10 flex h-12 items-center justify-between border-b border-black/10 bg-white/90 px-4 backdrop-blur md:px-6"
+    >
+      <a
+        href="/"
+        class="text-[13px] font-[500] text-zinc-600 transition-colors hover:text-black"
+      >
+        ← Back to chat
+      </a>
+      <button
+        id="cv-download"
+        type="button"
+        class="text-[13px] font-[500] text-zinc-600 transition-colors hover:text-black"
+      >
+        Download PDF
+      </button>
+    </div>
+
+    <div class="mx-auto w-full max-w-[800px] px-4 py-8 md:px-6">
+      <slot />
+    </div>
+
+    <script>
+      document
+        .getElementById("cv-download")
+        ?.addEventListener("click", () => window.print());
+    </script>
+  </body>
+</html>
+
+<style>
+  /* ATS / print-friendly output — force white page, hide chrome */
+  @media print {
+    html,
+    body {
+      background: #fff !important;
+      color: #000 !important;
+    }
+    [data-cv-bar] {
+      display: none !important;
+    }
+    * {
+      box-shadow: none !important;
+    }
+    section,
+    .cv-section {
+      break-inside: avoid;
+    }
+  }
+</style>

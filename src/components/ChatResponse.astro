@@ -1,0 +1,7 @@
+---
+import Canonical from '../features/chat/components/ChatResponse.astro';
+import type { MediaItem } from '../lib/types/chat';
+interface Props { answer: string; images?: MediaItem[]; answer_type?: string; isStreaming?: boolean; messageId?: string; class?: string; }
+const props = Astro.props as Props;
+---
+<Canonical {...props} />

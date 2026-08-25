@@ -1,0 +1,26 @@
+{
+  "basics": {
+    "name": "Work CV (Placeholder)",
+    "label": "Alternate CV",
+    "email": "fadlank.noer@gmail.com",
+    "summary": "Placeholder alternate CV used to test the /cv/[slug] static route. Publicly reachable at /cv/work by design."
+  },
+  "work": [
+    {
+      "company": "Sample Company",
+      "position": "Sample Role",
+      "startDate": "2023-01-01",
+      "endDate": "2023-12-31",
+      "description": "Placeholder work entry for route testing.",
+      "highlights": [
+        "Placeholder highlight for the alternate CV fixture."
+      ]
+    }
+  ],
+  "education": [],
+  "skills": [],
+  "projects": [],
+  "meta": {
+    "draft": true
+  }
+}

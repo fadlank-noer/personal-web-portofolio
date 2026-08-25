@@ -1,0 +1,7 @@
+---
+import Canonical from '../features/chat/components/ChatBubble.astro';
+import type { MediaItem } from '../lib/types/chat';
+interface Props { role: 'user' | 'assistant'; content: string; images?: MediaItem[]; timestamp?: number; isStreaming?: boolean; avatarLabel?: string; class?: string; }
+const props = Astro.props as Props;
+---
+<Canonical {...props} />

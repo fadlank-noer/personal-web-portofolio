@@ -1,0 +1,10 @@
+---
+/**
+ * Shim — canonical Sidebar now at features/sidebar/components/Sidebar.astro
+ * Keep this for backward compat until all imports updated
+ */
+import SidebarCanonical from '../features/sidebar/components/Sidebar.astro';
+interface Props { collapsed?: boolean; }
+const props = Astro.props as Props;
+---
+<SidebarCanonical {...props} />

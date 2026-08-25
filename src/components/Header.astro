@@ -1,0 +1,6 @@
+---
+import HeaderCanonical from './layout/Header.astro';
+interface Props { title?: string; }
+const props = Astro.props as Props;
+---
+<HeaderCanonical {...props} />

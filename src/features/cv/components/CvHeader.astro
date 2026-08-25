@@ -1,0 +1,48 @@
+---
+import type { CvBasics } from "../types";
+import photo from "../../../../public/assets/images/photo-in-studio.png";
+
+interface Props {
+  basics: CvBasics;
+}
+
+const { basics } = Astro.props;
+const profiles = basics.profiles ?? [];
+---
+
+<header class="cv-section mb-8 border-b border-black/[0.1] pb-6">
+  <div class="flex items-start gap-5">
+    <img
+      src={photo.src}
+      alt={basics.name}
+      width="112"
+      height="112"
+      class="h-28 w-28 flex-shrink-0 rounded-sm object-cover"
+    />
+    <div class="min-w-0 flex-1">
+      <h1 class="text-[28px] font-[800] leading-tight tracking-[-0.02em] text-black">
+        {basics.name}
+      </h1>
+      {basics.label && <p class="mt-1 text-[15px] font-[600] text-black">{basics.label}</p>}
+
+      <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-zinc-700">
+        {basics.email && (
+          <a href={`mailto:${basics.email}`} class="hover:underline">{basics.email}</a>
+        )}
+        {basics.phone && (
+          <a href={`https://wa.me/62${basics.phone.replace(/^0/, "")}`} target="_blank" rel="noopener noreferrer" class="hover:underline">{basics.phone}</a>
+        )}
+        {basics.url && (
+          <a href={basics.url} target="_blank" rel="noopener noreferrer" class="hover:underline">fadlank.web.id</a>
+        )}
+        {profiles.map((p) => (
+          <a href={p.url} target="_blank" rel="noopener noreferrer" class="hover:underline">{p.url}</a>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {basics.summary && (
+    <p class="mt-4 text-[14px] leading-relaxed text-zinc-800">{basics.summary}</p>
+  )}
+</header>

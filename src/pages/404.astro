@@ -1,3 +1,156 @@
 ---
-return Astro.redirect("/")
+Astro.response.status = 404;
+import "src/styles/global.css";
+import Head from "src/layouts/Head.astro";
+import sidebarData from "../data/sidebar.json";
+import socialsData from "../data/socials.json";
+
+// TypeScript interfaces
+interface SidebarItem {
+  id: string; title: string; time?: string; tag?: string;
+  url?: string; source?: string; meta?: string; icon?: string; type?: string;
+}
+interface SocialItem {
+  id: string; platform: string; displayName: string; handle: string;
+  url: string; icon: string; description: string; stats: string; category: string;
+}
+interface MarqueeItem { label: string; href: string; }
+interface MarqueeRow { items: MarqueeItem[]; }
+
+// Hardcoded portfolio keywords (fill sparse pinned/recents)
+const hardcodedKeywords: MarqueeItem[] = [
+  { label: "Fadlan Noer — Fullstack Engineer", href: "/" },
+  { label: "Astro + Tailwind + nanostores", href: "/" },
+  { label: "Best AI Product Engineer", href: "/" },
+  { label: "Jakarta Selatan — Remote okay", href: "/" },
+  { label: "Build fast ↗", href: "/" },
+  { label: "Portfolio 2026", href: "/" },
+  { label: "Strong backend di Jagakarsa", href: "/" },
+  { label: "Develop · Design · Deploy", href: "/" },
+];
+
+// Helper: convert sidebar items to MarqueeItem
+const sidebarToItems = (items: SidebarItem[]): MarqueeItem[] =>
+  items.map((item) => ({
+    label: item.icon ? `${item.icon} ${item.title}` : `#${item.tag ?? ""} ${item.title}`,
+    href: item.meta ?? item.url ?? "/",
+  }));
+
+// Helper: convert social entries to MarqueeItem
+const socialsToItems = (items: SocialItem[]): MarqueeItem[] =>
+  items.map((item) => ({
+    label: `${item.platform} · ${item.handle}`,
+    href: item.url,
+  }));
+
+// Build 6-row marquee structure
+const dataRows: MarqueeRow[] = [
+  // Row 1: pinned items (supplemented with hardcoded keywords if sparse)
+  { items: (sidebarData.pinned.length > 0 ? sidebarToItems(sidebarData.pinned) : []).concat(hardcodedKeywords.slice(0, 4)) },
+  // Row 2: recent items (supplemented with hardcoded keywords if sparse)
+  { items: (sidebarData.recents.length > 0 ? sidebarToItems(sidebarData.recents) : []).concat(hardcodedKeywords.slice(4)) },
+  // Rows 3-4: social media entries (3 per row)
+  { items: socialsToItems(socialsData.slice(0, 3)) },
+  { items: socialsToItems(socialsData.slice(3)) },
+  // Rows 5-6: social media cycle (all 5, rotated) so rows stay content-rich
+  { items: socialsToItems([...socialsData.slice(0, 2), ...socialsData.slice(3), socialsData[2]]) },
+  { items: socialsToItems([...socialsData.slice(2), ...socialsData.slice(0, 2)]) },
+];
+
+// Duplicate each row's items 6x so the track always exceeds viewport width
+// (prevents "bolong" gaps when a row's base content is narrower than 100vw).
+// 6 identical sets → animate -16.666% (one set) for a seamless loop.
+const x3 = <T,>(a: T[]): T[] => [...a, ...a, ...a, ...a, ...a, ...a];
 ---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Head />
+    <title>404 — Page not found | fadlank.web.id</title>
+    <meta name="robots" content="noindex" />
+  </head>
+
+  <body class="bg-black text-white antialiased overflow-hidden">
+    <main
+      class="relative flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden bg-[#050505] selection:bg-white selection:text-black"
+    >
+
+      <!-- =======================================================
+           Ambient aurora background (ChatGPT-like glow)
+           ======================================================= -->
+      <div class="aurora" aria-hidden="true">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+        <span class="blob blob-3"></span>
+      </div>
+
+      <!-- =======================================================
+           Layout: marquee rows (flow) above + below 404, space-between
+           ======================================================= -->
+      <div class="relative z-[1] flex min-h-dvh w-full flex-col justify-between overflow-hidden">
+
+        <!-- Top marquee rows (rows 0-2) -->
+        <div class="flex flex-col gap-3 overflow-hidden py-4 select-none">
+          {dataRows.slice(0, 3).map((row, i) => {
+            const isLeft = i % 2 === 0;
+            const speeds = ["spd-42", "spd-48", "spd-38"];
+            return (
+              <div class="relative w-full overflow-hidden">
+                <div class={`marquee-row ${isLeft ? "anim-left" : "anim-right"} ${speeds[i]} gap-4`}>
+                  {x3(row.items).map((item) => (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" class="box">
+                      <span class="truncate">{item.label}</span>
+                      <span class="ico">↗</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <!-- Center 404 — immersive, GPT-like -->
+        <div class="center-in relative z-[1] flex w-full flex-col items-center justify-center px-4 text-center">
+          <div class="center-glow" aria-hidden="true"></div>
+          <span class="eyebrow">This page took a detour</span>
+          <h1 class="t404 select-none font-extrabold tracking-tight text-white">
+            404
+          </h1>
+          <p class="sub">
+            The page you're looking for doesn't exist but me exist in home.
+          </p>
+          <a
+            href="/"
+            class="cta-btn mt-9 inline-flex items-center justify-center gap-2 rounded-full border border-emerald-400/40 bg-gradient-to-b from-zinc-700 to-zinc-800 px-8 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-black/40 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300/70 hover:from-emerald-500/80 hover:to-emerald-600/80 hover:shadow-[0_10px_30px_rgba(16,163,127,0.45)] active:scale-[0.98]"
+          >
+            Back to Home
+            <span class="text-base leading-none">↗</span>
+          </a>
+        </div>
+
+        <!-- Bottom marquee rows (rows 3-5) -->
+        <div class="flex flex-col gap-3 overflow-hidden py-4 select-none">
+          {dataRows.slice(3).map((row, i) => {
+            const isLeft = (i + 3) % 2 === 0;
+            const speeds = ["spd-55", "spd-44", "spd-60"];
+            return (
+              <div class="relative w-full overflow-hidden">
+                <div class={`marquee-row ${isLeft ? "anim-left" : "anim-right"} ${speeds[i]} gap-4`}>
+                  {x3(row.items).map((item) => (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" class="box">
+                      <span class="truncate">{item.label}</span>
+                      <span class="ico">↗</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+    </main>
+  </body>
+</html>

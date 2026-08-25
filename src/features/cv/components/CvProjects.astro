@@ -1,0 +1,60 @@
+---
+import type { CvProject } from "../types";
+
+interface Props {
+  projects?: CvProject[];
+}
+
+const { projects = [] } = Astro.props;
+
+function formatDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+---
+
+{projects.length > 0 && (
+  <section class="cv-section mb-8">
+    <h2 class="mb-3 border-b border-black pb-1.5 text-[13px] font-[700] uppercase tracking-[0.08em] text-black">
+      Projects
+    </h2>
+    <div class="space-y-6">
+      {projects.map((entry) => (
+        <div>
+          <div class="flex flex-wrap items-baseline justify-between gap-x-3">
+            <h3 class="text-[15px] font-[700] text-black">
+              {entry.name}
+              {entry.entity && <span class="font-[500] text-zinc-600"> — {entry.entity}</span>}
+            </h3>
+            {entry.roles && entry.roles.length > 0 && (
+              <p class="text-[13px] font-[600] text-zinc-700">{entry.roles.join(", ")}</p>
+            )}
+            {(entry.startDate || entry.endDate) && (
+              <span class="text-[13px] text-zinc-500">
+                {entry.startDate ? formatDate(entry.startDate) : ""}
+                {entry.endDate ? ` – ${formatDate(entry.endDate)}` : ""}
+              </span>
+            )}
+          </div>
+          {entry.description && <p class="mt-1 text-[13px] leading-relaxed text-zinc-700">{entry.description}</p>}
+          {entry.image && (
+            <div class="mt-3 overflow-hidden rounded-md border border-zinc-200">
+              <img
+                src={entry.image}
+                alt={`${entry.name} preview`}
+                class="h-auto w-full object-cover"
+                style="aspect-ratio: 1/1;"
+              />
+            </div>
+          )}
+          {entry.highlights && entry.highlights.length > 0 && (
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-zinc-700">
+              {entry.highlights.map((h) => <li>{h}</li>)}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}

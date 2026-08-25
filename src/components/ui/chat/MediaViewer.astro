@@ -1,0 +1,769 @@
+---
+/**
+ * MediaViewer — Full-screen GPT-style lightbox
+ * - Fixed full viewport, backdrop rgba(0,0,0,.92)
+ * - object-fit: contain, 90vw × 86vh
+ * - prev/next nav, counter "2 / 5"
+ * - keyboard: Esc close, ArrowLeft/Right navigate
+ * - mobile: swipe left/right, double-tap zoom, pinch-to-zoom, pan while zoomed
+ * - focus trap, restore focus on close, backdrop click closes
+ * Placed once in Layout.astro
+ */
+import X from '@lucide/astro/icons/x';
+import ChevronLeft from '@lucide/astro/icons/chevron-left';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import ExternalLink from '@lucide/astro/icons/external-link';
+---
+
+<!-- MediaViewer Dialog -->
+<div
+  id="media-viewer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Image viewer"
+  class="media-viewer"
+  hidden
+>
+  <!-- Backdrop -->
+  <div id="viewer-backdrop" class="viewer-backdrop" aria-hidden="true"></div>
+
+  <!-- Header: close + counter -->
+  <div class="viewer-header" aria-label="Viewer controls">
+    <div class="viewer-counter" id="viewer-counter" aria-live="polite" aria-atomic="true"></div>
+    <div class="viewer-actions">
+      <a
+        id="viewer-source-link"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="viewer-action-btn"
+        title="Open source"
+        aria-label="Open image source in new tab"
+      >
+        <ExternalLink class="action-icon" />
+      </a>
+      <button
+        id="viewer-close-btn"
+        type="button"
+        class="viewer-action-btn"
+        aria-label="Close image viewer"
+        title="Close (Esc)"
+      >
+        <X class="action-icon" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Image container -->
+  <div id="viewer-stage" class="viewer-stage" aria-label="Image stage">
+    <button
+      id="viewer-prev-btn"
+      type="button"
+      class="viewer-nav-btn viewer-nav-prev"
+      aria-label="Previous image"
+      disabled
+    >
+      <ChevronLeft class="nav-icon" />
+    </button>
+
+    <div id="viewer-image-wrap" class="viewer-image-wrap">
+      <img
+        id="viewer-image"
+        src=""
+        alt=""
+        class="viewer-image"
+        draggable="false"
+      />
+    </div>
+
+    <button
+      id="viewer-next-btn"
+      type="button"
+      class="viewer-nav-btn viewer-nav-next"
+      aria-label="Next image"
+      disabled
+    >
+      <ChevronRight class="nav-icon" />
+    </button>
+  </div>
+
+  <!-- Footer: caption + source -->
+  <div id="viewer-footer" class="viewer-footer" aria-label="Image caption">
+    <p id="viewer-caption" class="viewer-caption"></p>
+    <p id="viewer-source" class="viewer-source"></p>
+  </div>
+</div>
+
+<style>
+  /* === Viewer Container === */
+  .media-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .media-viewer[hidden] {
+    display: none;
+  }
+
+  /* === Backdrop === */
+  .viewer-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    cursor: zoom-out;
+  }
+
+  /* === Header === */
+  .viewer-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+  }
+
+  .viewer-counter {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.01em;
+    min-width: 48px;
+  }
+
+  .viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .viewer-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.75);
+    border: none;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+    text-decoration: none;
+  }
+
+  .viewer-action-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+
+  .viewer-action-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+  }
+
+  .action-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* === Stage (image + nav) === */
+  .viewer-stage {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    max-width: 90vw;
+    max-height: calc(100vh - 160px);
+    padding: 52px 56px;
+    touch-action: none;
+  }
+
+  /* === Image Wrap === */
+  .viewer-image-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    cursor: grab;
+  }
+
+  .viewer-image-wrap.zoomed {
+    cursor: move;
+  }
+
+  .viewer-image-wrap.no-zoom {
+    cursor: default;
+  }
+
+  .viewer-image {
+    max-width: 90vw;
+    max-height: calc(100vh - 160px);
+    object-fit: contain;
+    display: block;
+    transition: opacity 200ms ease, transform 180ms ease;
+    transform-origin: center center;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .viewer-image.loading {
+    opacity: 0;
+  }
+
+  .viewer-image.loaded {
+    opacity: 1;
+  }
+
+  /* === Nav Buttons === */
+  .viewer-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.75);
+    border: none;
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease, opacity 160ms ease;
+    backdrop-filter: blur(4px);
+  }
+
+  .viewer-nav-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  .viewer-nav-btn:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+  }
+
+  .viewer-nav-btn:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .viewer-nav-prev {
+    left: 8px;
+  }
+
+  .viewer-nav-next {
+    right: 8px;
+  }
+
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* === Footer === */
+  .viewer-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .viewer-caption {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    max-width: 480px;
+    line-height: 1.4;
+  }
+
+  .viewer-source {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .viewer-source a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 160ms;
+  }
+
+  .viewer-source a:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* === Mobile === */
+  @media (max-width: 640px) {
+    .viewer-stage {
+      padding: 52px 48px;
+    }
+
+    .viewer-nav-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .viewer-nav-prev { left: 4px; }
+    .viewer-nav-next { right: 4px; }
+
+    .viewer-footer {
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* === Reduced Motion === */
+  @media (prefers-reduced-motion: reduce) {
+    .viewer-image,
+    .viewer-nav-btn,
+    .viewer-action-btn {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // ─── Global MediaViewer Manager ───────────────────────────────────────────
+  // Galleries register their items; viewer reads from registry
+  // Usage: window.__mediaViewer__.register('gallery-id', items)
+  //        window.__mediaViewer__.open('gallery-id', index)
+
+  interface MediaItem {
+    src: string
+    alt: string
+    caption?: string
+    sourceLabel?: string
+    sourceUrl?: string
+  }
+
+  type GalleryRegistry = Map<string, MediaItem[]>;
+
+  const registry: GalleryRegistry = new Map();
+
+  // ─── DOM refs ──────────────────────────────────────────────────────────────
+  const viewer = document.getElementById('media-viewer') as HTMLElement;
+  const backdrop = document.getElementById('viewer-backdrop') as HTMLElement;
+  const closeBtn = document.getElementById('viewer-close-btn') as HTMLButtonElement;
+  const prevBtn = document.getElementById('viewer-prev-btn') as HTMLButtonElement;
+  const nextBtn = document.getElementById('viewer-next-btn') as HTMLButtonElement;
+  const imgEl = document.getElementById('viewer-image') as HTMLImageElement;
+  const imgWrap = document.getElementById('viewer-image-wrap') as HTMLDivElement;
+  const counter = document.getElementById('viewer-counter') as HTMLElement;
+  const captionEl = document.getElementById('viewer-caption') as HTMLElement;
+  const sourceEl = document.getElementById('viewer-source') as HTMLElement;
+  const sourceLink = document.getElementById('viewer-source-link') as HTMLAnchorElement;
+
+  // ─── State ─────────────────────────────────────────────────────────────────
+  let currentGalleryId: string | null = null;
+  let currentIndex = 0;
+  let items: MediaItem[] = [];
+  let lastFocusedElement: HTMLElement | null = null;
+
+  // Zoom state
+  let scale = 1;
+  let originX = 0;
+  let originY = 0;
+  let translateX = 0;
+  let translateY = 0;
+  let isZoomed = false;
+  let lastTapTime = 0;
+  let pinchStartDist = 0;
+  let pinchStartScale = 1;
+  let isSwiping = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragCurrentX = 0;
+  let dragDeltaX = 0;
+
+  const MAX_SCALE = 4;
+  const DOUBLE_TAP_THRESHOLD_MS = 300;
+  const SWIPE_THRESHOLD_PX = 40;
+
+  // ─── API ───────────────────────────────────────────────────────────────────
+  function register(galleryId: string, galleryItems: MediaItem[]) {
+    registry.set(galleryId, galleryItems);
+  }
+
+  function open(galleryId: string, index: number) {
+    const galleryItems = registry.get(galleryId);
+    if (!galleryItems || !viewer) return;
+
+    items = galleryItems;
+    currentGalleryId = galleryId;
+    currentIndex = Math.max(0, Math.min(index, items.length - 1));
+
+    // Save focus
+    lastFocusedElement = document.activeElement as HTMLElement;
+
+    // Reset zoom
+    resetZoom();
+
+    // Show viewer
+    viewer.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Load image
+    loadImage(currentIndex);
+
+    // Focus close button
+    setTimeout(() => closeBtn?.focus(), 50);
+  }
+
+  function close() {
+    if (!viewer) return;
+    viewer.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+    resetZoom();
+
+    // Restore focus
+    if (lastFocusedElement) {
+      lastFocusedElement.focus();
+      lastFocusedElement = null;
+    }
+
+    currentGalleryId = null;
+    currentIndex = 0;
+  }
+
+  function goTo(index: number) {
+    if (!items.length) return;
+    currentIndex = Math.max(0, Math.min(index, items.length - 1));
+    resetZoom();
+    loadImage(currentIndex);
+  }
+
+  function prev() { goTo(currentIndex - 1); }
+  function next() { goTo(currentIndex + 1); }
+
+  // ─── Image Loading ─────────────────────────────────────────────────────────
+  function loadImage(index: number) {
+    const item = items[index];
+    if (!item) return;
+
+    // Show loading state
+    imgEl.classList.remove('loaded');
+    imgEl.classList.add('loading');
+    imgEl.style.opacity = '0';
+    imgEl.style.transform = 'scale(0.96)';
+
+    const newSrc = item.src;
+    const tmpImg = new Image();
+    tmpImg.onload = () => {
+      imgEl.src = newSrc;
+      imgEl.alt = item.alt || '';
+      imgEl.classList.remove('loading');
+      imgEl.classList.add('loaded');
+      imgEl.style.opacity = '1';
+      imgEl.style.transform = scale !== 1
+        ? `translate(${translateX}px, ${translateY}px) scale(${scale})`
+        : 'scale(1)';
+    };
+    tmpImg.onerror = () => {
+      imgEl.src = newSrc;
+      imgEl.alt = 'Image could not be loaded';
+      imgEl.classList.remove('loading');
+      imgEl.classList.add('loaded');
+      imgEl.style.opacity = '1';
+      imgEl.style.transform = scale !== 1
+        ? `translate(${translateX}px, ${translateY}px) scale(${scale})`
+        : 'scale(1)';
+    };
+    tmpImg.src = newSrc;
+
+    // Update UI
+    counter.textContent = `${index + 1} / ${items.length}`;
+    captionEl.textContent = item.caption || '';
+    captionEl.style.display = item.caption ? 'block' : 'none';
+    sourceEl.style.display = 'none';
+
+    if (item.sourceUrl) {
+      sourceEl.style.display = 'block';
+      sourceEl.innerHTML = item.sourceLabel
+        ? `<a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">${item.sourceLabel} ↗</a>`
+        : `<a href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">Open source ↗</a>`;
+      sourceLink.href = item.sourceUrl;
+      sourceLink.removeAttribute('hidden');
+    } else {
+      sourceLink.setAttribute('hidden', '');
+    }
+
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === items.length - 1;
+  }
+
+  // ─── Zoom ───────────────────────────────────────────────────────────────────
+  function resetZoom() {
+    scale = 1;
+    translateX = 0;
+    translateY = 0;
+    isZoomed = false;
+    if (imgEl) {
+      imgEl.style.transform = 'scale(1)';
+    }
+    if (imgWrap) {
+      imgWrap.classList.remove('zoomed');
+      imgWrap.classList.add('no-zoom');
+    }
+  }
+
+  function applyZoom(newScale: number, px: number, py: number) {
+    scale = Math.max(1, Math.min(newScale, MAX_SCALE));
+    isZoomed = scale > 1;
+
+    if (isZoomed) {
+      // Pan relative to pinch/click origin
+      const rect = imgWrap.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      translateX += (px - cx) * (newScale - scale) / scale * 0.5;
+      translateY += (py - cy) * (newScale - scale) / scale * 0.5;
+      imgWrap.classList.add('zoomed');
+      imgWrap.classList.remove('no-zoom');
+    } else {
+      translateX = 0;
+      translateY = 0;
+      imgWrap.classList.remove('zoomed');
+      imgWrap.classList.add('no-zoom');
+    }
+
+    imgEl.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  // ─── Touch Gestures ─────────────────────────────────────────────────────────
+  function handleTouchStart(e: TouchEvent) {
+    if (e.touches.length === 1) {
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+      dragCurrentX = dragStartX;
+      dragDeltaX = 0;
+      isSwiping = false;
+    }
+    if (e.touches.length === 2) {
+      pinchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchStartScale = scale;
+    }
+  }
+
+  function handleTouchMove(e: TouchEvent) {
+    e.preventDefault();
+
+    if (e.touches.length === 1 && !isZoomed) {
+      // Gallery swipe — only when not zoomed
+      dragCurrentX = e.touches[0].clientX;
+      dragDeltaX = dragCurrentX - dragStartX;
+
+      if (Math.abs(dragDeltaX) > 8) {
+        isSwiping = true;
+        // Live feedback
+        const offset = dragDeltaX;
+        const progress = offset / window.innerWidth;
+        imgEl.style.transform = `translate(${offset}px, 0) scale(1)`;
+        imgEl.style.opacity = String(1 - Math.abs(progress) * 0.15);
+      }
+    } else if (e.touches.length === 1 && isZoomed) {
+      // Pan while zoomed
+      const dx = e.touches[0].clientX - dragStartX;
+      const dy = e.touches[0].clientY - dragStartY;
+      translateX += dx;
+      translateY += dy;
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+      imgEl.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    } else if (e.touches.length === 2) {
+      // Pinch zoom
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      const newScale = pinchStartScale * (dist / pinchStartDist);
+      scale = Math.max(1, Math.min(newScale, MAX_SCALE));
+      isZoomed = scale > 1;
+      imgEl.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      if (isZoomed) {
+        imgWrap.classList.add('zoomed');
+        imgWrap.classList.remove('no-zoom');
+      }
+    }
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    if (e.touches.length === 0) {
+      if (!isZoomed) {
+        // Gallery swipe decision
+        if (isSwiping) {
+          if (dragDeltaX < -SWIPE_THRESHOLD_PX) {
+            next();
+          } else if (dragDeltaX > SWIPE_THRESHOLD_PX) {
+            prev();
+          } else {
+            // Snap back
+            imgEl.style.transform = 'scale(1)';
+            imgEl.style.opacity = '1';
+          }
+        } else {
+          // Double tap zoom
+          const now = Date.now();
+          if (now - lastTapTime < DOUBLE_TAP_THRESHOLD_MS) {
+            if (isZoomed) {
+              resetZoom();
+            } else {
+              applyZoom(2, dragStartX, dragStartY);
+            }
+          }
+          lastTapTime = now;
+        }
+        isSwiping = false;
+        dragDeltaX = 0;
+      }
+    }
+  }
+
+  // ─── Wheel Zoom ─────────────────────────────────────────────────────────────
+  function handleWheel(e: WheelEvent) {
+    e.preventDefault();
+    const rect = imgWrap.getBoundingClientRect();
+    const px = e.clientX;
+    const py = e.clientY;
+    const delta = e.deltaY < 0 ? 0.9 : 1.1;
+    const newScale = scale * delta;
+    scale = Math.max(1, Math.min(newScale, MAX_SCALE));
+    isZoomed = scale > 1;
+
+    if (!isZoomed) {
+      translateX = 0;
+      translateY = 0;
+      imgWrap.classList.remove('zoomed');
+      imgWrap.classList.add('no-zoom');
+    } else {
+      imgWrap.classList.add('zoomed');
+      imgWrap.classList.remove('no-zoom');
+    }
+
+    imgEl.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  // ─── Keyboard Navigation ────────────────────────────────────────────────────
+  function handleKeydown(e: KeyboardEvent) {
+    if (!currentGalleryId) return;
+
+    switch (e.key) {
+      case 'Escape':
+        e.preventDefault();
+        close();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        prev();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        next();
+        break;
+    }
+  }
+
+  // ─── Focus Trap ─────────────────────────────────────────────────────────────
+  function handleFocusTrap(e: KeyboardEvent) {
+    if (!currentGalleryId || e.key !== 'Tab') return;
+    const focusable = viewer?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusable || focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  // ─── Attach Event Listeners ─────────────────────────────────────────────────
+  if (backdrop) backdrop.addEventListener('click', close);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  if (prevBtn) prevBtn.addEventListener('click', prev);
+  if (nextBtn) nextBtn.addEventListener('click', next);
+  document.addEventListener('keydown', handleKeydown);
+  viewer?.addEventListener('keydown', handleFocusTrap);
+
+  // Touch events on image wrap
+  if (imgWrap) {
+    imgWrap.addEventListener('touchstart', handleTouchStart, { passive: true });
+    imgWrap.addEventListener('touchmove', handleTouchMove, { passive: false });
+    imgWrap.addEventListener('touchend', handleTouchEnd, { passive: true });
+  }
+
+  // Mouse wheel zoom
+  imgWrap?.addEventListener('wheel', handleWheel, { passive: false });
+
+  // Double-click zoom (desktop)
+  imgWrap?.addEventListener('dblclick', (e: MouseEvent) => {
+    if (isZoomed) {
+      resetZoom();
+    } else {
+      applyZoom(2, e.clientX, e.clientY);
+    }
+  });
+
+  // ─── Register global API ────────────────────────────────────────────────────
+  (window as any).__mediaViewer__ = {
+    register,
+    open,
+    close,
+    goTo,
+    prev,
+    next,
+  };
+
+  // Auto-register any galleries already in DOM
+  document.querySelectorAll('.media-gallery').forEach((gallery) => {
+    const galleryId = gallery.getAttribute('data-gallery-id');
+    const buttons = gallery.querySelectorAll<HTMLButtonElement>('[data-tile-index]');
+    if (galleryId && buttons.length > 0) {
+      // Gather items from img alt attributes + src
+      const imgs = gallery.querySelectorAll<HTMLImageElement>('img');
+      const items: MediaItem[] = Array.from(imgs).map((img) => ({
+        src: img.src,
+        alt: img.alt || 'Image',
+      }));
+      (window as any).__mediaViewer__?.register(galleryId, items);
+    }
+  });
+</script>

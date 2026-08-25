@@ -1,0 +1,64 @@
+---
+import ChatResponse from './ChatResponse.astro';
+import type { MediaItem } from '../../../lib/types/chat';
+
+interface Props {
+  role: 'user' | 'assistant';
+  content: string;
+  images?: MediaItem[];
+  timestamp?: number;
+  isStreaming?: boolean;
+  avatarLabel?: string;
+  class?: string;
+}
+
+const {
+  role,
+  content,
+  images = [],
+  timestamp,
+  isStreaming = false,
+  avatarLabel = 'F',
+  class: className = '',
+} = Astro.props;
+
+const isUser = role === 'user';
+
+const formattedTime = timestamp
+  ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  : null;
+---
+
+{isUser ? (
+  <div class:list={["group flex w-full justify-end", className]} data-role="user" data-timestamp={timestamp}>
+    <div class="flex max-w-[80%] flex-col items-end gap-1">
+      {/* Bubble - ChatGPT style user: #303030 rounded-[24px] rounded-br-[6px] */}
+      <div class="rounded-[24px] rounded-br-[6px] bg-[#303030] px-4 py-2.5 text-[15px] leading-[24px] text-white">
+        <p class="whitespace-pre-wrap break-words">{content}</p>
+      </div>
+      {formattedTime && (
+        <span class="hidden px-1 text-[11px] text-zinc-500 group-hover:block">{formattedTime}</span>
+      )}
+    </div>
+  </div>
+) : (
+  <div class:list={["group flex w-full gap-3", className]} data-role="assistant" data-timestamp={timestamp}>
+    {/* Avatar - left */}
+    <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xs font-semibold text-white select-none">
+      {avatarLabel}
+    </div>
+
+    {/* Content */}
+    <div class="min-w-0 flex-1 pt-0.5">
+      <ChatResponse
+        answer={content}
+        images={images}
+        isStreaming={isStreaming}
+        messageId={String(timestamp ?? '')}
+      />
+      {formattedTime && (
+        <span class="mt-1 hidden text-[11px] text-zinc-500 group-hover:block">{formattedTime}</span>
+      )}
+    </div>
+  </div>
+)}

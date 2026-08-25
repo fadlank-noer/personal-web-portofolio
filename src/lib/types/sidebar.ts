@@ -1,0 +1,64 @@
+export type PinnedItemType = 'project' | 'notion';
+
+export interface PinnedItem {
+  id: string;
+  title: string;
+  meta?: string;
+  icon?: string;
+  type?: PinnedItemType;
+}
+
+export interface ProjectItem {
+  id: string;
+  title: string;
+  desc: string;
+  description?: string;
+  client?: string;
+  category?: string;
+  count: number;
+  color: string;
+  thumb: string;
+  url: string;
+  featured?: boolean;
+    cover?: boolean;
+    /**
+     * Optional screenshot/preview image for the project card.
+     * Path is relative to /public/assets/projects/ (e.g. "/assets/projects/prompt-builder-preview.png").
+     * Will be displayed with 1:1 aspect ratio and object-fit: cover.
+     */
+    image?: string;
+}
+
+export type LibraryMediaType = 'image' | 'video' | 'wide' | string;
+
+export interface LibraryItem {
+  id: string;
+  type: LibraryMediaType;
+  label: string;
+  ratio: string;
+  color: string;
+  wide?: boolean;
+  src?: string;
+}
+
+export interface RecentItem {
+  id: string;
+  title: string;
+  time: string;
+  tag: string;
+  url: string;
+  source: string;
+}
+
+export interface SidebarData {
+  pinned: PinnedItem[];
+  recents: RecentItem[];
+}
+
+export type SidebarSectionKey = 'pinned' | 'recents' | 'chats';
+
+export interface SidebarSectionsState {
+  pinned: boolean;
+  recents: boolean;
+  chats: boolean;
+}

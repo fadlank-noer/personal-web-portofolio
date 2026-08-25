@@ -1,0 +1,268 @@
+---
+import "../styles/global.css";
+import LibraryIcon from '../../public/assets/svgs/library.svg';
+import SideToggleMobile from '../../public/assets/svgs/side-toggle-mobile.svg';
+import Sidebar from "../features/sidebar/components/Sidebar.astro";
+import LinkConfirmationModal from "../components/ui/chat/LinkConfirmationModal.astro";
+import Head from "../layouts/Head.astro";
+import { libraryItems } from '../data/library';
+
+const imageCount = libraryItems.filter(i => i.type === 'image').length;
+
+// Notion card config
+const notionCardUrl = 'https://temporal-direction-036.notion.site/Shared-Contents-38008fb6d653800a8b29f2c634d72677?pvs=74';
+const notionCardLabel = 'want to see more? my public Notion collection is here';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <Head />
+  </head>
+  <body class="bg-black text-white antialiased overflow-hidden">
+    <div class="flex h-[100dvh] w-full overflow-hidden bg-black">
+      <Sidebar />
+
+      <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
+        <!-- Top bar -->
+        <div class="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 py-3 md:px-6 md:py-4 backdrop-blur">
+          <div class="flex items-center gap-2">
+            <button id="mobile-sidebar-toggle" class="flex md:hidden h-10 w-10 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
+              <SideToggleMobile class="h-[22px] w-[22px] text-white" />
+            </button>
+            <span class="hidden md:flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
+              <LibraryIcon class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
+            </span>
+            <h1 class="text-[16px] font-[700] tracking-[-0.02em] text-white">Library</h1>
+            <div class="ml-1 flex items-center gap-1.5">
+              <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} {imageCount === 1 ? 'item' : 'items'}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- reserved for future controls -->
+          </div>
+        </div>
+
+        <div class="w-full px-3 py-4 md:px-6 md:py-8">
+          <!-- Notion-style card (always visible, NOT part of masonry) -->
+          <a
+            href={notionCardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-link-trigger
+            data-link-url={notionCardUrl}
+            data-link-label={notionCardLabel}
+            class="group relative flex flex-col items-center justify-center gap-4 rounded-[14px] border-2 border-[#37352f] bg-[#fbfaf8] p-6 mb-4 transition-all duration-200 hover:shadow-[0_4px_24px_-4px_rgba(55,53,47,0.25)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#37352f]/40 min-h-[200px]"
+          >
+            <!-- Notion logo (local PNG) inside a dark-outlined box -->
+            <div class="flex h-14 w-14 items-center justify-center rounded-[10px] bg-white border-2 border-[#37352f] overflow-hidden">
+              <img
+                src="/assets/notion-app-logo.png"
+                alt="Notion"
+                width="48"
+                height="48"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <div class="flex flex-col items-center gap-1 text-center">
+              <span class="text-[13px] font-semibold text-[#37352f] leading-snug">Public Notion Collection</span>
+              <span class="text-[12px] text-[#787774] leading-snug">{notionCardLabel}</span>
+            </div>
+            <div class="rounded-[6px] bg-[#37352f] border border-[#37352f] px-3 py-1.5 text-[12px] font-medium text-white shadow-sm transition-all duration-200 group-hover:bg-[#2a2925]">
+              Buka Notion
+            </div>
+          </a>
+
+          <!-- Masonry grid — populated by JS -->
+          <div
+            id="masonry-grid"
+            class="relative w-full"
+            style="height: 0;"
+          ></div>
+
+          <!-- Load more -->
+          <div id="load-more-wrapper" class="mt-8 flex justify-center hidden">
+            <button
+              id="load-more-btn"
+              class="flex items-center gap-2 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-4 py-2 text-[13px] text-zinc-400 hover:text-white hover:bg-[#2a2a2a] transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 5v10M5 10l5 5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Load more
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
+
+<script>
+  // ── Mobile sidebar toggle ──────────────────────────────────────────
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const toggle = document.getElementById('mobile-sidebar-toggle');
+  const isMobile = () => window.innerWidth < 768;
+  const applyMobile = (open: boolean) => {
+    if (!sidebar || !overlay) return;
+    sidebar.dataset.mobileOpen = open ? 'true' : 'false';
+    overlay.classList.toggle('hidden', !open);
+  };
+  toggle?.addEventListener('click', () => {
+    if (!sidebar) return;
+    const cur = sidebar.dataset.mobileOpen === 'true';
+    applyMobile(!cur);
+  });
+  overlay?.addEventListener('click', () => applyMobile(false));
+  window.addEventListener('resize', () => {
+    if (!isMobile() && sidebar && overlay) {
+      sidebar.dataset.mobileOpen = 'false';
+      overlay.classList.add('hidden');
+    }
+  });
+
+  // ── JS Masonry (Pinterest-style, true interlocking columns) ────────
+  interface LibItem {
+    id: string;
+    type: string;
+    label: string;
+    src: string;
+    source?: string;
+    width?: number;
+    height?: number;
+  }
+
+  const GUTTER = 12; // px gap between items
+  const grid = document.getElementById('masonry-grid') as HTMLElement | null;
+
+  function getColumns(): number {
+    const w = window.innerWidth;
+    if (w < 640) return 2;    // mobile sm  → 2 cols
+    if (w < 768) return 3;    // mobile lg  → 3 cols
+    if (w < 1024) return 4;   // tablet     → 4 cols
+    if (w < 1280) return 5;   // desktop    → 5 cols
+    return 6;                 // wide       → 6 cols
+  }
+
+  function buildMasonry(items: LibItem[], limit = 9) {
+    if (!grid) return;
+    grid.innerHTML = '';
+    const cols = getColumns();
+    const colHeights = Array(cols).fill(0);
+
+    items.slice(0, limit).forEach((item) => {
+      // Find shortest column
+      const minIdx = colHeights.indexOf(Math.min(...colHeights));
+
+      const a = document.createElement('a');
+      a.href = item.src;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'group absolute block overflow-hidden rounded-xl border border-white/[0.06] bg-zinc-900 transition-all duration-300 ease-out hover:border-white/[0.16] hover:shadow-[0_12px_40px_-12px_rgba(139,92,246,0.25)] hover:-translate-y-0.5 focus-visible:border-violet-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/40';
+      a.setAttribute('aria-label', item.label);
+
+      // Calculate scaled height from column width
+      const w = item.width ?? 800;
+      const h = item.height ?? 800;
+      const colW = grid!.offsetWidth / cols;
+      const scaledH = Math.round((colW / w) * h);
+
+      a.style.left = `${minIdx * (colW + GUTTER)}px`;
+      a.style.top = `${colHeights[minIdx]}px`;
+      a.style.width = `${colW}px`;
+      a.style.height = `${scaledH}px`;
+
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = item.label;
+      img.className = 'block w-full h-full object-cover';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+
+      // Type badge
+      const badge = document.createElement('div');
+      badge.className = 'absolute left-2 top-2 z-10 rounded-full bg-black/60 backdrop-blur-sm border border-white/[0.1] px-1.5 py-0.5';
+      badge.innerHTML = `<span class="text-[9px] font-[500] uppercase tracking-wide text-white/70">${item.type}</span>`;
+
+      // Label
+      const label = document.createElement('div');
+      label.className = 'absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2';
+      label.innerHTML = `<span class="block truncate rounded bg-black/40 px-1.5 py-0.5 text-[10px] text-white/80 backdrop-blur-sm">${item.label}</span>`;
+
+      // Hover overlay with "View"
+      const overlay = document.createElement('div');
+      overlay.className = 'absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100 group-focus-visible:opacity-100';
+      overlay.innerHTML = `<span class="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-medium text-white/90">View</span>`;
+
+      a.appendChild(img);
+      a.appendChild(badge);
+      a.appendChild(label);
+      a.appendChild(overlay);
+      grid.appendChild(a);
+
+      colHeights[minIdx] += scaledH + GUTTER;
+    });
+
+    // Set container height to tallest column
+    const totalH = Math.max(...colHeights) - GUTTER;
+    grid.style.height = `${totalH}px`;
+  }
+
+  // Inject library data server-side via data attribute (avoids hydration issues)
+  const raw = document.getElementById('library-items-data')?.textContent ?? '[]';
+  let libraryItems: LibItem[] = [];
+  try { libraryItems = JSON.parse(raw); } catch {}
+
+  // Initial render (show first 9)
+  buildMasonry(libraryItems, 9);
+
+  // Responsive rebuild on resize
+  let resizeTimer: ReturnType<typeof setTimeout>;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => buildMasonry(libraryItems, 9), 120);
+  });
+
+  // ── Load more ───────────────────────────────────────────────────────
+  const wrapper = document.getElementById('load-more-wrapper');
+  const btn = document.getElementById('load-more-btn');
+  const HIDDEN_CLASS = 'masonry-hidden';
+
+  // Hide items beyond 9 via class (so masonry still knows about them)
+  function markExtra() {
+    if (!grid) return;
+    const anchors = grid.querySelectorAll<HTMLElement>('a');
+    anchors.forEach((el, i) => {
+      if (i >= 9) el.classList.add(HIDDEN_CLASS);
+      else el.classList.remove(HIDDEN_CLASS);
+    });
+    if (anchors.length > 9) wrapper?.classList.remove('hidden');
+    else wrapper?.classList.add('hidden');
+  }
+
+  markExtra();
+
+  btn?.addEventListener('click', () => {
+    buildMasonry(libraryItems); // show all
+    wrapper?.classList.add('hidden');
+  });
+</script>
+
+<!-- Pass library items to client script as JSON -->
+<script id="library-items-data" type="application/json" set:html={JSON.stringify(libraryItems)}></script>
+
+<style>
+  .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #2a2a2a #0a0a0a; }
+  .chat-scrollbar::-webkit-scrollbar { width: 6px; }
+  .chat-scrollbar::-webkit-scrollbar-track { background: #0a0a0a; }
+  .chat-scrollbar::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 9999px; border: 1px solid #0a0a0a; background-clip: padding-box; }
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+  .chat-scrollbar::-webkit-scrollbar-button { width: 6px; height: 10px; background: #0a0a0a no-repeat center; display: block; }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:start:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M3 0 L6 4 L0 4 Z' fill='%233a3a3a'/%3E%3C/svg%3E"); }
+  .chat-scrollbar::-webkit-scrollbar-button:vertical:end:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4' viewBox='0 0 6 4'%3E%3Cpath d='M0 0 L6 0 L3 4 Z' fill='%233a3a3a'/%3E%3C/svg%3E"); }
+  .masonry-hidden { display: none; }
+</style>
+<!-- Link confirmation modal (sidebar pinned/recents links) -->
+<LinkConfirmationModal />

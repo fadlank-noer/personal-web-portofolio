@@ -1,0 +1,297 @@
+---
+/**
+ * ChatResponse — Assistant bubble with MediaGallery + action bar (SSR canonical)
+ * - Borderless, integrated with chat canvas (guide: NO giant card)
+ * - Typography 15px/26px (lh 1.73), primary rgba(255,255,255,.92), max 72ch
+ * - Generating: opacity-only dots + "Generating response…" label (aria-live)
+ * - Actions: Copy / Regenerate / 👍 / 👎 — fade-in on complete + hover/focus reveal + always visible on mobile
+ */
+import Copy from '@lucide/astro/icons/copy';
+import Check from '@lucide/astro/icons/check';
+import RefreshCw from '@lucide/astro/icons/refresh-cw';
+import ThumbsUp from '@lucide/astro/icons/thumbs-up';
+import ThumbsDown from '@lucide/astro/icons/thumbs-down';
+import MediaGallery from './MediaGallery.astro';
+import type { MediaItem, LinkItem } from '../../../lib/types/chat';
+
+interface Props {
+  answer: string;
+  images?: MediaItem[];
+  links?: LinkItem[];
+  answer_type?: string;
+  isStreaming?: boolean;
+  messageId?: string;
+  class?: string;
+}
+
+const {
+  answer,
+  images = [],
+  links = [],
+  answer_type = 'text',
+  isStreaming = false,
+  messageId = `msg-${Math.random().toString(36).slice(2)}`,
+  class: className = '',
+} = Astro.props;
+
+const hasImages = images && images.length > 0;
+const isEmpty = !answer || answer.trim().length === 0;
+
+// Derive heading from answer: first line if it looks like a title (short, no period ending, starts with capital)
+function extractHeading(text: string): string | null {
+  if (!text) return null;
+  const firstLine = text.split('\n')[0].trim();
+  if (firstLine && firstLine.length <= 60 && firstLine.length >= 3 && /^[A-Z]/.test(firstLine) && !firstLine.endsWith('.')) {
+    return firstLine;
+  }
+  return null;
+}
+const heading = extractHeading(answer);
+
+// Derive source line: if heading exists, look for second line starting with http or contains "source"
+function extractSource(text: string): { label: string; url: string } | null {
+  const lines = text.split('\n');
+  if (lines.length < 2) return null;
+  const second = (lines[1] || '').trim();
+  const urlMatch = second.match(/https?:\/\/[^\s\)]+/);
+  if (urlMatch) {
+    const label = second.replace(/https?:\/\/[^\s\)]+.*/, '').trim() || urlMatch[0];
+    return { label, url: urlMatch[0] };
+  }
+  return null;
+}
+const source = heading ? extractSource(answer) : null;
+
+// Strip heading + source from body
+function stripHeader(text: string): string {
+  if (!text) return '';
+  const lines = text.split('\n');
+  if (heading) lines.shift(); // remove heading
+  if (source) lines.shift(); // remove source line
+  return lines.join('\n').trim();
+}
+const body = stripHeader(answer);
+
+// Gallery ID unique per message
+const galleryId = `gallery-${messageId}`;
+---
+
+<div class:list={["group/response flex w-full flex-col", className]} data-message-id={messageId} data-streaming={isStreaming ? 'true' : 'false'}>
+
+  {/* Generating indicator when streaming and empty — opacity-only dots (guide §6) */}
+  {isStreaming && isEmpty ? (
+    <div class="flex items-center gap-2 py-2" role="status" aria-live="polite">
+      <span class="text-[12px] font-medium text-[rgba(255,255,255,0.42)]">Generating response…</span>
+      <span class="resp-dot"></span>
+      <span class="resp-dot" style="animation-delay:140ms"></span>
+      <span class="resp-dot" style="animation-delay:280ms"></span>
+    </div>
+  ) : (
+    <>
+      {/* Media Gallery — ABOVE text, aligned with response column */}
+      {hasImages && (
+        <div class="mb-4 max-w-full">
+          <MediaGallery
+            items={images}
+            galleryId={galleryId}
+          />
+        </div>
+      )}
+
+      {/* Heading + Source */}
+      {heading && (
+        <div class="mb-1">
+          <h3 class="text-[19px] font-[600] leading-tight tracking-tight text-white">
+            {heading}
+          </h3>
+          {source && (
+            <a
+              href={source.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-0.5 inline-flex items-center gap-1 text-[13px] text-zinc-400 hover:text-zinc-200 transition-colors"
+            >
+              {source.label}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M3 1h6v6M9 1L1 9" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Body text — 15px/26px, primary rgba(255,255,255,.92), max 72ch (guide §11) */}
+      {body && (
+        <div class="prose prose-invert max-w-none">
+          <div class="whitespace-pre-wrap break-words text-[15px] leading-[26px] text-[rgba(255,255,255,0.92)] max-w-[72ch]">
+            {body}
+            {isStreaming && (
+              <span class="ml-0.5 inline-block h-[16px] w-[2px] animate-pulse bg-white align-middle"></span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Streaming cursor when there's content */}
+      {isStreaming && !isEmpty && !body && (
+        <span class="ml-0.5 inline-block h-[16px] w-[2px] animate-pulse bg-white align-middle mt-1"></span>
+      )}
+    </>
+  )}
+
+  {/* Action bar — fade-in on complete + hover/focus reveal + always visible on mobile (guide §12) */}
+  <div class="resp-actions mt-3 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/response:opacity-100 focus-within:opacity-100 max-md:opacity-100">
+    <button
+      data-copy-btn
+      data-copy-target={messageId}
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      title="Copy"
+      aria-label="Copy response"
+    >
+      <Copy class="copy-icon h-4 w-4" />
+      <Check class="check-icon hidden h-4 w-4 text-emerald-400" />
+    </button>
+
+    <button
+      data-regenerate-btn
+      data-regenerate-id={messageId}
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      title="Regenerate"
+      aria-label="Regenerate response"
+    >
+      <RefreshCw class="h-4 w-4" />
+    </button>
+
+    <button
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      title="Good response"
+      aria-label="Good response"
+    >
+      <ThumbsUp class="h-4 w-4" />
+    </button>
+
+    <button
+      class="flex h-7 w-7 max-md:h-10 max-md:w-10 items-center justify-center rounded-md text-zinc-400 hover:bg-[#2a2a2a] hover:text-zinc-100 transition-colors"
+      title="Bad response"
+      aria-label="Bad response"
+    >
+      <ThumbsDown class="h-4 w-4" />
+    </button>
+  </div>
+
+  {/* Links — ChatGPT-style vertical stack (Variant A) */}
+  {links && links.length > 0 && (
+      <div class="mt-3 flex flex-col gap-1.5">
+        {links.map((l) => (
+          <button
+            type="button"
+            data-link-trigger
+            data-link-url={l.url}
+            data-link-label={l.label}
+            class="flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 border border-[#2f2f2f] bg-[#1e1e1e] hover:bg-[#252525] hover:border-[#3a3a3a] transition-colors text-left group"
+          >
+            <div class="min-w-0 flex-1">
+              <span class="block text-[13px] font-medium text-white leading-tight truncate">{l.label}</span>
+              {l.description && (
+                <span class="block text-[11px] text-zinc-500 leading-tight truncate">{l.description}</span>
+              )}
+            </div>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-zinc-500 group-hover:text-zinc-300 transition-colors" aria-hidden="true">
+              <path d="M4 2h8v8M12 2L2 12"/>
+            </svg>
+          </button>
+        ))}
+      </div>
+    )}
+
+  {/* Hidden plain text for copy */}
+  <span data-copy-text={messageId} class="hidden">{answer}</span>
+</div>
+
+{/* Register gallery items with global viewer */}
+{hasImages && (
+  <script define:vars={{ galleryId, images }}>
+    (window.__mediaViewer__ || { register() {} }).register(galleryId, images);
+  </script>
+)}
+
+<style>
+  /* Generating dots — opacity-only, 1000ms loop, 140ms stagger (guide §6) */
+  .resp-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.55);
+    animation: resp-dot 1000ms ease-in-out infinite;
+  }
+  @keyframes resp-dot {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+  }
+
+  /* Actions fade-in on complete (140ms, guide §14) — backwards fill so hover-reveal still works */
+  .resp-actions {
+    animation: resp-actions-in 140ms ease backwards;
+  }
+  @keyframes resp-actions-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .resp-dot {
+      animation: none;
+      opacity: 0.55;
+    }
+    .resp-actions {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // Delegated copy + regenerate logic
+  function initButtons() {
+    // Copy
+    document.querySelectorAll('[data-copy-btn]').forEach((btn) => {
+      if ((btn as HTMLElement).dataset.bound === 'true') return;
+      (btn as HTMLElement).dataset.bound = 'true';
+
+      btn.addEventListener('click', async () => {
+        const targetId = (btn as HTMLElement).dataset.copyTarget;
+        const textEl = document.querySelector(`[data-copy-text="${targetId}"]`);
+        const text = textEl?.textContent ?? '';
+
+        try {
+          await navigator.clipboard.writeText(text);
+          const copyIcon = btn.querySelector('.copy-icon');
+          const checkIcon = btn.querySelector('.check-icon');
+          copyIcon?.classList.add('hidden');
+          checkIcon?.classList.remove('hidden');
+          setTimeout(() => {
+            copyIcon?.classList.remove('hidden');
+            checkIcon?.classList.add('hidden');
+          }, 2000);
+        } catch (e) {
+          console.error('Copy failed', e);
+        }
+      });
+    });
+
+    // Regenerate → dispatch event; ChatBox listener re-runs the flow
+    document.querySelectorAll('[data-regenerate-btn]').forEach((btn) => {
+      if ((btn as HTMLElement).dataset.regBound === 'true') return;
+      (btn as HTMLElement).dataset.regBound = 'true';
+
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.regenerateId;
+        window.dispatchEvent(new CustomEvent('chat:regenerate', { detail: { messageId: id } }));
+      });
+    });
+  }
+
+  initButtons();
+  const observer = new MutationObserver(() => initButtons());
+  observer.observe(document.body, { childList: true, subtree: true });
+  document.addEventListener('astro:page-load', initButtons);
+</script>

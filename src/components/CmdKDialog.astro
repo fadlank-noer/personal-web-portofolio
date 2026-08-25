@@ -1,0 +1,418 @@
+---
+/**
+ * CmdKDialog — accessible Cmd+K command palette
+ *
+ * Trigger: #sidebar-search button (Sidebar.astro) OR global Cmd/Ctrl+K shortcut.
+ * Data: recents[] from sidebar.json, normalized to CmdKItem via window.__CMDK_DATA__.
+ * Search: AND order-free ILIKE (case-insensitive substring, all tokens must match).
+ * Highlight: matched chars wrapped in <mark class="cmdk-highlight"> (underline via CSS).
+ * Keyboard: ↑/↓ navigate, Enter select, Esc close, Cmd/Ctrl+K toggle.
+ * External links: target="_blank" rel="noopener noreferrer".
+ *
+ * Variants:
+ *   Default (dark): bg-black, border-white/[0.06], white text — for index/library/projects
+ *   Light (data-theme="light"): bg-white, border-black/10, black text — for CV pages
+ */
+
+import sidebarData from '../data/sidebar.json';
+import type { SidebarData, RecentItem } from '../lib/types/sidebar';
+import type { CmdKItem } from '../lib/types/cmdk';
+
+interface Props {
+  theme?: 'dark' | 'light';
+}
+const { theme = 'dark' } = Astro.props;
+
+// Normalize sidebar.json recents to CmdKItem[]
+const raw = sidebarData as SidebarData;
+const cmdItems: CmdKItem[] = (raw.recents ?? []).map((item: RecentItem) => ({
+  id: item.id,
+  title: item.title,
+  url: item.url ?? '',
+  source: item.source ?? '',
+  tag: item.tag ?? '',
+  time: item.time ?? '',
+}));
+
+// Serialize to JSON for inline script (no define:vars + import pattern)
+const itemsJson = JSON.stringify(cmdItems);
+---
+
+<!-- Cmd+K Dialog — dark variant (default) or light variant (data-theme="light") -->
+<dialog
+  id="cmdk-dialog"
+  data-theme={theme}
+  class="cmdk-dialog"
+  aria-label="Command palette"
+  aria-modal="true"
+>
+  <div class="cmdk-wrapper">
+    <!-- Header: search input + clear button -->
+    <div class="cmdk-header">
+      <div class="cmdk-search-wrap">
+        <svg class="cmdk-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="search"
+          id="cmdk-input"
+          class="cmdk-input"
+          placeholder="Search pages..."
+          aria-label="Search pages"
+          aria-controls="cmdk-list"
+          aria-autocomplete="list"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </div>
+      <div class="cmdk-hints-shortcut">
+        <kbd class="cmdk-kbd">Esc</kbd>
+        <span>to close</span>
+      </div>
+    </div>
+
+    <!-- Results list -->
+    <div id="cmdk-list" class="cmdk-list" role="listbox" aria-label="Search results" aria-live="polite">
+      <!-- Rendered by cmdk.ts client module -->
+    </div>
+
+    <!-- Status / empty state -->
+    <div id="cmdk-status" class="cmdk-status" aria-live="polite" aria-atomic="true" hidden></div>
+
+    <!-- Footer hints -->
+    <div class="cmdk-footer">
+      <div class="cmdk-footer-hint">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        <span>to navigate</span>
+      </div>
+      <div class="cmdk-footer-hint">
+        <kbd class="cmdk-kbd">Enter</kbd>
+        <span>to open</span>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- D1 GUARDRAIL: inline script sets window.__CMDK_DATA__ BEFORE module script runs.
+     Using is:inline so Astro does NOT hoist/process it as a module — it executes
+     inline in document order, ensuring data is available when cmdk.ts reads it. -->
+<script is:inline define:vars={{ itemsJson }}>
+  window.__CMDK_DATA__ = { items: JSON.parse(itemsJson) };
+</script>
+
+<!-- cmdk.ts module — reads window.__CMDK_DATA__, handles search/keyboard/trigger -->
+<script>
+  import '../scripts/cmdk.ts';
+</script>
+
+<style>
+  /* ── Shared reset / base ─────────────────────────────────────────── */
+  :global(#cmdk-dialog) {
+    all: unset;
+    box-sizing: border-box;
+  }
+
+  #cmdk-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    border: none;
+    padding: 0;
+    background: transparent;
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    /* NOTE: no `display` here — setting it unconditionally (author origin)
+       overrides the UA stylesheet's `dialog:not([open]) { display: none }`,
+       leaving a closed dialog painted on screen. Display is set ONLY in the
+       [open] rule below, plus an explicit closed-state rule. */
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: min(15vh, 120px);
+  }
+
+  /* Closed dialog MUST be hidden. Explicit author rule because `all: unset`
+     above and the base rule both (as author origin) would otherwise defeat
+     the UA stylesheet's dialog:not([open]) { display: none }. */
+  #cmdk-dialog:not([open]) {
+    display: none;
+  }
+
+  #cmdk-dialog[open] {
+    display: flex;
+  }
+
+  /* Dark variant (default) */
+  #cmdk-dialog[data-theme='dark'],
+  #cmdk-dialog:not([data-theme]) {
+    --cmdk-bg: #000;
+    --cmdk-border: rgba(255, 255, 255, 0.06);
+    --cmdk-text: #e4e4e7;
+    --cmdk-subtle: #71717a;
+    --cmdk-item-hover: rgba(255, 255, 255, 0.04);
+    --cmdk-item-active: rgba(255, 255, 255, 0.08);
+    --cmdk-highlight-bg: transparent;
+    --cmdk-highlight-color: #fff;
+    --cmdk-source-bg: rgba(255, 255, 255, 0.06);
+    --cmdk-source-text: #a1a1aa;
+    --cmdk-tag-bg: rgba(255, 255, 255, 0.04);
+    --cmdk-tag-text: #71717a;
+    --cmdk-kbd-bg: rgba(255, 255, 255, 0.06);
+    --cmdk-kbd-text: #71717a;
+    --cmdk-kbd-border: rgba(255, 255, 255, 0.1);
+    --cmdk-overlay: rgba(0, 0, 0, 0.6);
+  }
+
+  /* Light variant (CV pages) */
+  #cmdk-dialog[data-theme='light'] {
+    --cmdk-bg: #ffffff;
+    --cmdk-border: rgba(0, 0, 0, 0.1);
+    --cmdk-text: #18181b;
+    --cmdk-subtle: #71717a;
+    --cmdk-item-hover: rgba(0, 0, 0, 0.04);
+    --cmdk-item-active: rgba(0, 0, 0, 0.08);
+    --cmdk-highlight-bg: transparent;
+    --cmdk-highlight-color: #18181b;
+    --cmdk-source-bg: rgba(0, 0, 0, 0.06);
+    --cmdk-source-text: #71717a;
+    --cmdk-tag-bg: rgba(0, 0, 0, 0.04);
+    --cmdk-tag-text: #71717a;
+    --cmdk-kbd-bg: rgba(0, 0, 0, 0.06);
+    --cmdk-kbd-text: #71717a;
+    --cmdk-kbd-border: rgba(0, 0, 0, 0.12);
+    --cmdk-overlay: rgba(0, 0, 0, 0.4);
+  }
+
+  /* ── Backdrop ────────────────────────────────────────────────────── */
+  #cmdk-dialog::backdrop {
+    background: var(--cmdk-overlay);
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── Wrapper ─────────────────────────────────────────────────────── */
+  .cmdk-wrapper {
+    width: min(100%, 540px);
+    background: var(--cmdk-bg);
+    border: 1px solid var(--cmdk-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    max-height: min(70vh, 480px);
+  }
+
+  /* ── Header ──────────────────────────────────────────────────────── */
+  .cmdk-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--cmdk-border);
+    flex-shrink: 0;
+  }
+
+  .cmdk-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cmdk-search-icon {
+    flex-shrink: 0;
+    color: var(--cmdk-subtle);
+  }
+
+  .cmdk-input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cmdk-text);
+    font-size: 14px;
+    line-height: 1.5;
+    caret-color: var(--cmdk-subtle);
+    font-family: inherit;
+  }
+
+  .cmdk-input::placeholder {
+    color: var(--cmdk-subtle);
+  }
+
+  /* Hide browser default search clear button */
+  .cmdk-input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .cmdk-hints-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--cmdk-subtle);
+  }
+
+  /* ── List ────────────────────────────────────────────────────────── */
+  .cmdk-list {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px 0;
+    min-height: 0;
+  }
+
+  .cmdk-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .cmdk-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .cmdk-list::-webkit-scrollbar-thumb {
+    background: var(--cmdk-border);
+    border-radius: 9999px;
+  }
+
+  /* Result items */
+  :global(.cmdk-item) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: var(--cmdk-text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 80ms;
+    min-height: 36px;
+    box-sizing: border-box;
+  }
+
+  :global(.cmdk-item:hover),
+  :global(.cmdk-item--active) {
+    background: var(--cmdk-item-hover);
+  }
+
+  :global(.cmdk-item--active) {
+    background: var(--cmdk-item-active);
+  }
+
+  :global(.cmdk-title) {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :global(.cmdk-highlight) {
+    color: var(--cmdk-highlight-color);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    font-weight: 500;
+    background: transparent;
+  }
+
+  :global(.cmdk-source) {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--cmdk-source-bg);
+    color: var(--cmdk-source-text);
+  }
+
+  :global(.cmdk-tag) {
+    flex-shrink: 0;
+    font-size: 10px;
+    color: var(--cmdk-tag-text);
+    background: var(--cmdk-tag-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  :global(.cmdk-empty) {
+    padding: 24px 12px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--cmdk-subtle);
+  }
+
+  :global(.cmdk-empty span) {
+    font-style: italic;
+  }
+
+  /* ── Status ──────────────────────────────────────────────────────── */
+  #cmdk-status {
+    display: none;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────────── */
+  .cmdk-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    border-top: 1px solid var(--cmdk-border);
+    flex-shrink: 0;
+  }
+
+  .cmdk-footer-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--cmdk-subtle);
+  }
+
+  .cmdk-footer-hint svg {
+    color: var(--cmdk-subtle);
+    flex-shrink: 0;
+  }
+
+  .cmdk-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-family: inherit;
+    font-weight: 500;
+    min-width: 20px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: var(--cmdk-kbd-bg);
+    color: var(--cmdk-kbd-text);
+    border: 1px solid var(--cmdk-kbd-border);
+    box-sizing: border-box;
+  }
+
+  /* ── Mobile ──────────────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    #cmdk-dialog {
+      padding-top: 0;
+      align-items: flex-end;
+    }
+
+    .cmdk-wrapper {
+      width: 100%;
+      border-radius: 16px 16px 0 0;
+      max-height: 80vh;
+    }
+
+    /* Hide shortcut hint badges on mobile */
+    .cmdk-hints-shortcut,
+    .cmdk-footer {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+/**
+ * RecentsSection — dark theme for chat index
+ */
+import ChevronDown from '@lucide/astro/icons/chevron-down';
+import Ellipsis from '@lucide/astro/icons/ellipsis';
+import SquarePen from '@lucide/astro/icons/square-pen';
+import type { RecentItem } from '../../../lib/types/sidebar';
+
+interface Props { items: RecentItem[]; }
+const { items } = Astro.props;
+---
+<div data-section-wrap="recents" class="group/section bg-black">
+  <div class="group/header flex h-[32px] w-full items-center justify-between px-1 rounded-md hover:bg-[#0a0a0a] transition-colors">
+    <button data-section-toggle="recents" class="flex items-center gap-1 bg-black group-hover/header:bg-[#0a0a0a] text-white transition-colors">
+      <span class="text-[13px] font-[600] leading-none tracking-tight sidebar-label">Recents</span>
+      <ChevronDown class="h-[12px] w-[12px] text-white/60 opacity-0 group-hover/header:opacity-100 transition-all duration-150 sidebar-label hover-reveal" data-chevron="recents" />
+    </button>
+    <div class="flex items-center gap-0.5 opacity-0 group-hover/header:opacity-100 transition-opacity duration-150">
+      <button class="flex h-6 w-6 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-[#141414] transition-colors sidebar-label hover-reveal" aria-label="More">
+        <Ellipsis class="h-[14px] w-[14px]" />
+      </button>
+      <button id="recents-edit" class="flex h-6 w-6 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-[#141414] transition-colors sidebar-label hover-reveal" aria-label="Edit">
+        <SquarePen class="h-[14px] w-[14px]" />
+      </button>
+    </div>
+  </div>
+
+  <div data-section-content="recents" class="mt-1 space-y-0.5 sidebar-section-content bg-black px-1 overflow-hidden">
+      {items.length === 0 ? (
+        <div id="notion-recents-list" class="space-y-0.5"><p class="px-2 py-1.5 text-[12px] text-zinc-600 sidebar-label">No recents</p></div>
+      ) : (
+        <div id="notion-recents-list" class="space-y-0.5">
+          {items.map((n) => (
+            <button
+              type="button"
+              data-link-trigger
+              data-link-url={n.url || ''}
+              data-link-label={n.title}
+              class="group/note flex items-center gap-2 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-white transition-colors text-left overflow-hidden w-full"
+            >
+              <span class="truncate sidebar-label leading-tight min-w-0 flex-1">{n.title}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+</div>

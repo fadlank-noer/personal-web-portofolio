@@ -1,38 +1,26 @@
 {
   "name": "web-portofolio-fadlan",
   "type": "module",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "deploy:pages": "npm run build && npx wrangler pages deploy"
   },
   "dependencies": {
-    "@astrojs/alpinejs": "^0.4.7",
-    "@astrojs/node": "^9.4.3",
-    "@astrojs/preact": "^4.0.10",
-    "@astrojs/react": "^4.2.5",
-    "@astrojs/solid-js": "^5.0.9",
-    "@astrojs/svelte": "^7.0.11",
-    "@astrojs/vercel": "^8.2.7",
-    "@astrojs/vue": "^5.0.11",
-    "@solidjs/router": "^0.15.3",
-    "@tailwindcss/vite": "^4.1.4",
-    "@types/alpinejs": "^3.13.11",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "alpinejs": "^3.14.9",
-    "astro": "^5.7.5",
-    "google-recaptcha-v3": "^1.1.2",
-    "preact": "^10.26.5",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "resend": "^6.0.2",
-    "solid-js": "^1.9.5",
-    "svelte": "^5.28.2",
-    "tailwindcss": "^4.1.4",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.13"
+    "@lucide/astro": "^1.25.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.1.2",
+    "clsx": "^2.1.1",
+    "nanostores": "^1.4.2",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
   }
 }

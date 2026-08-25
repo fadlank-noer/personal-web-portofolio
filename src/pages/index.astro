@@ -1,24 +1,7 @@
 ---
-import "../../styles/global.css";
-import Head from "../components/Head.astro"
-import Navbar from "../components/alpine/Navbar.astro";
-import HeroLayer from "../components/solid/HeroLayer.tsx"
-import Experience from "../components/vue/Experience.vue";
-import ProjectGallery from "../components/preact/ProjectGallery.tsx";
-import Testimonials from "../components/react/Testimonials.tsx";
-import ContactForm from "../components/svelte/ContactForm.svelte";
+import Layout from "../layouts/Layout.astro"
 ---
 
-<html lang="en">
-	<head>
-		<Head />
-	</head>
-	<body class="overflow-x-hidden">
-		<Navbar/>
-		<HeroLayer client:load />
-		<Experience client:load /> 
-		<ProjectGallery client:load />
-		<Testimonials client:load />
-		<ContactForm client:only />
-	</body>
-</html>
+<Layout>
+  <!-- index hanya wrapper - semua ada di Layout: Sidebar + ChatHistory (atas) + ChatBox (bawah) -->
+</Layout>
