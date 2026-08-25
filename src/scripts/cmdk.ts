@@ -305,9 +305,12 @@ function init() {
     input.addEventListener('input', handleInput);
   }
 
-  // Wire sidebar search button trigger
+  // Wire sidebar search button triggers
   const sidebarSearchBtn = document.getElementById('sidebar-search');
   sidebarSearchBtn?.addEventListener('click', () => open(sidebarSearchBtn));
+
+  const sidebarSearchChatsBtn = document.getElementById('sidebar-search-chats');
+  sidebarSearchChatsBtn?.addEventListener('click', () => open(sidebarSearchChatsBtn));
 }
 
 // Init after DOM is ready
