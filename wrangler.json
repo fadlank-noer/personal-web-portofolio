@@ -1,6 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "fadlan-portfolio",
+  "name": "personal-web-portfolio",
   "compatibility_date": "2026-08-24",
-  "pages_build_output_dir": "dist"
+  "pages_config": {
+    "project_name": "personal-web-portfolio",
+    "branch": "main"
+  },
+  "assets": {
+    "directory": "./dist"
+  }
 }
