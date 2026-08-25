@@ -274,12 +274,12 @@ const data = sidebarData as SidebarData;
   window.toggleSidebar = () => { if (isMobile()) applyMobile(sidebar?.dataset.mobileOpen !== 'true'); };
 
   // Hero re-entrance stagger after chat clears
-  window.addEventListener('chat:state', (e) => {
-    if (!e.detail?.empty) return;
+  window.addEventListener('chat:state', (e: Event) => {
+    if (!(e as CustomEvent).detail?.empty) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
     const targets = ['#chat-empty-state h1', '#chat-empty-state p', '#chat-empty-state .chip-btn'];
-    document.querySelectorAll(targets.join(',')).forEach((el, i) => {
+    document.querySelectorAll<HTMLElement>(targets.join(',')).forEach((el, i) => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(8px)';
       requestAnimationFrame(() => requestAnimationFrame(() => {

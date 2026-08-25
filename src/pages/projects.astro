@@ -12,7 +12,7 @@ import type { ProjectItem } from '../lib/types/sidebar';
 
 export type { ProjectItem };
 
-const projects = (cvData.projects ?? []).map((p: any, index: number) => ({
+const projects = (cvData.projects ?? []).map((p: any) => ({
   ...p,
   desc: p.desc ?? p.description ?? '',
 })) as ProjectItem[];
@@ -63,7 +63,7 @@ const projects = (cvData.projects ?? []).map((p: any, index: number) => ({
                   <!-- badge row -->
                   <div class="flex items-center justify-between">
                     <span class={`inline-flex h-[26px] items-center gap-1.5 rounded-full ${p.color} bg-opacity-20 border border-current px-3 text-[11px] font-[600] text-white`}>
-                      <span class="opacity-90">{p.name}</span>
+                      <span class="opacity-90">{p.title}</span>
                     </span>
                   </div>
 
@@ -82,7 +82,7 @@ const projects = (cvData.projects ?? []).map((p: any, index: number) => ({
                           onerror={`this.style.display='none';this.nextElementSibling.style.display='flex'`}
                         />
                         <div class="hidden h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f]" style="display: flex;">
-                          <span class="text-[13px] font-[600] text-zinc-500">{p.name}</span>
+                          <span class="text-[13px] font-[600] text-zinc-500">{p.title}</span>
                         </div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                       </>
