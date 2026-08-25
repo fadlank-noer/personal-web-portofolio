@@ -176,6 +176,11 @@ function open(fromTrigger?: HTMLElement) {
 
   isOpen = true;
   openTrigger = fromTrigger ?? null;
+
+  // Clear any belt-and-suspenders CSS override from close()
+  dialog.style.display = '';
+  dialog.style.visibility = '';
+
   dialog.showModal();
 
   // Focus input after dialog opens
@@ -191,6 +196,14 @@ function close() {
 
   isOpen = false;
   dialog.close();
+
+  // Belt-and-suspenders: ensure the dialog is actually hidden.
+  // Native dialog.close() removes the [open] attribute which hides via
+  // CSS (#cmdk-dialog:not([open]) { display: none; }) — but if Astro SSR
+  // re-renders the dialog mid-session or the attribute doesn't take effect
+  // for any reason, this CSS override guarantees invisibility.
+  dialog.style.display = 'none';
+  dialog.style.visibility = 'hidden';
 
   // Reset state
   const input = getInput();
@@ -246,6 +259,14 @@ function handleGlobalKeydown(e: KeyboardEvent) {
     } else {
       open();
     }
+    return;
+  }
+
+  // Escape — document-level fallback so cmdk closes even when focus is
+  // outside the dialog (e.g. body, or when dialog element doesn't receive
+  // the event for any reason). Only fires when the dialog is open.
+  if (e.key === 'Escape' && isOpen) {
+    close();
   }
 }
 
@@ -256,26 +277,14 @@ function handleInput() {
   renderResults();
 }
 
-// ── Overlay click to close ────────────────────────────────────────────────────
-
-function handleOverlayClick(e: MouseEvent) {
-  const dialog = getDialog();
-  if (!dialog) return;
-  // Only close if clicking the backdrop (outside the dialog box)
-  const rect = dialog.getBoundingClientRect();
-  const clickedOutside =
-    e.clientX < rect.left ||
-    e.clientX > rect.right ||
-    e.clientY < rect.top ||
-    e.clientY > rect.bottom;
-  if (clickedOutside) {
-    close();
-  }
-}
-
 // ── Init ─────────────────────────────────────────────────────────────────────
 
+let _inited = false;
+
 function init() {
+  if (_inited) return;
+  _inited = true;
+
   // Read data from window.__CMDK_DATA__ (set by Astro inline script)
   const winData = (window as unknown as { __CMDK_DATA__?: CmdKWindowData }).__CMDK_DATA__;
   if (winData?.items?.length) {
@@ -289,7 +298,6 @@ function init() {
   const dialog = getDialog();
   if (dialog) {
     dialog.addEventListener('keydown', handleKeydown);
-    dialog.addEventListener('click', handleOverlayClick);
   }
 
   const input = getInput();

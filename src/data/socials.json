@@ -1,0 +1,57 @@
+[
+  {
+    "id": "linkedin",
+    "platform": "LinkedIn",
+    "displayName": "Fadlan Noer",
+    "handle": "@fadlannoer",
+    "url": "https://www.linkedin.com/in/fadlan-kautsar-noer/",
+    "icon": "Linkedin",
+    "description": "Connect with me on LinkedIn for professional updates and career opportunities.",
+    "stats": "500+ connections",
+    "category": "Tech & Code"
+  },
+  {
+    "id": "github",
+    "platform": "GitHub",
+    "displayName": "fadlannoer",
+    "handle": "@fadlannoer",
+    "url": "https://github.com/fadlank-noer",
+    "icon": "Github",
+    "description": "Open source projects, coding experiments, and side project repositories.",
+    "stats": "20+ repos",
+    "category": "Tech & Code"
+  },
+  {
+    "id": "threads",
+    "platform": "Threads",
+    "displayName": "fadlans_repo",
+    "handle": "@fadlans_repo",
+    "url": "https://www.threads.com/@fadlans_repo",
+    "icon": "AtSign",
+    "description": "Short-form thoughts, links, and conversations on Threads.",
+    "stats": "500+ followers",
+    "category": "Tech & Code"
+  },
+  {
+    "id": "twitter",
+    "platform": "Twitter/X",
+    "displayName": "Fadlans Repo",
+    "handle": "@fadlans_repo",
+    "url": "https://x.com/fadlans_repo",
+    "icon": "Twitter",
+    "description": "Thoughts on software engineering, AI, and tech trends.",
+    "stats": "850 followers",
+    "category": "Tech & Code"
+  },
+  {
+    "id": "youtube",
+    "platform": "YouTube",
+    "displayName": "Fadlan Kautsarnoer",
+    "handle": "@fadlankautsarnoer9647",
+    "url": "https://www.youtube.com/@fadlankautsarnoer9647",
+    "icon": "Youtube",
+    "description": "Technical tutorials, coding walkthroughs, and project demos.",
+    "stats": "150 subscribers",
+    "category": "Tech & Code"
+  }
+]

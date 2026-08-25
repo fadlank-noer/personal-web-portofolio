@@ -8,6 +8,7 @@
 import Plus from '@lucide/astro/icons/plus';
 import ArrowUp from '@lucide/astro/icons/arrow-up';
 import Mic from '../../../../public/assets/svgs/mic.svg';
+import ThreadsIcon from '../../../../public/assets/svgs/threads.svg';
 import Dices from '@lucide/astro/icons/dices';
 import questionsData from '../../../data/question-templates.json';
 
@@ -360,6 +361,10 @@ const { cn = "" } = Astro.props;
                     <path d="M16 17H8"/>
                   </svg>
                   View CV
+                </a>
+                <a href="/social" data-dropup-item class="flex items-center gap-3 px-3 py-2.5 text-[13px] text-zinc-200 hover:bg-white/[0.06] transition-colors" role="menuitem">
+                  <ThreadsIcon class="h-[16px] w-[16px] text-white flex-shrink-0" />
+                  Social Media
                 </a>
               </div>
             </div>

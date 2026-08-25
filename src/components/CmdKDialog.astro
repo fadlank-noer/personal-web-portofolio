@@ -124,10 +124,20 @@ const itemsJson = JSON.stringify(cmdItems);
     max-height: 100%;
     width: 100%;
     height: 100%;
-    display: flex;
+    /* NOTE: no `display` here — setting it unconditionally (author origin)
+       overrides the UA stylesheet's `dialog:not([open]) { display: none }`,
+       leaving a closed dialog painted on screen. Display is set ONLY in the
+       [open] rule below, plus an explicit closed-state rule. */
     align-items: flex-start;
     justify-content: center;
     padding-top: min(15vh, 120px);
+  }
+
+  /* Closed dialog MUST be hidden. Explicit author rule because `all: unset`
+     above and the base rule both (as author origin) would otherwise defeat
+     the UA stylesheet's dialog:not([open]) { display: none }. */
+  #cmdk-dialog:not([open]) {
+    display: none;
   }
 
   #cmdk-dialog[open] {
