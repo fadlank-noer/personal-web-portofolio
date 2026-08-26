@@ -41,13 +41,13 @@ const data = sidebarData as SidebarData;
 >
   <!-- Header -->
   <div class="flex h-[52px] items-center justify-between px-2.5 flex-shrink-0 bg-black">
-    <button id="sidebar-toggle" class="flex h-8 w-8 items-center justify-center rounded-lg text-white hover:bg-[#141414] transition-colors shrink-0" title="Toggle sidebar" aria-label="Toggle sidebar">
+    <button id="sidebar-toggle" class="flex h-11 w-11 items-center justify-center rounded-lg text-white hover:bg-[#141414] transition-colors shrink-0 min-h-[44px] min-w-[44px]" title="Toggle sidebar" aria-label="Toggle sidebar">
       <LogoV2 class="h-5 w-5 [&_path]:!fill-white" />
     </button>
 
     <!-- Actions -->
-    <div class="flex items-center gap-0.5 ml-auto">
-      <button id="sidebar-search" class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors sidebar-label" title="Search" aria-label="Search chats">
+    <div class="flex items-center gap-1 ml-auto">
+      <button id="sidebar-search" class="flex h-11 w-11 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors sidebar-label min-h-[44px] min-w-[44px]" title="Search" aria-label="Search chats">
         <Search class="h-[18px] w-[18px]" />
       </button>
 
@@ -57,17 +57,17 @@ const data = sidebarData as SidebarData;
 
   <!-- Quick actions -->
     <div class="px-2.5 pb-2 space-y-0.5 bg-black">
-      <button id="new-chat-btn" type="button" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors active:scale-[.97]">
-        <SquarePen class="h-[18px] w-[18px] flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
+      <button id="new-chat-btn" type="button" class="flex w-full items-center gap-3 rounded-lg px-2 py-3 text-[14px] text-zinc-200 hover:bg-[#141414] transition-colors active:scale-[.97] min-h-[44px]">
+        <SquarePen class="h-5 w-5 flex-shrink-0" /> <span class="truncate sidebar-label">New chat</span>
       </button>
-      <a href="/library/" data-nav="library" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
-        <LibraryIcon class="h-[18px] w-[18px] flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Library</span>
+      <a href="/library/" data-nav="library" class="flex w-full items-center gap-3 rounded-lg px-2 py-3 text-[14px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa min-h-[44px]">
+        <LibraryIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Library</span>
       </a>
-      <a href="/projects/" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa">
+      <a href="/projects/" data-nav="projects" class="flex w-full items-center gap-3 rounded-lg px-2 py-3 text-[14px] text-zinc-200 hover:bg-[#141414] transition-colors group/qa min-h-[44px]">
         <FolderIcon class="h-5 w-5 flex-shrink-0 text-zinc-300 group-hover/qa:text-white transition-colors" /> <span class="truncate sidebar-label">Projects</span>
       </a>
-      <button id="sidebar-search-chats" class="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors">
-        <Search class="h-[18px] w-[18px] flex-shrink-0 [&_path]:!fill-none [&_path]:!stroke-current" /> <span class="truncate sidebar-label">Search chats</span>
+      <button id="sidebar-search-chats" class="flex w-full items-center gap-3 rounded-lg px-2 py-3 text-[14px] text-zinc-400 hover:bg-[#141414] hover:text-zinc-200 transition-colors min-h-[44px]">
+        <Search class="h-5 w-5 flex-shrink-0 [&_path]:!fill-none [&_path]:!stroke-current" /> <span class="truncate sidebar-label">Search chats</span>
       </button>
     </div>
 
@@ -80,8 +80,8 @@ const data = sidebarData as SidebarData;
 
     <div class="mt-auto border-t border-white/[0.06] bg-black sidebar-profile-separator">
       <div class="px-2 py-2 pb-3" data-user-section>
-        <button class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#141414] transition-colors">
-          <div class="h-7 w-7 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-white">F</div>
+        <button class="flex w-full items-center gap-2 rounded-lg px-2 py-2 hover:bg-[#141414] transition-colors min-h-[44px]">
+          <div class="h-8 w-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-white">F</div>
           <span class="truncate flex-1 text-left text-[13px] text-zinc-200 sidebar-label">Fadlan K. Noer</span>
           <ChevronDown class="h-4 w-4 text-zinc-500 flex-shrink-0 sidebar-label" />
         </button>
