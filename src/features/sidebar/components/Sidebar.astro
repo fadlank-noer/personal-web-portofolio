@@ -41,13 +41,13 @@ const data = sidebarData as SidebarData;
 >
   <!-- Header -->
   <div class="flex h-[52px] items-center justify-between px-2.5 flex-shrink-0 bg-black">
-    <button id="sidebar-toggle" class="flex h-11 w-11 items-center justify-center rounded-lg text-white hover:bg-[#141414] transition-colors shrink-0 min-h-[44px] min-w-[44px]" title="Toggle sidebar" aria-label="Toggle sidebar">
+    <button id="sidebar-toggle" class="flex h-8 w-8 max-md:h-11 max-md:w-11 items-center justify-center rounded-lg text-white hover:bg-[#141414] transition-colors shrink-0" title="Toggle sidebar" aria-label="Toggle sidebar">
       <LogoV2 class="h-5 w-5 [&_path]:!fill-white" />
     </button>
 
     <!-- Actions -->
     <div class="flex items-center gap-1 ml-auto">
-      <button id="sidebar-search" class="flex h-11 w-11 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors sidebar-label min-h-[44px] min-w-[44px]" title="Search" aria-label="Search chats">
+      <button id="sidebar-search" class="flex h-8 w-8 max-md:h-11 max-md:w-11 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-[#141414] transition-colors sidebar-label" title="Search" aria-label="Search chats">
         <Search class="h-[18px] w-[18px]" />
       </button>
 
@@ -244,7 +244,7 @@ const data = sidebarData as SidebarData;
     history.slice().reverse().forEach((msg: ChatMsg) => {
       const btn = document.createElement('button');
       btn.setAttribute('data-sidebar-item', msg.id);
-      btn.className = 'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-[13px] text-zinc-300 hover:bg-[#141414] transition-colors text-left';
+      btn.className = 'flex w-full items-center gap-3 rounded-lg px-2 py-2 max-md:py-3 max-md:min-h-[44px] text-[13px] text-zinc-300 hover:bg-[#141414] transition-colors text-left';
       btn.title = msg.question;
       btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 flex-shrink-0 opacity-70"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="truncate flex-1 sidebar-label">${escapeHtml(msg.question)}</span>`;
       btn.addEventListener('click', () => { window.dispatchEvent(new CustomEvent('chat:scroll-to', { detail: { id: msg.id } })); if (isMobile()) applyMobile(false); });
