@@ -3,8 +3,10 @@ import { defineConfig } from 'astro/config';
 
 // Plugins
 import tailwindcss from "@tailwindcss/vite";
+import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
+  site: "https://fadlank.web.id",
   vite: {
     plugins: [tailwindcss()],
     server: {
@@ -19,4 +21,8 @@ export default defineConfig({
 
   // SPA-ready: static output for speed, no server secrets
   output: "static",
+
+  integrations: [
+    sitemap(),
+  ],
 });

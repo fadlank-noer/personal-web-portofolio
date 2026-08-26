@@ -11,6 +11,7 @@
     "deploy": "npm run build && npx wrangler pages deploy dist --project-name=personal-web-portofolio"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
     "@lucide/astro": "^1.25.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.2",
