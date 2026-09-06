@@ -1,23 +1,18 @@
 ---
 import "../styles/global.css";
 import FolderIcon from '../../public/assets/svgs/folder.svg';
-import SideToggleMobile from '../../public/assets/svgs/side-toggle-mobile.svg';
 import LogoV2 from '../../public/assets/logo-v2.svg';
 
 import Sidebar from '../features/sidebar/components/Sidebar.astro';
 import LinkConfirmationModal from '../components/ui/chat/LinkConfirmationModal.astro';
 import Head from '../layouts/Head.astro';
-import cvData from '../data/cv/fadlan.json';
-import type { ProjectItem } from '../lib/types/sidebar';
+import PageTopBar from '../components/ui/PageTopBar.astro';
+import projectsData from '../data/projects.json';
+import type { ProjectEntry } from '../lib/types/projects';
 
-export type { ProjectItem };
+export type { ProjectEntry };
 
-const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
-  ...p,
-  id: p.id ?? p.name ?? `project-${i}`,
-  title: p.title ?? p.name ?? '',
-  desc: p.desc ?? p.description ?? '',
-})) as ProjectItem[];
+const projects = projectsData as ProjectEntry[];
 ---
 
 <html lang="en">
@@ -30,35 +25,35 @@ const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
     <div class="flex h-[100dvh] w-full overflow-hidden bg-black">
       <Sidebar />
 
-      <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
+      <main class="dot-grid flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
         <!-- Top bar -->
-        <div class="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 py-3 md:px-6 md:py-4 backdrop-blur">
-          <div class="flex items-center gap-2">
-            <!-- Mobile sidebar toggle -->
-            <button id="mobile-sidebar-toggle" class="flex md:hidden h-10 w-10 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
-              <SideToggleMobile class="h-[22px] w-[22px] text-white" />
-            </button>
-            <span class="hidden md:flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
-              <FolderIcon class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
-            </span>
-            <h1 class="text-[16px] font-[700] tracking-[-0.02em] text-white">Projects</h1>
-            <span class="ml-1 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">{projects.length} projects</span>
-          </div>
-        </div>
+        <PageTopBar title="Projects">
+          <FolderIcon slot="icon" class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
+          <span slot="badge" class="ml-1 rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">{projects.length} projects</span>
+        </PageTopBar>
 
         <div class="mx-auto w-full max-w-[1280px] px-3 py-4 md:px-6 md:py-8">
 
           <!-- Folder grid -->
           <div class="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
             {projects.map((p, index) => (
-              <a
-                href={p.url ?? '#'}
-                style={`animation-delay: ${index * 80}ms;`}
-                class="group glass-card relative flex flex-col overflow-hidden rounded-[18px] border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl hover:bg-white/[0.07] hover:border-white/[0.15] hover:shadow-[0_0_24px_-4px_rgba(139,92,246,0.25)] hover:scale-[1.02] transition-all duration-200 cursor-pointer"
-                data-link-trigger
-                data-link-url={p.url ?? '#'}
-                data-link-label={p.title}
-              >
+              <div class="group relative" style={`--gc: ${p.glowColor};`}>
+                <!-- Ambient glow: outside card stacking context -->
+                <span
+                  aria-hidden="true"
+                  class="pointer-events-none absolute -inset-[35%] z-0 rounded-full opacity-0 blur-[72px] transition-opacity duration-300 group-hover:opacity-100"
+                  style="background: radial-gradient(circle, var(--gc), transparent 70%);"
+                />
+                <a
+                  href={p.url ?? '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={`animation-delay: ${index * 80}ms;`}
+                  class="relative z-10 glass-card flex flex-col overflow-hidden rounded-[18px] border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl hover:bg-white/[0.07] hover:border-white/[0.15] hover:shadow-[0_0_32px_-8px_var(--gc)] hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+                  data-link-trigger
+                  data-link-url={p.url ?? '#'}
+                  data-link-label={p.title}
+                >
                 <!-- top color accent thin -->
                 <div class={`h-[3px] w-full ${p.color} opacity-90 group-hover:opacity-100 transition-opacity`} />
                 <div class="flex flex-col p-4 gap-4">
@@ -67,6 +62,7 @@ const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
                     <span class={`inline-flex h-[26px] items-center gap-1.5 rounded-full ${p.color} bg-opacity-20 border border-current px-3 text-[11px] font-[600] text-white`}>
                       <span class="opacity-90">{p.title}</span>
                     </span>
+                    <span class="inline-flex h-[22px] flex-shrink-0 items-center rounded-full border border-white/[0.08] bg-white/[0.04] px-2 text-[10px] font-[500] text-zinc-400">{p.category}</span>
                   </div>
 
                   <!-- description -->
@@ -109,7 +105,8 @@ const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-[12px] w-[12px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                   </span>
                 </div>
-              </a>
+                </a>
+              </div>
             ))}
           </div>
 
@@ -125,8 +122,11 @@ const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
 </html>
 
 <script>
-  // Intercept all window.open calls → route through link confirmation modal
+  // Intercept external window.open → route through link confirmation modal
   const _originalOpen = window.open.bind(window);
+  // Expose the native open so LinkConfirmationModal.openUrl can bypass this
+  // interceptor — otherwise its window.open call loops back into showLinkModal.
+  (window as any).__nativeOpen = _originalOpen;
   (window as any).open = function(url: string, ...args: any[]) {
     if (
       typeof url === 'string' &&
@@ -173,6 +173,12 @@ const projects = (cvData.projects ?? []).map((p: any, i: number) => ({
   }
   .glass-card {
     animation: fadeSlideUp 300ms ease-out both;
+  }
+  /* Micro-dot matrix background (Vercel/Linear canvas feel) — FD6 fallback path */
+  .dot-grid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='1' cy='1' r='1' fill='rgba(255,255,255,0.035)'/%3E%3C/svg%3E");
+    background-size: 16px 16px;
+    background-repeat: repeat;
   }
   .chat-scrollbar { scrollbar-width: thin; scrollbar-color: #2a2a2a #0a0a0a; }
   .chat-scrollbar::-webkit-scrollbar { width: 6px; }

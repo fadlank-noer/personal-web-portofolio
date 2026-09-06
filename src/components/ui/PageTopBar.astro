@@ -1,0 +1,56 @@
+---
+/**
+ * PageTopBar — sticky top bar shared by standalone pages (projects/library/social).
+ * Extracted from projects.astro lines 34-47 (2026-09-05).
+ *
+ * Slots:
+ *   icon    (required): page icon inside the dark tile
+ *   badge   (optional): count chip right of the title
+ *   actions (optional): right-side controls (reserved area)
+ * The mobile sidebar toggle (SideToggleMobile) is built in — identical on all pages.
+ */
+import SideToggleMobile from '../../../public/assets/svgs/side-toggle-mobile.svg';
+
+interface Props {
+  title: string;
+  /** compact = 52px bar + smaller tile/toggle/title (social). Default: 72px (projects/library). */
+  compact?: boolean;
+}
+
+const { title, compact = false } = Astro.props;
+---
+
+<div
+  class:list={[
+    'sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 md:px-6 backdrop-blur',
+    compact ? 'h-[52px]' : 'h-[72px]',
+  ]}
+>
+  <div class="flex items-center gap-2">
+    <button
+      id="mobile-sidebar-toggle"
+      class:list={[
+        'flex md:hidden items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1',
+        compact ? 'h-9 w-9' : 'h-10 w-10',
+      ]}
+      aria-label="Toggle sidebar"
+    >
+      <SideToggleMobile class="h-[22px] w-[22px] text-white" />
+    </button>
+    <span
+      class:list={[
+        'hidden md:flex items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]',
+        compact ? 'h-8 w-8' : 'h-9 w-9',
+      ]}
+    >
+      <slot name="icon" />
+    </span>
+    <h1
+      class:list={['font-[700] tracking-[-0.02em] text-white', compact ? 'text-[15px]' : 'text-[16px]']}
+    >
+      {title}
+    </h1>
+    <slot name="badge" />
+  </div>
+  <slot name="actions" />
+</div>

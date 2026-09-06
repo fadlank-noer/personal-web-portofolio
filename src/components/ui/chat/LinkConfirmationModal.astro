@@ -64,7 +64,12 @@
       if (normalized.startsWith('file://')) {
         window.location.href = normalized;
       } else {
-        window.open(normalized, '_blank', 'noopener,noreferrer');
+        // Prefer the native (unpatched) window.open: pages like projects.astro
+        // intercept window.open to show this modal, so calling window.open here
+        // would re-trigger the modal instead of opening the tab.
+        const nativeOpen: typeof window.open =
+          (window as any).__nativeOpen || window.open.bind(window);
+        nativeOpen(normalized, '_blank', 'noopener,noreferrer');
       }
     }
 

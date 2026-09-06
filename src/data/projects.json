@@ -1,0 +1,62 @@
+[
+  {
+    "id": "laundry",
+    "title": "Laundry Landing Page",
+    "desc": "Built a conversion-focused landing page for LaundryPro - animated hero, tiered pricing, and a booking CTA. Tech: SvelteKit, Tailwind CSS v4, GSAP.",
+    "url": "https://laundry.fadlank.web.id/",
+    "image": "/assets/projects/laundry-preview.png",
+    "category": "Code",
+    "color": "from-cyan-500 to-emerald-500",
+    "thumb": "LL",
+    "count": 3,
+    "glowColor": "rgba(34,211,238,0.30)"
+  },
+  {
+    "id": "prompt-builder",
+    "title": "Prompt Builder",
+    "desc": "Craft high-quality prompts for GPT Image 2 and Seedance 2.0 with structured forms, live preview, and one-click copy. Speed up your workflow - no guesswork.",
+    "url": "https://prompt-builder.fadlank.web.id/",
+    "image": "/assets/projects/prompt-builder-preview.png",
+    "category": "Code",
+    "color": "from-violet-500 to-purple-600",
+    "thumb": "PB",
+    "count": 3,
+    "glowColor": "rgba(139,92,246,0.30)"
+  },
+  {
+    "id": "explan-gaming",
+    "title": "EXPlan Gaming",
+    "desc": "Gaming community brand page managed across social platforms: content strategy, community engagement, and creative direction.",
+    "url": "https://www.youtube.com/@explan-vibing",
+    "image": "/assets/projects/explan-gaming-preview.png",
+    "category": "Social Media",
+    "color": "from-red-500 to-orange-600",
+    "thumb": "XG",
+    "count": 145,
+    "glowColor": "rgba(248,113,113,0.28)"
+  },
+  {
+    "id": "exp-lan",
+    "title": "@exp.lan",
+    "desc": "Personal tech & lifestyle account covering gaming, coding tutorials, and daily productivity tips for the curious developer.",
+    "url": "https://www.tiktok.com/@exp.lan",
+    "image": "/assets/projects/exp-lan-preview.png",
+    "category": "Social Media",
+    "color": "from-cyan-400 to-blue-500",
+    "thumb": "EL",
+    "count": 569,
+    "glowColor": "rgba(34,211,238,0.28)"
+  },
+  {
+    "id": "mochicimmi",
+    "title": "@mochicimmi",
+    "desc": "Creative lifestyle account featuring aesthetic photography, study setups, and wellness routines tailored for young creatives.",
+    "url": "https://www.tiktok.com/@mochicimmi",
+    "image": "/assets/projects/mochicimmi-preview.png",
+    "category": "Social Media",
+    "color": "from-rose-400 to-pink-500",
+    "thumb": "MC",
+    "count": 369,
+    "glowColor": "rgba(244,114,182,0.28)"
+  }
+]

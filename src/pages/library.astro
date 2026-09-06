@@ -1,10 +1,10 @@
 ---
 import "../styles/global.css";
 import LibraryIcon from '../../public/assets/svgs/library.svg';
-import SideToggleMobile from '../../public/assets/svgs/side-toggle-mobile.svg';
 import Sidebar from "../features/sidebar/components/Sidebar.astro";
 import LinkConfirmationModal from "../components/ui/chat/LinkConfirmationModal.astro";
 import Head from "../layouts/Head.astro";
+import PageTopBar from "../components/ui/PageTopBar.astro";
 import { libraryItems } from '../data/library';
 
 const imageCount = libraryItems.filter(i => i.type === 'image').length;
@@ -26,25 +26,17 @@ const notionCardLabel = 'want to see more? my public Notion collection is here';
 
       <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
         <!-- Top bar -->
-        <div class="sticky top-0 z-10 flex h-[72px] items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 py-3 md:px-6 md:py-4 backdrop-blur">
-          <div class="flex items-center gap-2">
-            <button id="mobile-sidebar-toggle" class="flex md:hidden h-10 w-10 items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1" aria-label="Toggle sidebar">
-              <SideToggleMobile class="h-[22px] w-[22px] text-white" />
-            </button>
-            <span class="hidden md:flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]">
-              <LibraryIcon class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
+        <PageTopBar title="Library">
+          <LibraryIcon slot="icon" class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
+          <div slot="badge" class="ml-1 flex items-center gap-1.5">
+            <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} {imageCount === 1 ? 'item' : 'items'}
             </span>
-            <h1 class="text-[16px] font-[700] tracking-[-0.02em] text-white">Library</h1>
-            <div class="ml-1 flex items-center gap-1.5">
-              <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} {imageCount === 1 ? 'item' : 'items'}
-              </span>
-            </div>
           </div>
-          <div class="flex items-center gap-2">
+          <div slot="actions" class="flex items-center gap-2">
             <!-- reserved for future controls -->
           </div>
-        </div>
+        </PageTopBar>
 
         <div class="w-full px-3 py-4 md:px-6 md:py-8">
           <!-- Notion-style card (always visible, NOT part of masonry) -->
