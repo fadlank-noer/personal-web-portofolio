@@ -13,7 +13,7 @@ import SideToggleMobile from '../../../public/assets/svgs/side-toggle-mobile.svg
 
 interface Props {
   title: string;
-  /** compact = 52px bar + smaller tile/toggle/title (social). Default: 72px (projects/library). */
+  /** compact = 64px bar + smaller tile/toggle/title (social). Default: 88px (projects/library). */
   compact?: boolean;
 }
 
@@ -22,16 +22,16 @@ const { title, compact = false } = Astro.props;
 
 <div
   class:list={[
-    'sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-black/85 px-3 md:px-6 backdrop-blur',
-    compact ? 'h-[52px]' : 'h-[72px]',
+    'sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-white/[0.08] bg-black/70 px-4 py-3 shadow-[0_1px_0_0_rgba(255,255,255,0.02)] backdrop-blur-xl md:px-8',
+    compact ? 'h-[64px]' : 'h-[88px]',
   ]}
 >
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-3 md:gap-4">
     <button
       id="mobile-sidebar-toggle"
       class:list={[
-        'flex md:hidden items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1',
-        compact ? 'h-9 w-9' : 'h-10 w-10',
+        'flex md:hidden items-center justify-center rounded-full text-white hover:bg-[#1a1a1a] transition-colors -ml-1.5',
+        compact ? 'h-10 w-10' : 'h-11 w-11',
       ]}
       aria-label="Toggle sidebar"
     >
@@ -39,14 +39,14 @@ const { title, compact = false } = Astro.props;
     </button>
     <span
       class:list={[
-        'hidden md:flex items-center justify-center rounded-[10px] bg-[#1a1a1a] border border-white/[0.06]',
-        compact ? 'h-8 w-8' : 'h-9 w-9',
+        'hidden md:flex items-center justify-center border border-violet-500/20 bg-violet-500/10 text-violet-300 shadow-[0_0_18px_-6px_rgba(139,92,246,0.55)]',
+        compact ? 'h-10 w-10 rounded-lg' : 'h-12 w-12 rounded-xl',
       ]}
     >
       <slot name="icon" />
     </span>
     <h1
-      class:list={['font-[700] tracking-[-0.02em] text-white', compact ? 'text-[15px]' : 'text-[16px]']}
+      class:list={['font-[700] tracking-[-0.02em] text-white', compact ? 'text-[16px]' : 'text-[18px]']}
     >
       {title}
     </h1>

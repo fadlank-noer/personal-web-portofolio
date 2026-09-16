@@ -5,7 +5,7 @@
     "displayName": "Fadlan Noer",
     "handle": "@fadlannoer",
     "url": "https://www.linkedin.com/in/fadlan-kautsar-noer/",
-    "icon": "Linkedin",
+    "icon": "linkedin",
     "description": "Connect with me on LinkedIn for professional updates and career opportunities.",
     "stats": "500+ connections",
     "category": "Tech & Code"
@@ -16,7 +16,7 @@
     "displayName": "fadlannoer",
     "handle": "@fadlannoer",
     "url": "https://github.com/fadlank-noer",
-    "icon": "Github",
+    "icon": "github",
     "description": "Open source projects, coding experiments, and side project repositories.",
     "stats": "20+ repos",
     "category": "Tech & Code"
@@ -27,7 +27,7 @@
     "displayName": "fadlans_repo",
     "handle": "@fadlans_repo",
     "url": "https://www.threads.com/@fadlans_repo",
-    "icon": "AtSign",
+    "icon": "threads",
     "description": "Short-form thoughts, links, and conversations on Threads.",
     "stats": "500+ followers",
     "category": "Tech & Code"
@@ -38,7 +38,7 @@
     "displayName": "Fadlans Repo",
     "handle": "@fadlans_repo",
     "url": "https://x.com/fadlans_repo",
-    "icon": "Twitter",
+    "icon": "x",
     "description": "Thoughts on software engineering, AI, and tech trends.",
     "stats": "850 followers",
     "category": "Tech & Code"
@@ -49,9 +49,20 @@
     "displayName": "Fadlan Kautsarnoer",
     "handle": "@fadlankautsarnoer9647",
     "url": "https://www.youtube.com/@fadlankautsarnoer9647",
-    "icon": "Youtube",
+    "icon": "youtube",
     "description": "Technical tutorials, coding walkthroughs, and project demos.",
     "stats": "150 subscribers",
     "category": "Tech & Code"
+  },
+  {
+    "id": "substack",
+    "platform": "Substack",
+    "displayName": "Fadlan's Thoughts",
+    "handle": "@fadlansthought",
+    "url": "https://substack.com/@fadlansthought",
+    "icon": "substack",
+    "description": "Long-form writing on software, AI, and tech thinking.",
+    "stats": "New",
+    "category": "Personal"
   }
 ]

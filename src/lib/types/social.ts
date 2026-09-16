@@ -4,7 +4,8 @@ export interface SocialLink {
   displayName: string;
   handle: string;    // e.g. "@fadlannoer"
   url: string;       // external URL
-  icon: string;      // Lucide icon component name (PascalCase)
+  icon: string;      // Simple Icons slug (lowercase) used as the /social card logo URL;
+                    // falls back to the platform initial when the slug 404s
   description: string;
   stats: string;     // e.g. "500+ connections"
   category: string;  // "Tech & Code" | "Personal" | "Featured"

@@ -27,8 +27,8 @@ const categories = ["All", ...new Set(socials.map((s) => s.category))];
           <svg
             slot="icon"
             xmlns="http://www.w3.org/2000/svg"
-            class="h-[18px] w-[18px] text-violet-500"
-            width="18" height="18" viewBox="0 0 24 24" fill="none"
+            class="h-[20px] w-[20px] text-violet-300"
+            width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           >
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
@@ -87,8 +87,19 @@ const categories = ["All", ...new Set(socials.map((s) => s.category))];
               >
                 <!-- Icon + platform -->
                 <div class="flex items-start gap-4 mb-3">
-                  <div class="flex-shrink-0 w-11 h-11 rounded-xl bg-[#252525] border border-white/[0.08] flex items-center justify-center">
-                    <span class="text-lg font-bold text-white/80">{social.platform.charAt(0)}</span>
+                  <div class="flex-shrink-0 w-11 h-11 overflow-hidden rounded-xl bg-[#252525] border border-white/[0.08] flex items-center justify-center">
+                    <img
+                      src={`https://cdn.simpleicons.org/${encodeURIComponent(social.icon || social.platform.toLowerCase())}/ffffff`}
+                      alt={`${social.platform} logo`}
+                      width="24"
+                      height="24"
+                      loading="lazy"
+                      decoding="async"
+                      class="h-7 w-7 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                      onerror={`this.style.display='none';this.nextElementSibling.classList.remove('hidden')`}
+                    />
+                    <!-- Letter fallback: shown if the CDN image 404s / is offline / slug is dead -->
+                    <span class="hidden text-lg font-bold text-white/80">{social.platform.charAt(0)}</span>
                   </div>
                   <div class="min-w-0 flex-1">
                     <p class="text-[15px] font-semibold text-white leading-tight truncate">{social.platform}</p>

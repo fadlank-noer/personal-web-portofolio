@@ -8,10 +8,6 @@ import PageTopBar from "../components/ui/PageTopBar.astro";
 import { libraryItems } from '../data/library';
 
 const imageCount = libraryItems.filter(i => i.type === 'image').length;
-
-// Notion card config
-const notionCardUrl = 'https://temporal-direction-036.notion.site/Shared-Contents-38008fb6d653800a8b29f2c634d72677?pvs=74';
-const notionCardLabel = 'want to see more? my public Notion collection is here';
 ---
 
 <html lang="en">
@@ -27,7 +23,7 @@ const notionCardLabel = 'want to see more? my public Notion collection is here';
       <main class="flex flex-1 flex-col min-w-0 bg-black overflow-y-auto chat-scrollbar">
         <!-- Top bar -->
         <PageTopBar title="Library">
-          <LibraryIcon slot="icon" class="h-[19px] w-[19px] text-violet-500 [&_path]:!stroke-current" />
+          <LibraryIcon slot="icon" class="h-[22px] w-[22px] text-violet-300 [&_path]:!stroke-current" />
           <div slot="badge" class="ml-1 flex items-center gap-1.5">
             <span class="rounded-full bg-[#1a1a1a] border border-white/[0.06] px-2 py-0.5 text-[11px] font-[500] text-zinc-400">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 20 20" fill="none" class="inline mr-1"><rect x="2" y="3" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.33"/><circle cx="8" cy="7.5" r="1.5" stroke="currentColor" stroke-width="1.33"/></svg>{imageCount} {imageCount === 1 ? 'item' : 'items'}
@@ -39,35 +35,6 @@ const notionCardLabel = 'want to see more? my public Notion collection is here';
         </PageTopBar>
 
         <div class="w-full px-3 py-4 md:px-6 md:py-8">
-          <!-- Notion-style card (always visible, NOT part of masonry) -->
-          <a
-            href={notionCardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-link-trigger
-            data-link-url={notionCardUrl}
-            data-link-label={notionCardLabel}
-            class="group relative flex flex-col items-center justify-center gap-4 rounded-[14px] border-2 border-[#37352f] bg-[#fbfaf8] p-6 mb-4 transition-all duration-200 hover:shadow-[0_4px_24px_-4px_rgba(55,53,47,0.25)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#37352f]/40 min-h-[200px]"
-          >
-            <!-- Notion logo (local PNG) inside a dark-outlined box -->
-            <div class="flex h-14 w-14 items-center justify-center rounded-[10px] bg-white border-2 border-[#37352f] overflow-hidden">
-              <img
-                src="/assets/notion-app-logo.png"
-                alt="Notion"
-                width="48"
-                height="48"
-                class="w-full h-full object-contain"
-              />
-            </div>
-            <div class="flex flex-col items-center gap-1 text-center">
-              <span class="text-[13px] font-semibold text-[#37352f] leading-snug">Public Notion Collection</span>
-              <span class="text-[12px] text-[#787774] leading-snug">{notionCardLabel}</span>
-            </div>
-            <div class="rounded-[6px] bg-[#37352f] border border-[#37352f] px-3 py-1.5 text-[12px] font-medium text-white shadow-sm transition-all duration-200 group-hover:bg-[#2a2925]">
-              Buka Notion
-            </div>
-          </a>
-
           <!-- Masonry grid — populated by JS -->
           <div
             id="masonry-grid"
