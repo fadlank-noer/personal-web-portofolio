@@ -16,7 +16,7 @@
     "@lucide/astro": "^1.25.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.2",
-    "astro-substack": "^0.1.3",
+    "astro-substack": "^0.2.1",
     "clsx": "^2.1.1",
     "nanostores": "^1.4.2",
     "tailwind-merge": "^3.6.0",

@@ -32,6 +32,11 @@ jobs:
           SUBSTACK_PUBLICATION_URL: ${{ secrets.SUBSTACK_PUBLICATION_URL || 'https://fadlansthought.substack.com/' }}
           SUBSTACK_LIMIT: ${{ secrets.SUBSTACK_LIMIT || '10' }}
           SUBSTACK_SORT: ${{ secrets.SUBSTACK_SORT || 'new' }}
+          # GitHub Actions runner IPs are 403-challenged by Substack's
+          # Cloudflare on direct fetches, so route through the Pages Function
+          # proxy of the astro-substack-static test site (needs
+          # astro-substack >= 0.2.0 for the proxyBaseUrl option).
+          SUBSTACK_PROXY_URL: https://astro-substack-static.pages.dev/api/archive
         run: npm run build
 
       - name: Ensure Cloudflare Pages project exists
