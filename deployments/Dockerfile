@@ -3,6 +3,13 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# .env is excluded by .dockerignore, so the Substack prebuild config comes in
+# as build args (defaults match the repo .env; override with --build-arg).
+ARG SUBSTACK_PUBLICATION_URL=https://fadlansthought.substack.com/
+ARG SUBSTACK_LIMIT=10
+ENV SUBSTACK_PUBLICATION_URL=${SUBSTACK_PUBLICATION_URL} \
+    SUBSTACK_LIMIT=${SUBSTACK_LIMIT}
+
 # Copy package files and install deps
 COPY package*.json ./
 RUN npm ci

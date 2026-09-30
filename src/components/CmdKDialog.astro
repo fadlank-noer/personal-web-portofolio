@@ -3,7 +3,7 @@
  * CmdKDialog — accessible Cmd+K command palette
  *
  * Trigger: #sidebar-search button (Sidebar.astro) OR global Cmd/Ctrl+K shortcut.
- * Data: recents[] from sidebar.json, normalized to CmdKItem via window.__CMDK_DATA__.
+ * Data: recents fetched from Substack at build time (src/lib/substack.ts), normalized to CmdKItem via window.__CMDK_DATA__.
  * Search: AND order-free ILIKE (case-insensitive substring, all tokens must match).
  * Highlight: matched chars wrapped in <mark class="cmdk-highlight"> (underline via CSS).
  * Keyboard: ↑/↓ navigate, Enter select, Esc close, Cmd/Ctrl+K toggle.
@@ -14,8 +14,7 @@
  *   Light (data-theme="light"): bg-white, border-black/10, black text — for CV pages
  */
 
-import sidebarData from '../data/sidebar.json';
-import type { SidebarData, RecentItem } from '../lib/types/sidebar';
+import { getSubstackRecents } from '../lib/substack';
 import type { CmdKItem } from '../lib/types/cmdk';
 
 interface Props {
@@ -23,15 +22,14 @@ interface Props {
 }
 const { theme = 'dark' } = Astro.props;
 
-// Normalize sidebar.json recents to CmdKItem[]
-const raw = sidebarData as SidebarData;
-const cmdItems: CmdKItem[] = (raw.recents ?? []).map((item: RecentItem) => ({
+// Normalize Substack recents (fetched at build time) to CmdKItem[]
+const cmdItems: CmdKItem[] = (await getSubstackRecents()).map((item) => ({
   id: item.id,
   title: item.title,
-  url: item.url ?? '',
-  source: item.source ?? '',
-  tag: item.tag ?? '',
-  time: item.time ?? '',
+  url: item.url,
+  source: item.source,
+  tag: item.tag,
+  time: item.time,
 }));
 
 // Serialize to JSON for inline script (no define:vars + import pattern)

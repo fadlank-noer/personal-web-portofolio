@@ -52,7 +52,6 @@ export interface RecentItem {
 
 export interface SidebarData {
   pinned: PinnedItem[];
-  recents: RecentItem[];
 }
 
 export type SidebarSectionKey = 'pinned' | 'recents' | 'chats';

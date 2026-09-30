@@ -19,16 +19,20 @@ import CmdKDialog from '../../../components/CmdKDialog.astro';
 
 import sidebarData from '../../../data/sidebar.json';
 import type { SidebarData } from '../../../lib/types/sidebar';
+import { getSubstackRecents } from '../../../lib/substack';
 
 interface Props { collapsed?: boolean; }
 const { collapsed = false } = Astro.props;
 const data = sidebarData as SidebarData;
+// Recents are fetched from Substack at build time (src/lib/substack.ts);
+// no fallback entries — an empty fetch renders an empty Recents section.
+const recents = await getSubstackRecents();
 ---
 
 <aside
   id="sidebar"
   data-collapsed={collapsed ? 'true' : 'false'}
-  data-recents-count={data.recents?.length ?? 0}
+  data-recents-count={recents.length}
   data-pinned-count={data.pinned?.length ?? 0}
   class="flex h-full flex-col bg-black transition-all duration-200 ease-in-out
          w-[75vw] max-w-[245px] md:w-[245px] md:max-w-[245px] min-[1920px]:w-[245px] min-[1920px]:max-w-[245px] flex-shrink-0
@@ -75,7 +79,7 @@ const data = sidebarData as SidebarData;
 
     <div data-sidebar-sections class="flex flex-1 flex-col min-h-0 overflow-y-auto chat-scrollbar px-2 py-1 pb-3 space-y-5 bg-black">
       <PinnedSection items={data.pinned} />
-      <RecentsSection items={data.recents} />
+      <RecentsSection items={recents} />
     </div>
 
     <div class="mt-auto border-t border-white/[0.06] bg-black sidebar-profile-separator">

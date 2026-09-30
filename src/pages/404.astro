@@ -4,6 +4,7 @@ import "src/styles/global.css";
 import Head from "src/layouts/Head.astro";
 import sidebarData from "../data/sidebar.json";
 import socialsData from "../data/socials.json";
+import { getSubstackRecents } from "../lib/substack";
 
 // TypeScript interfaces
 interface SidebarItem {
@@ -43,12 +44,15 @@ const socialsToItems = (items: SocialItem[]): MarqueeItem[] =>
     href: item.url,
   }));
 
+// Recents come from Substack (fetched at build time)
+const substackRecents = await getSubstackRecents();
+
 // Build 6-row marquee structure
 const dataRows: MarqueeRow[] = [
   // Row 1: pinned items (supplemented with hardcoded keywords if sparse)
   { items: (sidebarData.pinned.length > 0 ? sidebarToItems(sidebarData.pinned) : []).concat(hardcodedKeywords.slice(0, 4)) },
   // Row 2: recent items (supplemented with hardcoded keywords if sparse)
-  { items: (sidebarData.recents.length > 0 ? sidebarToItems(sidebarData.recents) : []).concat(hardcodedKeywords.slice(4)) },
+  { items: (substackRecents.length > 0 ? sidebarToItems(substackRecents) : []).concat(hardcodedKeywords.slice(4)) },
   // Rows 3-4: social media entries (3 per row)
   { items: socialsToItems(socialsData.slice(0, 3)) },
   { items: socialsToItems(socialsData.slice(3)) },

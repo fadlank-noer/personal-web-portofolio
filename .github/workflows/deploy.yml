@@ -25,6 +25,13 @@ jobs:
         run: npm run check
 
       - name: Build project
+        env:
+          # Prebuild (scripts/prebuild.mjs) fetches Substack posts before the
+          # static build. .env is gitignored, so CI gets these from repo
+          # secrets; the fallbacks match the local .env defaults.
+          SUBSTACK_PUBLICATION_URL: ${{ secrets.SUBSTACK_PUBLICATION_URL || 'https://fadlansthought.substack.com/' }}
+          SUBSTACK_LIMIT: ${{ secrets.SUBSTACK_LIMIT || '10' }}
+          SUBSTACK_SORT: ${{ secrets.SUBSTACK_SORT || 'new' }}
         run: npm run build
 
       - name: Ensure Cloudflare Pages project exists
