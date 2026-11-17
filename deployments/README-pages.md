@@ -6,7 +6,7 @@ Static Astro site (`output: "static"`), no Git integration, no Functions.
 | File | Role |
 |---|---|
 | `wrangler.json` (repo root) | Pages project config — `name` + `pages_build_output_dir`. Must stay at root (wrangler reads it from cwd). |
-| `deployments/deploy-pages.sh` | One-shot deploy: auth check → build → upload. |
+| `deployments/local-runner/deploy-pages.sh` | One-shot deploy: auth check → build → upload. |
 
 ## Why wrangler.json sits at repo root
 Wrangler discovers `wrangler.json` from the working directory only. Root placement
@@ -19,7 +19,7 @@ so keep `wrangler.json` at the repo root.
 ## First-time setup
 ```bash
 npx wrangler login        # once; opens browser
-bash deployments/deploy-pages.sh
+bash deployments/local-runner/deploy-pages.sh
 ```
 First deploy auto-creates the Pages project named in `wrangler.json`
 (`fadlan-portfolio`). Production branch defaults to `main` (settable only via

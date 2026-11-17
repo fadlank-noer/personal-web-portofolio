@@ -21,7 +21,7 @@ FROM nginx:alpine AS production
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY --from=build /build/dist  /usr/share/nginx/html
-COPY deployments/nginx.conf   /etc/nginx/conf.d/default.conf
+COPY deployments/local-development/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

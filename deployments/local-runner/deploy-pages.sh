@@ -3,17 +3,17 @@
 # Cloudflare Pages Direct Upload deploy (wrangler.json-driven)
 # Project: personal-web-portofolio (Astro 7 static)
 #
-# Config source of truth: ../wrangler.json at repo root
+# Config source of truth: ../../wrangler.json at repo root
 #   - name: fadlan-portfolio          (Pages project name)
 #   - pages_build_output_dir: dist    (build output; lets us omit the dir arg)
 #
-# Usage: bash deployments/deploy-pages.sh  (run from anywhere)
+# Usage: bash deployments/local-runner/deploy-pages.sh  (run from anywhere)
 # First run needs auth:  npx wrangler login   (or set CLOUDFLARE_API_TOKEN)
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
-# Always run from repo root (script lives in deployments/)
-cd "$(dirname "$0")/.."
+# Always run from repo root (script lives in deployments/local-runner/)
+cd "$(dirname "$0")/../.."
 
 # --- 1. Auth pre-check (wrangler whoami exits 0 even when logged out!) -----
 if ! npx wrangler whoami 2>&1 | grep -qi "account ID\|@"; then

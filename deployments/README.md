@@ -3,17 +3,35 @@
 This project ships two deploy paths. Both build the same static `dist/` output
 (`npm run build`).
 
+## Layout
+
+```
+deployments/
+├── README.md            (this file — overview of both deploy paths)
+├── README-pages.md      (Cloudflare Pages deploy guide)
+├── local-runner/        (scripts you run by hand from this machine)
+│   └── deploy-pages.sh  (one-shot Cloudflare Pages deploy)
+└── local-development/   (local Docker preview of the built static site)
+    ├── Dockerfile
+    ├── Dockerfile.multi
+    ├── nginx.conf
+    └── docker-compose.yml
+```
+
+## 1. Local Docker preview (nginx SPA)
+
 ## 1. Local Docker preview (nginx SPA)
 
 Used to catch build / route / asset bugs locally **before** deploying to Cloudflare.
 
 ```bash
-docker compose -f deployments/docker-compose.yml up --build -d
+docker compose -f deployments/local-development/docker-compose.yml up --build -d
 # open http://localhost:3000
-docker compose -f deployments/docker-compose.yml down
+docker compose -f deployments/local-development/docker-compose.yml down
 ```
 
-Files: `Dockerfile`, `Dockerfile.multi`, `nginx.conf`, `docker-compose.yml`.
+Files (all in `deployments/local-development/`): `Dockerfile`, `Dockerfile.multi`,
+`nginx.conf`, `docker-compose.yml`.
 
 ## 2. Cloudflare Pages — Direct Upload (wrangler)
 
@@ -58,9 +76,9 @@ Notes:
 `podman compose` works directly:
 
 ```bash
-podman compose -f deployments/docker-compose.yml up --build -d
+podman compose -f deployments/local-development/docker-compose.yml up --build -d
 # open http://localhost:3000
-podman compose -f deployments/docker-compose.yml down
+podman compose -f deployments/local-development/docker-compose.yml down
 ```
 
 (The `Dockerfile.multi` build args carry the Substack prebuild config, since

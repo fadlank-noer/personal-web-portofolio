@@ -1,8 +1,8 @@
 services:
   web:
     build:
-      context: ..
-      dockerfile: deployments/Dockerfile.multi
+      context: ../..
+      dockerfile: deployments/local-development/Dockerfile.multi
     image: web-portofolio:local
     ports:
       - "3000:80"

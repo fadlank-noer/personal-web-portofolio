@@ -1,7 +1,7 @@
 {
   "name": "personal-web-portofolio",
   "type": "module",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scripts": {
     "dev": "npm run prebuild && astro dev",
     "prebuild": "node scripts/prebuild.mjs",
@@ -16,7 +16,7 @@
     "@lucide/astro": "^1.25.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.2",
-    "astro-substack": "^0.2.1",
+    "astro-substack": "^0.4.1",
     "clsx": "^2.1.1",
     "nanostores": "^1.4.2",
     "tailwind-merge": "^3.6.0",

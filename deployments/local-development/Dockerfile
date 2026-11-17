@@ -30,7 +30,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy custom nginx SPA config
-COPY deployments/nginx.conf /etc/nginx/conf.d/default.conf
+COPY deployments/local-development/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80
 EXPOSE 80
